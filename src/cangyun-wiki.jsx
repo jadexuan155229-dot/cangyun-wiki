@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE } from "./cangyun-data";
 import { serif, T, useNarrow } from "./theme";
 import { parseRoute, routeHash } from "./router";
+import { FLAT } from "./novel";
 import NovelReader from "./novel-reader";
 
 /* ============================================================
@@ -152,7 +153,7 @@ function dimAccent(hex, grayT, darkT, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function DetailPanel({ c, onClose, onOpenChar }) {
+function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
   const [showAll, setShowAll] = useState(false);
   /* Esc 關閉：與文庫批注卡對齊；hook 須居早退之前，開啟時方掛監聽 */
   useEffect(() => {
@@ -161,6 +162,20 @@ function DetailPanel({ c, onClose, onOpenChar }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [c, onClose]);
+  /* 見於文庫：正文以本名精確計數（表字、別號短而易誤中，不入檢索）；
+     僅列有命中之章。正文隨構建打包，全量掃描僅開檔案時一算 */
+  const mentions = useMemo(() => {
+    if (!c) return [];
+    const out = [];
+    for (const f of FLAT) {
+      const text = f.ch.text;
+      if (!text) continue;
+      let n = 0, at = 0;
+      while ((at = text.indexOf(c.name, at)) !== -1) { n += 1; at += c.name.length; }
+      if (n > 0) out.push({ f, n });
+    }
+    return out;
+  }, [c]);
   if (!c) return null;
   const related = EVENTS.filter((e) => e.chars.includes(c.id)).sort(sortEvents);
   const co = {};
@@ -392,6 +407,22 @@ function DetailPanel({ c, onClose, onOpenChar }) {
           </div>
         ) : (
           <div style={{ marginTop: 24, fontSize: 13, color: T.faint, fontFamily: serif }}>事件庫中暫無此人繫年條目。</div>
+        )}
+
+        {mentions.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <SectionLabel>見於文庫（本名計數）</SectionLabel>
+            <div className="flex flex-wrap" style={{ gap: 8 }}>
+              {mentions.map(({ f, n }) => (
+                <button key={f.path} onClick={() => { setShowAll(false); onOpenNovel(f.path); }}
+                  style={{ fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer", textAlign: "left" }}>
+                  <span style={{ color: T.faint }}>【{f.novel.tag}】</span>
+                  {f.group ? `${f.group.title} · ` : ""}{f.ch.title}
+                  <span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{n} 处</span>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
         </div>
       </div>
@@ -1801,7 +1832,8 @@ export default function CangyunWiki() {
         {tab === "novel" && <NovelReader path={route.novelPath} onNav={(p, replace) => nav({ novelPath: p }, replace)} />}
       </main>
 
-      <DetailPanel c={openChar} onClose={() => setOpenChar(null)} onOpenChar={setOpenChar} />
+      <DetailPanel c={openChar} onClose={() => setOpenChar(null)} onOpenChar={setOpenChar}
+        onOpenNovel={(p) => nav({ tab: "novel", novelPath: p })} />
     </div>
   );
 }

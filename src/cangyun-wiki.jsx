@@ -163,19 +163,38 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [c, onClose]);
   /* 見於文庫：正文以本名精確計數（表字、別號短而易誤中，不入檢索）；
-     僅列有命中之章。正文隨構建打包，全量掃描僅開檔案時一算 */
-  const mentions = useMemo(() => {
+     僅列有命中之章。正文隨構建打包，全量掃描僅開檔案時一算。
+     按「線（·卷）」聚合為可展開塊——屬卷之章歸【線·卷】，散章歸【線】，
+     同線可並出兩塊（卷與散章於目錄本同級）；塊上僅標章數，處數在章 chip */
+  const mentionGroups = useMemo(() => {
     if (!c) return [];
-    const out = [];
+    const groups = [];
+    const byKey = {};
     for (const f of FLAT) {
       const text = f.ch.text;
       if (!text) continue;
       let n = 0, at = 0;
       while ((at = text.indexOf(c.name, at)) !== -1) { n += 1; at += c.name.length; }
-      if (n > 0) out.push({ f, n });
+      if (n === 0) continue;
+      const key = f.group ? `${f.novel.id}/${f.group.id}` : f.novel.id;
+      if (!byKey[key]) {
+        byKey[key] = { key, label: f.group ? `${f.novel.tag}·${f.group.title}` : f.novel.tag, chapters: [] };
+        groups.push(byKey[key]);
+      }
+      byKey[key].chapters.push({ f, n });
     }
-    return out;
+    return groups;
   }, [c]);
+  /* 塊展開態：可多開，默認全收；換人自動全收 */
+  const [openGroups, setOpenGroups] = useState(() => new Set());
+  useEffect(() => { setOpenGroups(new Set()); }, [c]);
+  const toggleGroup = (k) =>
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
   if (!c) return null;
   const related = EVENTS.filter((e) => e.chars.includes(c.id)).sort(sortEvents);
   const co = {};
@@ -409,19 +428,32 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
           <div style={{ marginTop: 24, fontSize: 13, color: T.faint, fontFamily: serif }}>事件庫中暫無此人繫年條目。</div>
         )}
 
-        {mentions.length > 0 && (
+        {mentionGroups.length > 0 && (
           <div style={{ marginTop: 24 }}>
             <SectionLabel>見於文庫（本名計數）</SectionLabel>
-            <div className="flex flex-wrap" style={{ gap: 8 }}>
-              {mentions.map(({ f, n }) => (
-                <button key={f.path} onClick={() => { setShowAll(false); onOpenNovel(f.path); }}
-                  style={{ fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer", textAlign: "left" }}>
-                  <span style={{ color: T.faint }}>【{f.novel.tag}】</span>
-                  {f.group ? `${f.group.title} · ` : ""}{f.ch.title}
-                  <span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{n} 处</span>
-                </button>
-              ))}
-            </div>
+            {mentionGroups.map((g) => {
+              const open = openGroups.has(g.key);
+              return (
+                <div key={g.key} style={{ marginBottom: 6 }}>
+                  <button onClick={() => toggleGroup(g.key)}
+                    style={{ display: "block", textAlign: "left", fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
+                    <span style={{ color: T.accent, fontSize: 10, marginRight: 6 }}>{open ? "▾" : "▸"}</span>
+                    【{g.label}】
+                    <span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{g.chapters.length} 章</span>
+                  </button>
+                  {open && (
+                    <div className="flex flex-wrap" style={{ gap: 8, margin: "8px 0 10px 22px" }}>
+                      {g.chapters.map(({ f, n }) => (
+                        <button key={f.path} onClick={() => { setShowAll(false); onOpenNovel(f.path); }}
+                          style={{ fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
+                          {f.ch.title}<span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{n} 处</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
         </div>

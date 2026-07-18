@@ -8,6 +8,7 @@
    警告（exit 0）：可疑但站點尚能運行的問題。
    ============================================================ */
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS } from "../src/cangyun-data.js";
+import { CHAR_TERMS } from "../src/novel/char-terms.js";
 
 const errors = [];
 const warns = [];
@@ -74,6 +75,23 @@ for (const [id, list] of Object.entries(TRACK_SUPPLEMENTS)) {
   });
 }
 
+/* ---------- 文庫詞條 ---------- */
+const seenTerms = new Map(); /* term → 首見 id：同 term 重複即「同名」，須人工映射（見 docs/wenku-margin-note.md 待辦） */
+CHAR_TERMS.forEach((t, i) => {
+  const tag = `CHAR_TERMS[${i}]「${t.term || "?"}」`;
+  if (!t.term || typeof t.term !== "string") err(tag, "缺 term");
+  if (!charIds.has(t.id)) err(tag, `id 引用不存在的人物：${t.id}（批注卡將查無此人、點擊無效）`);
+  if (t.term) {
+    if (seenTerms.has(t.term)) err(tag, `term 重複（先見於 id: ${seenTerms.get(t.term)}）——同名人物須人工映射，不能並列詞條`);
+    else seenTerms.set(t.term, t.id);
+  }
+});
+/* 有 readerNote 而無詞條：接入只做了一半（正文名字不可點），提醒補 char-terms.js */
+const termIds = new Set(CHAR_TERMS.map((t) => t.id));
+for (const c of CHARACTERS) {
+  if (c.readerNote != null && !termIds.has(c.id)) warn(`CHARACTERS ${c.name}`, "有 readerNote 而無 CHAR_TERMS 詞條——正文名字不可點，接入未完成");
+}
+
 /* ---------- 地點 ---------- */
 const KINDS = new Set(["city", "sect", "region", "off"]);
 for (const [name, c] of Object.entries(LOC_COORDS)) {
@@ -87,7 +105,7 @@ for (const [name, c] of Object.entries(LOC_COORDS)) {
 for (const w of warns) console.log(`  ⚠ ${w}`);
 for (const e of errors) console.log(`  ✗ ${e}`);
 console.log(
-  `check-data：人物 ${CHARACTERS.length} · 事件 ${EVENTS.length} · 關係 ${RELATIONS.length} · 地點 ${Object.keys(LOC_COORDS).length} · 補點 ${Object.values(TRACK_SUPPLEMENTS).flat().length} —— ` +
+  `check-data：人物 ${CHARACTERS.length} · 事件 ${EVENTS.length} · 關係 ${RELATIONS.length} · 地點 ${Object.keys(LOC_COORDS).length} · 補點 ${Object.values(TRACK_SUPPLEMENTS).flat().length} · 詞條 ${CHAR_TERMS.length} —— ` +
   (errors.length ? `${errors.length} 錯` : "無錯") + (warns.length ? `，${warns.length} 警告` : "")
 );
 if (errors.length) process.exit(1);

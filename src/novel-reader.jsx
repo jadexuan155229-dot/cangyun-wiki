@@ -8,9 +8,16 @@ import { fc, CHARACTERS } from "./cangyun-data";
    文庫 · 正文閱讀器
    左：目錄（故事線可折疊，卷之下再折疊）；右：正文。
    章節繫於路由 #/novel/<線>/<章>[/<子章>]（props: path / onNav）；
-   閱讀位置另存 localStorage——初訪 #/novel 無章時回上次章節。
+   閱讀位置另存 localStorage——初訪 #/novel 無章時回上次章節及滾動處。
    ============================================================ */
 const POS_KEY = "cangyun-wenku-pos";
+const SCROLL_KEY = "cangyun-wenku-scroll"; /* { path, y }：章內滾動處，與章節位分鍵存 */
+const readSavedScroll = () => {
+  try {
+    const s = JSON.parse(localStorage.getItem(SCROLL_KEY) || "null");
+    return s && typeof s.path === "string" && typeof s.y === "number" ? s : null;
+  } catch { return null; }
+};
 const byPath = Object.fromEntries(FLAT.map((f) => [f.path, f]));
 const wc = (t) => (t ? t.replace(/\s/g, "").length : 0);
 
@@ -209,10 +216,11 @@ export default function NovelReader({ path, onNav }) {
   const sel = path && byPath[path] ? path : null;
   /* 初訪 #/novel 無章：回上次閱讀處（replace 寫入不佔歷史，後退不折返）；
      繪製前替換，不閃目錄頁。僅掛載時恢復——後退回 #/novel 目錄頁不得再彈回 */
+  const restoreScrollTo = useRef(null); /* 回章之路徑：該章首渲染後恢復滾動處（分享鏈接直入不恢復，從頁首起） */
   useLayoutEffect(() => {
     if (!sel) {
       const s = localStorage.getItem(POS_KEY);
-      if (s && byPath[s]) onNav(s, true);
+      if (s && byPath[s]) { restoreScrollTo.current = s; onNav(s, true); }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -254,6 +262,31 @@ export default function NovelReader({ path, onNav }) {
 
   useEffect(() => {
     if (sel) localStorage.setItem(POS_KEY, sel);
+  }, [sel]);
+  /* 滾動處恢復：僅回章那一次（restoreScrollTo 一致方行），正文渲染後定位 */
+  useEffect(() => {
+    if (!sel || restoreScrollTo.current !== sel) return;
+    restoreScrollTo.current = null;
+    const s = readSavedScroll();
+    if (s && s.path === sel) window.scrollTo({ top: s.y, behavior: "auto" });
+  }, [sel]);
+  /* 滾動處保存：節流 200ms；離章（清理時窗口尚在舊章滾動處）與 pagehide 各補記一次 */
+  useEffect(() => {
+    if (!sel) return;
+    let t = null;
+    const save = () => {
+      t = null;
+      try { localStorage.setItem(SCROLL_KEY, JSON.stringify({ path: sel, y: Math.round(window.scrollY) })); } catch { /* 寫入失敗（私隱模式等）：靜默 */ }
+    };
+    const onScroll = () => { if (t == null) t = setTimeout(save, 200); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pagehide", save);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pagehide", save);
+      if (t != null) clearTimeout(t);
+      save();
+    };
   }, [sel]);
   /* 章節更替（含瀏覽器前進後退）：關批注（舊錨點座標隨正文更替失效）、展開所在線／卷 */
   useEffect(() => {

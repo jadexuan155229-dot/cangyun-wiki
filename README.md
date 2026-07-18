@@ -7,7 +7,7 @@
 - `#/chars` `#/timeline` `#/map` `#/network` `#/community` `#/novel` —— 六个页签
 - `#/chars/minfangcheng`、`#/timeline/lvdingyi` —— 第二段为打开的人物档案（文库页签除外）
 - `#/novel/shengfeng/menqiang/m1` —— 文库章节：线 / 章（有卷则 线 / 卷 / 子章）
-- `#/novel` 不带章节时自动回到上次阅读位置
+- `#/novel` 不带章节时自动回到上次阅读位置（章节及滚动处；分享出去的章节链接则总是从页首开始）
 
 ## 自动打开开发服务
 

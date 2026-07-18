@@ -154,6 +154,13 @@ function dimAccent(hex, grayT, darkT, alpha) {
 
 function DetailPanel({ c, onClose, onOpenChar }) {
   const [showAll, setShowAll] = useState(false);
+  /* Esc 關閉：與文庫批注卡對齊；hook 須居早退之前，開啟時方掛監聽 */
+  useEffect(() => {
+    if (!c) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [c, onClose]);
   if (!c) return null;
   const related = EVENTS.filter((e) => e.chars.includes(c.id)).sort(sortEvents);
   const co = {};

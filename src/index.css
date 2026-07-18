@@ -1,0 +1,400 @@
+body {
+  margin: 0;
+}
+
+.flex {
+  display: flex;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.items-center {
+  align-items: center;
+}
+.items-baseline {
+  align-items: baseline;
+}
+.justify-center {
+  justify-content: center;
+}
+.fixed {
+  position: fixed;
+}
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* 門派底紋：對應門派人物的檔案詳情卡渲染（cangyun-wiki.jsx DetailPanel）。
+   須置於詳情卡不滾動的外層（overflow: hidden 裁切邊緣溢出），
+   正文滾動層 z-index: 1 在其上，故不遮字、不擋關閉鈕與印章。 */
+.faction-watermark {
+  position: absolute;
+  aspect-ratio: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+/* 蒼雲：以圖片 alpha 作 mask、青灰鐵色染色，深色底上比原灰圖更清晰。
+   矮視口中按卡片高度等比縮小以保完整：圖案本體止於圖幅 86%，
+   top 16% 不變 + max-height 93% 使圖案下緣落在卡高約 96% 處（同天策、明教） */
+.faction-watermark--cangyun {
+  width: 690px;
+  max-height: 93%;
+  right: -85px;
+  top: 16%;
+  background-color: #6f7f8f;
+  -webkit-mask: url("/images/cangyun-mark.webp") center / contain no-repeat;
+  mask: url("/images/cangyun-mark.webp") center / contain no-repeat;
+  opacity: 0.065;
+}
+/* 天策：與蒼雲同為 alpha mask + 單色染色（偏暖鐵灰），紅圖直出在深底上不穩定故棄用。
+   紋樣實際約佔圖幅寬 55%，故 800px 圖幅使可見紋樣約 440px，
+   佔 700px 詳情卡約六成寬、主體完整、居中偏右。 */
+/* 矮視口中按卡片高度等比縮小以保完整：圖案本體止於圖幅 84%，
+   top 8% + max-height 104% 使圖案下緣落在卡高約 96% 處（同明教的處理） */
+.faction-watermark--tiance {
+  width: 800px;
+  max-height: 104%;
+  right: -120px;
+  top: 8%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/tiance-mark.webp") center / contain no-repeat;
+  mask: url("/images/tiance-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 明教：圖案佔幅與天策相近（寬約 55%），故複用天策的灰度參數。
+   火焰圖形偏高，矮視口中按卡片高度等比縮小以保完整；圖案本體止於圖幅 83%，
+   top 8% + max-height 106% 恰使圖案下緣落在卡高約 96% 處，框底裁掉的只是
+   透明留白。mask contain 置中等比縮放，任何情況下不變形。 */
+.faction-watermark--mingjiao {
+  width: 800px;
+  max-height: 106%;
+  right: -120px;
+  top: 8%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/mingjiao-mark.webp") center / contain no-repeat;
+  mask: url("/images/mingjiao-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 霸刀：灰度參數同天策、明教。圖案較寬（約佔圖幅 63%），框寬按比例縮至 700px
+   使可見紋樣與他派相當；圖案本體止於圖幅 80%，top 8% + max-height 110%
+   使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--badao {
+  width: 700px;
+  max-height: 110%;
+  right: -75px; /* 圖案右緣弧線較他派更靠右，多收 30px 以避開滾動條 */
+  top: 8%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/badao-mark.webp") center / contain no-repeat;
+  mask: url("/images/badao-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 長歌：灰度參數同前。琴形纖長（寬僅約佔圖幅 33%），本體止於圖幅 83%。
+   較他派整體偏右偏下放置，並以 scaleY 輕微縱向拉伸增纖長感；
+   max-height 100% 配合 top 12% 與拉伸後圖案下緣仍留 ~3% 卡高餘量 */
+.faction-watermark--changge {
+  width: 800px;
+  max-height: 100%;
+  right: -155px;
+  top: 12%;
+  transform: scaleY(1.06);
+  background-color: #847A74;
+  -webkit-mask: url("/images/changge-mark.webp") center / contain no-repeat;
+  mask: url("/images/changge-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 凌雪閣：灰度參數同前。圖案幾乎撐滿圖幅（寬約 67%、豎向 6%–95%，留白極少），
+   故框格整體縮小：640px 框使可見紋樣與他派相當；
+   top 16% + max-height 84% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--lingxuege {
+  width: 640px;
+  max-height: 84%;
+  right: -85px;
+  top: 16%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/lingxuege-mark.webp") center / contain no-repeat;
+  mask: url("/images/lingxuege-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 萬花：灰度參數同前。花鳥紋佔幅與天策相近（寬約 55%、本體止於圖幅 85%），
+   沿用標準框格，top 8% + max-height 103% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--wanhua {
+  width: 800px;
+  max-height: 103%;
+  right: -120px;
+  top: 8%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/wanhua-mark.webp") center / contain no-repeat;
+  mask: url("/images/wanhua-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 七秀：灰度參數同前。扇形橫寬豎扁（寬約佔圖幅 75%、豎向僅 27%–71%），
+   框格縮至 580px 並放低（top 21%），扇面落於卡片中下部偏右 */
+.faction-watermark--qixiu {
+  width: 580px;
+  max-height: 75%;
+  right: -20px;
+  top: 21%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/qixiu-mark.webp") center / contain no-repeat;
+  mask: url("/images/qixiu-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 純陽：灰度參數同前。陰陽圓紋緻密（寬約 57%、豎向 21%–79%），
+   750px 框 + top 10% + max-height 95%，圓心約落在卡高 58% 處 */
+.faction-watermark--chunyang {
+  width: 750px;
+  max-height: 95%;
+  right: -100px;
+  top: 10%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/chunyang-mark.webp") center / contain no-repeat;
+  mask: url("/images/chunyang-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 丐幫：灰度參數同前。酒葫蘆（寬約 59%、本體止於圖幅 80%），
+   720px 框，top 8% + max-height 110% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--gaibang {
+  width: 640px;
+  max-height: 102%;
+  right: -60px;
+  top: 14%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/gaibang-mark.webp") center / contain no-repeat;
+  mask: url("/images/gaibang-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 蓬萊：灰度參數同前。圓形波紋幾乎撐滿圖幅（寬高均約 80%，同凌雪閣情形），
+   框格縮至 550px；top 11% + max-height 94% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--penglai {
+  width: 550px;
+  max-height: 84%;
+  right: -5px;
+  top: 20%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/penglai-mark.webp") center / contain no-repeat;
+  mask: url("/images/penglai-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 藏劍：灰度參數同前。劍形豎長（寬約 49%、本體止於圖幅 86%），
+   沿用標準框格，top 8% + max-height 102% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--cangjian {
+  width: 800px;
+  max-height: 102%;
+  right: -120px;
+  top: 8%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/cangjian-mark.webp") center / contain no-repeat;
+  mask: url("/images/cangjian-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 唐門：灰度參數同前。面具紋豎長（寬約 52%、本體止於圖幅 86%），
+   沿用標準框格，top 8% + max-height 102% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--tangmen {
+  width: 750px;
+  max-height: 97%;
+  right: -130px;
+  top: 12%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/tangmen-mark.webp") center / contain no-repeat;
+  mask: url("/images/tangmen-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 五毒：灰度參數同前。薔薇圓紋緻密（寬約 61%、豎向 19%–79%），
+   形態同純陽一類，700px 緊湊框 + top 10% + max-height 95% */
+.faction-watermark--wudu {
+  width: 650px;
+  max-height: 90%;
+  right: -75px;
+  top: 13%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/wudu-mark.webp") center / contain no-repeat;
+  mask: url("/images/wudu-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 少林：灰度參數同前。書法「佛」字（寬約 49%、本體止於圖幅 82%），
+   框格同唐門，top 12% + max-height 102% 使圖案下緣落在卡高約 96% 處 */
+.faction-watermark--shaolin {
+  width: 750px;
+  max-height: 102%;
+  right: -130px;
+  top: 12%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/shaolin-mark.webp") center / contain no-repeat;
+  mask: url("/images/shaolin-mark.webp") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 藥宗：葉焰紋極高（豎向 4%–91%，寬約 54%），框格縮至 600px。
+   此圖為多色圖案，內部紋路靠色塊分界而非鏤空表達——mask 只取 alpha
+   會壓成整塊剪影，故此派例外地用灰度化圖片直出以保留內部層次；
+   opacity 略高於他派補償灰階分散後的整體強度 */
+.faction-watermark--yaozong {
+  width: 600px;
+  max-height: 87%;
+  right: -40px;
+  top: 16%;
+  background: url("/images/yaozong-mark.webp") center / contain no-repeat;
+  /* 自定義灰度（濾鏡定義見 cangyun-wiki.jsx 水印層內的 #yaozong-tone）：
+     藍通道負權重使中心黃芽（≈1.0）亮於白線（≈0.8），黃形輪廓可辨；
+     外圍翠綠（≈0.46）、淺綠（≈0.69）維持原有深淺關係 */
+  filter: url(#yaozong-tone);
+  opacity: 0.09;
+}
+/* 衍天宗：灰度參數同前。星環紋幾乎撐滿圖幅（寬約 80%、豎向 8%–93%），
+   框格縮至 490px；top 12% + max-height 90%（原圖為 PNG） */
+.faction-watermark--yantianzong {
+  width: 460px;
+  max-height: 73%;
+  right: 60px;
+  top: 28%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/yantianzong-mark.png") center / contain no-repeat;
+  mask: url("/images/yantianzong-mark.png") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 萬靈：灰度參數同前。鳳鳥紋幾乎撐滿圖幅（寬約 83%、豎向 8%–95%，
+   原圖 1557×1516 非正方 PNG，contain 自適配）；框格縮至 520px */
+.faction-watermark--wanling {
+  width: 490px;
+  max-height: 78%;
+  right: 25px;
+  top: 23%;
+  background-color: #847A74;
+  -webkit-mask: url("/images/wanling.png") center / contain no-repeat;
+  mask: url("/images/wanling.png") center / contain no-repeat;
+  opacity: 0.08;
+}
+/* 段氏：火焰扇形橫寬豎扁（寬約佔圖幅 94%、豎向 11%–80%），460px 小框
+   放於卡片中下部偏右（原圖僅 200×200，放大後邊緣略軟，暗紋下可接受）。
+   扇內紅紋、銀白漸變與黑色分隔均靠色差表達，mask 會壓成剪影，
+   故同藥宗以灰度化圖片直出：銀白 ≈0.85、紅 ≈0.32、黑線近底色，層次自然分離 */
+.faction-watermark--duanshi {
+  width: 460px;
+  max-height: 86%;
+  right: 45px;
+  top: 27%;
+  background: url("/images/duanshi-mark.png") center / contain no-repeat;
+  filter: grayscale(1);
+  opacity: 0.09;
+}
+
+/* 人物檔案卡網格（cangyun-wiki.jsx 檔案頁）：桌面首屏恰容三整行。
+   行距須由此處聲明（內聯 gap 會壓過媒體查詢），列距 14 仍在組件內聯。
+   網格頂緣距頁頂約 287px（表頭 ~124 + 主欄上內距 28 + 兩行門派籤 ~78 + 檢索行 ~52，
+   實測值，隨字體度量有 ±4px 浮動）。首屏多餘縱向空間由行距與卡高各擔一半：
+   桌面視口下行距放寬至 29、行最小高取 (100vh − 361px)/3（= 頂緣 287 +
+   行距 29×3 − 下探 13），使第三行下緣收在首屏下緣之上約 16px（整卡連底線
+   完整可見）、第四行頂緣落在首屏之下約 13px。
+   卡片自然高（~122px）更高時 minmax 以內容為準，行不會被壓縮。
+   僅限常用桌面視口（寬 ≥1024、高 ≤960）；窄窗、移動端維持原 14px 行距與
+   自然緊湊排布，超高視口（>960px）本可完整容納更多行，亦不作拉伸。 */
+.char-grid {
+  row-gap: 14px;
+}
+@media (min-width: 1024px) and (max-height: 960px) {
+  .char-grid {
+    row-gap: 29px;
+    grid-auto-rows: minmax(calc((100vh - 361px) / 3), auto);
+  }
+}
+
+/* 一字品評印章：白文小印，輕度鈐印效果。
+   底色由組件內聯 backgroundColor 提供（T.seal）；印泥肌理集中在 ::before，
+   便於小印整體減弱；文字層 z-index 高於其上。
+   邊緣缺口用多層 mask 挖去小圓，按 data-size 分大小兩套（sm 更輕、遠離四角），
+   舊瀏覽器不支持 mask-composite 時自然退化為完整方印。 */
+.seal-stamp {
+  position: relative;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  font-weight: 700;
+}
+/* 印面肌理：兩三處不規則深淺 + 細小露底空隙 + 一道淡擦痕（無規則條紋） */
+.seal-stamp::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.1em 0.7em at 30% 24%, rgba(118, 38, 52, 0.44), transparent 70%),
+    radial-gradient(0.8em 0.9em at 76% 70%, rgba(112, 36, 48, 0.36), transparent 72%),
+    radial-gradient(0.5em 0.35em at 60% 34%, rgba(198, 96, 110, 0.2), transparent 75%),
+    radial-gradient(0.14em 0.1em at 80% 30%, rgba(24, 17, 20, 0.4), transparent 90%),
+    radial-gradient(0.11em 0.09em at 24% 70%, rgba(24, 17, 20, 0.32), transparent 90%),
+    radial-gradient(0.09em 0.08em at 50% 86%, rgba(24, 17, 20, 0.26), transparent 90%),
+    linear-gradient(112deg, transparent 45%, rgba(28, 18, 22, 0.18) 48%, rgba(28, 18, 22, 0.18) 51%, transparent 55%);
+}
+/* 小印肌理：僅三塊低頻、不規則的淺斑，無空隙點與擦痕，不干擾白字 */
+.seal-stamp[data-size="sm"]::before {
+  background-image:
+    radial-gradient(1.2em 0.9em at 32% 30%, rgba(118, 38, 52, 0.3), transparent 72%),
+    radial-gradient(0.9em 1em at 74% 72%, rgba(112, 36, 48, 0.24), transparent 75%),
+    radial-gradient(0.6em 0.45em at 58% 40%, rgba(198, 96, 110, 0.14), transparent 78%);
+}
+/* 大印邊緣缺口：六處小斷口，避開四角、左右不對稱 */
+.seal-stamp[data-size="lg"] {
+  -webkit-mask-image:
+    radial-gradient(0.14em 0.09em at 30% 0%, #000 96%, transparent),
+    radial-gradient(0.08em 0.07em at 72% 0%, #000 96%, transparent),
+    radial-gradient(0.08em 0.12em at 100% 42%, #000 96%, transparent),
+    radial-gradient(0.12em 0.08em at 58% 100%, #000 96%, transparent),
+    radial-gradient(0.07em 0.07em at 22% 100%, #000 96%, transparent),
+    radial-gradient(0.07em 0.1em at 0% 58%, #000 96%, transparent),
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: destination-out, destination-out, destination-out, destination-out, destination-out, destination-out, source-over;
+  mask-image:
+    radial-gradient(0.14em 0.09em at 30% 0%, #000 96%, transparent),
+    radial-gradient(0.08em 0.07em at 72% 0%, #000 96%, transparent),
+    radial-gradient(0.08em 0.12em at 100% 42%, #000 96%, transparent),
+    radial-gradient(0.12em 0.08em at 58% 100%, #000 96%, transparent),
+    radial-gradient(0.07em 0.07em at 22% 100%, #000 96%, transparent),
+    radial-gradient(0.07em 0.1em at 0% 58%, #000 96%, transparent),
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+/* 小印邊緣缺口：四處更小的斷口，居邊中段 */
+.seal-stamp[data-size="sm"] {
+  -webkit-mask-image:
+    radial-gradient(0.1em 0.07em at 34% 0%, #000 96%, transparent),
+    radial-gradient(0.06em 0.09em at 100% 55%, #000 96%, transparent),
+    radial-gradient(0.09em 0.06em at 62% 100%, #000 96%, transparent),
+    radial-gradient(0.05em 0.08em at 0% 38%, #000 96%, transparent),
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: destination-out, destination-out, destination-out, destination-out, source-over;
+  mask-image:
+    radial-gradient(0.1em 0.07em at 34% 0%, #000 96%, transparent),
+    radial-gradient(0.06em 0.09em at 100% 55%, #000 96%, transparent),
+    radial-gradient(0.09em 0.06em at 62% 100%, #000 96%, transparent),
+    radial-gradient(0.05em 0.08em at 0% 38%, #000 96%, transparent),
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+/* 白字刻入感：緊貼字緣的暗色壓痕 + 極細同色描邊增厚筆畫（此為大印參數） */
+.seal-stamp-ch {
+  position: relative;
+  z-index: 1;
+  -webkit-text-stroke: 0.008em rgba(231, 226, 214, 0.9);
+  text-shadow:
+    0 0 0.026em rgba(56, 15, 23, 0.3),
+    0.03em 0.04em 0.03em rgba(56, 15, 23, 0.35),
+    -0.02em -0.02em 0.02em rgba(122, 44, 58, 0.4);
+}
+/* 小印：描邊與刻入感整體更輕，優先字形清楚利落 */
+.seal-stamp[data-size="sm"] .seal-stamp-ch {
+  -webkit-text-stroke: 0.006em rgba(231, 226, 214, 0.9);
+  text-shadow:
+    0 0 0.016em rgba(56, 15, 23, 0.18),
+    0.03em 0.04em 0.03em rgba(56, 15, 23, 0.24),
+    -0.02em -0.02em 0.02em rgba(122, 44, 58, 0.28);
+}
+/* 變體 B：輕隸意。優先平台隸/隸變字體（macOS: Baoli/Libian，Windows: LiSu/STLiti），
+   缺字時退回楷、再退回 A 的宋系棧，保證 15px 下不糊 */
+.seal-stamp--li {
+  font-family: "Baoli SC", "Libian SC", "LiSu", "STLiti", "Kaiti SC", "STKaiti", "KaiTi",
+    "Noto Serif SC", "Songti SC", "SimSun", serif;
+  font-weight: 700;
+}

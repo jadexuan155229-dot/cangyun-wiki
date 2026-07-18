@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE } from "./cangyun-data";
 import { serif, T, useNarrow } from "./theme";
+import { parseRoute, routeHash } from "./router";
 import NovelReader from "./novel-reader";
 
 /* ============================================================
@@ -1706,10 +1707,29 @@ function GeoMap({ onOpenChar }) {
 
 /* ---------------- 主應用 ---------------- */
 export default function CangyunWiki() {
-  const [tab, setTab] = useState("chars");
+  /* 路由：哈希為唯一事實源（見 router.js 體例）。寫入即改哈希，
+     hashchange（含瀏覽器前進後退）回灌 state；nav 同步 setHash 一份，
+     免事件異步間隙內連續導航取到舊值——事件再至時值相同，React 自行免渲染 */
+  const [hash, setHash] = useState(() => window.location.hash);
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const route = useMemo(() => parseRoute(hash), [hash]);
+  const nav = (patch, replace = false) => {
+    const h = routeHash({ ...route, ...patch });
+    if (h === hash) return;
+    setHash(h);
+    if (replace) window.history.replaceState(null, "", h);
+    else window.location.hash = h;
+  };
+  const tab = route.tab;
+  const openChar = route.char ? byId[route.char] || null : null; /* 壞 id 鏈接：不開彈窗、不作報錯 */
+  const setTab = (k) => nav({ tab: k });
+  const setOpenChar = (c) => nav({ char: c ? c.id : null });
   const [faction, setFaction] = useState("全部");
   const [q, setQ] = useState("");
-  const [openChar, setOpenChar] = useState(null);
 
   const factions = ["全部", ...new Set(CHARACTERS.flatMap((c) => c.belong))];
   const shown = CHARACTERS.filter(
@@ -1771,7 +1791,7 @@ export default function CangyunWiki() {
         {tab === "network" && <Planetary onOpenChar={setOpenChar} />}
         {tab === "map" && <GeoMap onOpenChar={setOpenChar} />}
         {tab === "community" && <Community onOpenChar={setOpenChar} />}
-        {tab === "novel" && <NovelReader />}
+        {tab === "novel" && <NovelReader path={route.novelPath} onNav={(p, replace) => nav({ novelPath: p }, replace)} />}
       </main>
 
       <DetailPanel c={openChar} onClose={() => setOpenChar(null)} onOpenChar={setOpenChar} />

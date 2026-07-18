@@ -6,7 +6,8 @@ import { fc, CHARACTERS } from "./cangyun-data";
 /* ============================================================
    文庫 · 正文閱讀器
    左：目錄（故事線可折疊，卷之下再折疊）；右：正文。
-   閱讀位置存 localStorage，重開自動回到上次章節。
+   章節繫於路由 #/novel/<線>/<章>[/<子章>]（props: path / onNav）；
+   閱讀位置另存 localStorage——初訪 #/novel 無章時回上次章節。
    ============================================================ */
 const POS_KEY = "cangyun-wenku-pos";
 const byPath = Object.fromEntries(FLAT.map((f) => [f.path, f]));
@@ -206,18 +207,24 @@ function MarginNote({ peek, bodyColRef, onClose }) {
   );
 }
 
-export default function NovelReader() {
+export default function NovelReader({ path, onNav }) {
   const narrow = useNarrow();
-  const [sel, setSel] = useState(() => {
-    const s = localStorage.getItem(POS_KEY);
-    return s && byPath[s] ? s : null;
-  });
-  /* 初始折疊：僅展開上次閱讀所在之線（及卷） */
+  /* 章節由路由派生（#/novel/…，見 router.js）；壞路徑同無章 */
+  const sel = path && byPath[path] ? path : null;
+  /* 初訪 #/novel 無章：回上次閱讀處（replace 寫入不佔歷史，後退不折返）；
+     繪製前替換，不閃目錄頁。僅掛載時恢復——後退回 #/novel 目錄頁不得再彈回 */
+  useLayoutEffect(() => {
+    if (!sel) {
+      const s = localStorage.getItem(POS_KEY);
+      if (s && byPath[s]) onNav(s, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  /* 初始折疊：僅展開當前章所在之線（及卷）；此後隨章節更替增開（見 sel 效應） */
   const [expanded, setExpanded] = useState(() => {
     const next = new Set();
-    const s = localStorage.getItem(POS_KEY);
-    if (s && byPath[s]) {
-      const p = s.split("/");
+    if (sel) {
+      const p = sel.split("/");
       next.add(p[0]);
       if (p.length === 3) next.add(`${p[0]}/${p[1]}`);
     }
@@ -252,6 +259,18 @@ export default function NovelReader() {
   useEffect(() => {
     if (sel) localStorage.setItem(POS_KEY, sel);
   }, [sel]);
+  /* 章節更替（含瀏覽器前進後退）：關批注（舊錨點座標隨正文更替失效）、展開所在線／卷 */
+  useEffect(() => {
+    setPeek(null);
+    if (!sel) return;
+    const p = sel.split("/");
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      next.add(p[0]);
+      if (p.length === 3) next.add(`${p[0]}/${p[1]}`);
+      return next;
+    });
+  }, [sel]);
 
   const toggle = (key) =>
     setExpanded((prev) => {
@@ -259,17 +278,10 @@ export default function NovelReader() {
       next.has(key) ? next.delete(key) : next.add(key);
       return next;
     });
-  /* 選章 = 展開所在線／卷 + 收抽屜 + 回頁首（自檢索結果入章時不回頁首，改滾至命中處） */
+  /* 選章 = 寫路由 + 收抽屜 + 回頁首（自檢索結果入章時不回頁首，改滾至命中處）；
+     展開線／卷與關批注繫於 sel 效應，瀏覽器前進後退同得 */
   const jump = (path, toTop = true) => {
-    setPeek(null); /* 換章即關批注：舊錨點座標隨正文更替失效 */
-    const p = path.split("/");
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      next.add(p[0]);
-      if (p.length === 3) next.add(`${p[0]}/${p[1]}`);
-      return next;
-    });
-    setSel(path);
+    onNav(path);
     setTocOpen(false);
     if (toTop) window.scrollTo({ top: 0, behavior: "smooth" });
   };

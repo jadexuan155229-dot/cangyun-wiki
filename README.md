@@ -1,5 +1,14 @@
 # 苍云 Wiki
 
+## 链接体例（哈希路由）
+
+页签、打开的人物档案、文库章节都写入网址，可直接分享、刷新不丢、浏览器前进后退可用：
+
+- `#/chars` `#/timeline` `#/map` `#/network` `#/community` `#/novel` —— 六个页签
+- `#/chars/minfangcheng`、`#/timeline/lvdingyi` —— 第二段为打开的人物档案（文库页签除外）
+- `#/novel/shengfeng/menqiang/m1` —— 文库章节：线 / 章（有卷则 线 / 卷 / 子章）
+- `#/novel` 不带章节时自动回到上次阅读位置
+
 ## 自动打开开发服务
 
 使用 VS Code 打开这个项目文件夹时，项目会自动运行开发服务器，终端里会显示可点击的网页链接：

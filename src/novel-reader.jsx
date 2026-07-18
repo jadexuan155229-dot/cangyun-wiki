@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from "react";
 import { serif, T, useNarrow } from "./theme";
 import { NOVELS, FLAT } from "./novel";
+import { CHAR_TERMS, scanCharTerms } from "./novel/char-terms";
 import { fc, CHARACTERS } from "./cangyun-data";
 
 /* ============================================================
@@ -13,10 +14,10 @@ const POS_KEY = "cangyun-wenku-pos";
 const byPath = Object.fromEntries(FLAT.map((f) => [f.path, f]));
 const wc = (t) => (t ? t.replace(/\s/g, "").length : 0);
 
-/* 角色名點選（原型僅「高垣」）：只在純文本片段內精確匹配、拆分文本節點渲染，
+/* 角色名點選：詞條與識別邏輯在 novel/char-terms.js（多詞條遍歷、長詞優先）。
+   只在純文本片段內精確匹配、拆分文本節點渲染，
    不觸碰檢索高亮命中段與段落結構；命中處化為可點 span——默認同正文，
    hover／鍵盤聚焦／批注打開時現門派色細虛下劃線，點擊或 Enter/Space 開右側頁邊批注 */
-const CHAR_TERMS = [{ term: "高垣", id: "gaoyuan" }];
 /* 各角色強調色：取首屬門派之 fc 色（高垣→凌雪閣凝血玄絳），經 --char-accent 注入 CSS */
 const TERM_ACCENT = Object.fromEntries(
   CHAR_TERMS.map(({ id }) => {
@@ -25,25 +26,20 @@ const TERM_ACCENT = Object.fromEntries(
   })
 );
 function splitCharTerms(s, keyBase, onCharClick, activeKey) {
-  const { term, id } = CHAR_TERMS[0];
-  if (!s.includes(term)) return s;
-  const out = [];
-  let at = 0, p;
-  while ((p = s.indexOf(term, at)) !== -1) {
-    if (p > at) out.push(s.slice(at, p));
-    const k = `${keyBase}@${p}`;
-    out.push(
+  const segs = scanCharTerms(s);
+  if (!segs) return s;
+  return segs.map((g) => {
+    if (g.text != null) return g.text;
+    const k = `${keyBase}@${g.at}`;
+    return (
       <span key={k} className={`nvl-char${activeKey === k ? " nvl-char--open" : ""}`}
-        role="button" tabIndex={0} style={{ "--char-accent": TERM_ACCENT[id] }}
-        onClick={(e) => onCharClick(id, k, e.currentTarget)}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCharClick(id, k, e.currentTarget); } }}>
-        {term}
+        role="button" tabIndex={0} style={{ "--char-accent": TERM_ACCENT[g.id] }}
+        onClick={(e) => onCharClick(g.id, k, e.currentTarget)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCharClick(g.id, k, e.currentTarget); } }}>
+        {g.term}
       </span>
     );
-    at = p + term.length;
-  }
-  if (at < s.length) out.push(s.slice(at));
-  return out;
+  });
 }
 
 /* 正文體例：一行一段，段首縮進兩字；空行為節間距

@@ -12,7 +12,8 @@
 | 文件 | 职责 |
 |---|---|
 | `src/cangyun-data.js` | 人物数据，含批注专用字段 `readerNote` |
-| `src/novel-reader.jsx` | 名字识别（`CHAR_TERMS`）、批注卡（`MarginNote`）、引导线 |
+| `src/novel/char-terms.js` | 词条表（`CHAR_TERMS`）与识别逻辑（`scanCharTerms`，纯函数、可 Node 测试） |
+| `src/novel-reader.jsx` | 命中段渲染（`splitCharTerms`）、批注卡（`MarginNote`）、引导线 |
 
 ## 给新人物增补批注：两步
 
@@ -31,18 +32,19 @@ readerNote: "【文库旁批待补】",
 - 占位文案统一 `"【文库旁批待补】"`；
 - 不动 `F()`；完整档案页 DetailPanel 不读取此字段，完全不受影响。
 
-### 第二步 · 识别层（novel-reader.jsx）
+### 第二步 · 识别层（src/novel/char-terms.js）
 
-正文可点的名字来自硬编码的 `CHAR_TERMS`：
+正文可点的名字来自 `CHAR_TERMS` 词条表：
 
 ```js
-const CHAR_TERMS = [{ term: "高垣", id: "gaoyuan" }];
+export const CHAR_TERMS = [
+  { term: "高垣", id: "gaoyuan" },
+];
 ```
-> 当前版本虽然 `CHAR_TERMS` 是数组，但 `splitCharTerms` 仍只读取第 1 项。
-> 在完成多词条遍历前，直接追加第二个人物不会真正生效。
+
 追加一项即可：`term` 为正文中的精确字符串，`id` 对应 CHARACTERS 条目。门派强调色自动经 `TERM_ACCENT` 从该人物 `belong[0]` + `fc()` 派生，无需另外配置。
 
-> 注意：当前 `splitCharTerms` 只处理 `CHAR_TERMS[0]`，接入第二个人物时需将其改为遍历全部词条。
+多词条遍历已支持（2026-07）：每步取最早命中处、等位取最长词（长名不被短名吞掉，如「陆危」「陆危楼」并存时三字名处必识别为「陆危楼」）。同名人物的人工映射/上下文区分尚未实现，见后续待办。
 
 ### 无需改动的部分
 
@@ -71,9 +73,7 @@ const CHAR_TERMS = [{ term: "高垣", id: "gaoyuan" }];
 
 ## 后续待办
 
-- [ ] `splitCharTerms` 支持多词条遍历
+- [x] `splitCharTerms` 支持多词条遍历（2026-07：抽出 `scanCharTerms` 纯函数，长词优先已内建）
 - [ ] 全量人物自动识别（含同名/子串冲突处理）
-- [ ] 多词条识别时：
-  - 按 `term` 长度降序匹配，优先长词，避免短名吞掉长名；
-  - 同名人物需使用人工映射或上下文区分，不能只靠字符串匹配。
+- [ ] 同名人物需使用人工映射或上下文区分，不能只靠字符串匹配
 - [ ] 可选：是否接入完整档案入口；当前设计暂不需要。

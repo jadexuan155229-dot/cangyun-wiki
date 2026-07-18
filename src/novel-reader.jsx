@@ -21,6 +21,30 @@ const readSavedScroll = () => {
 const byPath = Object.fromEntries(FLAT.map((f) => [f.path, f]));
 const wc = (t) => (t ? t.replace(/\s/g, "").length : 0);
 
+/* ---------------- 閱讀設置 ----------------
+   字號五擋、行距三擋（無單位倍數，隨字號等比）、底色兩主題；存 localStorage。
+   素紙僅作用於正文紙面（正文欄＋翻頁按鈕）——章題、目錄、頁頭維持全站深色 */
+const VIEW_KEY = "cangyun-wenku-view";
+const FS_STEPS = [13.5, 14.5, 15.5, 17, 18.5];
+const LH_STEPS = [["紧", 1.8], ["常", 2.1], ["疏", 2.4]];
+const VIEW_DEFAULT = { fs: 2, lh: 1, theme: "dark" };
+const readView = () => {
+  try {
+    const v = JSON.parse(localStorage.getItem(VIEW_KEY) || "null") || {};
+    return {
+      fs: Number.isInteger(v.fs) && v.fs >= 0 && v.fs < FS_STEPS.length ? v.fs : VIEW_DEFAULT.fs,
+      lh: Number.isInteger(v.lh) && v.lh >= 0 && v.lh < LH_STEPS.length ? v.lh : VIEW_DEFAULT.lh,
+      theme: v.theme === "paper" ? "paper" : "dark",
+    };
+  } catch { return { ...VIEW_DEFAULT }; }
+};
+/* 素紙色板：宣紙暖白配深墨，僅正文紙面之用 */
+const PAPER = { bg: "#E9E1CF", ink: "#2E2A24", muted: "#6B6353", faint: "#8A8070", line: "#CFC5AE" };
+/* 設置浮卡條目樣式 */
+const rowLabel = { fontFamily: serif, fontSize: 11, color: T.faint, letterSpacing: "0.2em", minWidth: 34 };
+const chipBtn = (active) => ({ fontFamily: serif, fontSize: 12, color: active ? T.ink : T.muted, background: active ? T.panelHi : "none", border: `1px solid ${active ? T.accent : T.line}`, borderRadius: 3, padding: "2px 10px", cursor: "pointer" });
+const stepBtn = (dis) => ({ fontFamily: serif, fontSize: 11.5, color: dis ? T.faint : T.ink, background: "none", border: `1px solid ${T.line}`, borderRadius: 3, padding: "2px 7px", cursor: dis ? "default" : "pointer", opacity: dis ? 0.5 : 1 });
+
 /* 角色名點選：詞條與識別邏輯在 novel/char-terms.js（多詞條遍歷、長詞優先）。
    只在純文本片段內精確匹配、拆分文本節點渲染，
    不觸碰檢索高亮命中段與段落結構；命中處化為可點 span——默認同正文，
@@ -52,9 +76,9 @@ function splitCharTerms(s, keyBase, onCharClick, activeKey) {
 /* 正文體例：一行一段，段首縮進兩字；空行為節間距
    hl：檢索關鍵詞——命中處以淺橘紅半透明底標出（拆分文本節點渲染，不用 innerHTML）；
    firstHitRef：全文首個命中 span 之 ref，供檢索結果點入後平滑滾動定位 */
-function Body({ text, hl, firstHitRef, onCharClick, activeCharKey }) {
+function Body({ text, hl, firstHitRef, onCharClick, activeCharKey, fs = 15.5, lh = 2.1, pal = T }) {
   if (!text) {
-    return <div style={{ fontFamily: serif, fontSize: 14, color: T.faint, padding: "36px 0", letterSpacing: "0.15em" }}>正文待錄。</div>;
+    return <div style={{ fontFamily: serif, fontSize: 14, color: pal.faint, padding: "36px 0", letterSpacing: "0.15em" }}>正文待錄。</div>;
   }
   const out = [];
   let gap = false;
@@ -80,7 +104,7 @@ function Body({ text, hl, firstHitRef, onCharClick, activeCharKey }) {
       content = seg;
     }
     out.push(
-      <p key={i} style={{ fontFamily: serif, fontSize: 15.5, color: T.ink, lineHeight: 2.1, margin: gap ? "1.5em 0 0" : "0.4em 0 0", textIndent: "2em" }}>{content}</p>
+      <p key={i} style={{ fontFamily: serif, fontSize: fs, color: pal.ink, lineHeight: lh, margin: gap ? "1.5em 0 0" : "0.4em 0 0", textIndent: "2em" }}>{content}</p>
     );
     gap = false;
   });
@@ -108,7 +132,7 @@ const noteInk = (hex, lift = 0.25, alpha = 0.5) => {
   const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(v + (255 - v) * lift));
   return `rgba(${c[0]},${c[1]},${c[2]},${alpha})`;
 };
-function MarginNote({ peek, bodyColRef, onClose }) {
+function MarginNote({ peek, bodyColRef, onClose, paper }) {
   const c = CHARACTERS.find((x) => x.id === peek.id);
   const cardRef = useRef(null);
   const [pos, setPos] = useState(null); /* { left, top, leader, dotTop }；null = 隱身量高中 */
@@ -159,6 +183,8 @@ function MarginNote({ peek, bodyColRef, onClose }) {
 
   if (!c) return null;
   const accent = TERM_ACCENT[peek.id] || T.accent;
+  /* 引導線／圓點：深底提白防沉沒；素紙上提白反致線淡，改門派原色微透 */
+  const lineInk = noteInk(accent, paper ? 0 : 0.25, paper ? 0.7 : 0.5);
   /* 批注文案：人工編輯之 readerNote 優先、原樣不截斷（長度作者自控，卡有 maxHeight+內滾兜底）；
      缺此字段則回退 profile「官职身份」段摘要 */
   const note = (c.readerNote || "").trim();
@@ -170,14 +196,14 @@ function MarginNote({ peek, bodyColRef, onClose }) {
       {pos && pos.leader && (
         <div aria-hidden="true" style={{
           position: "fixed", left: pos.leader.x, top: pos.leader.y, width: pos.leader.w, height: 1,
-          background: `repeating-linear-gradient(90deg, ${noteInk(accent)} 0 3px, transparent 3px 6px)`,
+          background: `repeating-linear-gradient(90deg, ${lineInk} 0 3px, transparent 3px 6px)`,
           pointerEvents: "none", zIndex: 29, animation: "nvl-note-in .18s ease-out",
         }} />
       )}
       {pos && pos.dotTop != null && (
         <div aria-hidden="true" style={{
           position: "fixed", left: pos.left - 2, top: pos.top + pos.dotTop, width: 5, height: 5,
-          borderRadius: "50%", background: noteInk(accent), pointerEvents: "none", zIndex: 31,
+          borderRadius: "50%", background: lineInk, pointerEvents: "none", zIndex: 31,
           animation: "nvl-note-in .18s ease-out",
         }} />
       )}
@@ -235,6 +261,27 @@ export default function NovelReader({ path, onNav }) {
     return next;
   });
   const [tocOpen, setTocOpen] = useState(false); /* 窄屏目錄抽屜 */
+  const [view, setView] = useState(readView); /* 閱讀設置：{ fs, lh, theme } */
+  const [viewOpen, setViewOpen] = useState(false); /* Aa 設置浮卡 */
+  const viewRef = useRef(null); /* Aa 按鈕＋浮卡之行容器：點外關閉判此界 */
+  const paper = view.theme === "paper";
+  const pal = paper ? PAPER : T;
+  useEffect(() => {
+    try { localStorage.setItem(VIEW_KEY, JSON.stringify(view)); } catch { /* 寫入失敗：靜默 */ }
+  }, [view]);
+  useEffect(() => {
+    if (!viewOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setViewOpen(false); };
+    const onDown = (e) => {
+      if (viewRef.current && e.target instanceof Element && !viewRef.current.contains(e.target)) setViewOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [viewOpen]);
   const [peek, setPeek] = useState(null); /* 頁邊批注（原型僅高垣）：{ id, key: 錨點span鍵, anchor: 點擊時視口矩形 } */
   const closePeek = useCallback(() => setPeek(null), []); /* 引用穩定：免批注卡監聽器隨父渲染反復掛卸 */
   const openPeek = useCallback((id, key, el) => {
@@ -288,9 +335,10 @@ export default function NovelReader({ path, onNav }) {
       save();
     };
   }, [sel]);
-  /* 章節更替（含瀏覽器前進後退）：關批注（舊錨點座標隨正文更替失效）、展開所在線／卷 */
+  /* 章節更替（含瀏覽器前進後退）：關批注（舊錨點座標隨正文更替失效）、關設置浮卡、展開所在線／卷 */
   useEffect(() => {
     setPeek(null);
+    setViewOpen(false);
     if (!sel) return;
     const p = sel.split("/");
     setExpanded((prev) => {
@@ -529,19 +577,61 @@ export default function NovelReader({ path, onNav }) {
                 : { borderTop: `1px solid ${T.line}`, marginTop: 16, marginLeft: -26, width: "calc(100% + 26px)", maxWidth: 1026 }} />
               {/* 正文主區：寬屏時以 1000（分隔線右端對齊基準）為界，正文欄在此界內水平置中，與靠左的標題各自獨立留邊 */}
               <div style={narrow ? undefined : { maxWidth: 1000 }}>
-                <div ref={bodyColRef} style={{ maxWidth: bodyMaxWidth, paddingTop: 22, ...(narrow ? null : { marginLeft: "auto", marginRight: "auto" }) }}>
-                  <Body text={cur.ch.text} hl={q.trim() || null} firstHitRef={firstHitEl} onCharClick={openPeek} activeCharKey={peek ? peek.key : null} />
+                {/* 素紙：正文欄與翻頁按鈕包一張紙面（寬＝正文欄＋兩側內邊距，行寬不隨主題變）；玄墨下此層無樣式 */}
+                <div style={paper ? {
+                  background: PAPER.bg, boxShadow: "0 2px 20px rgba(0,0,0,0.4)",
+                  padding: narrow ? "2px 16px 18px" : "2px 34px 24px",
+                  ...(narrow ? null : { maxWidth: bodyMaxWidth + 68, marginLeft: "auto", marginRight: "auto" }),
+                } : null}>
+                <div ref={bodyColRef} style={{ maxWidth: bodyMaxWidth, paddingTop: 16, ...(narrow || paper ? null : { marginLeft: "auto", marginRight: "auto" }) }}>
+                  {/* Aa 閱讀設置：行容器兼點外關閉判界；浮卡恆深色（浮於紙面之上，不隨主題） */}
+                  <div ref={viewRef} style={{ display: "flex", justifyContent: "flex-end", position: "relative", marginBottom: 4 }}>
+                    <button onClick={() => setViewOpen((o) => !o)} title="阅读设置"
+                      style={{ fontSize: 12, fontFamily: serif, color: pal.faint, background: "none", border: `1px solid ${pal.line}`, borderRadius: 3, padding: "2px 9px", cursor: "pointer" }}>
+                      Aa
+                    </button>
+                    {viewOpen && (
+                      <div style={{ position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 24, width: 236, background: T.panel, border: `1px solid ${T.line}`, boxShadow: "0 8px 28px rgba(0,0,0,0.45)", padding: "12px 14px 10px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={rowLabel}>字号</span>
+                          <button onClick={() => setView((v) => ({ ...v, fs: Math.max(0, v.fs - 1) }))} disabled={view.fs === 0} style={stepBtn(view.fs === 0)}>A−</button>
+                          <span style={{ fontSize: 9, letterSpacing: 3, color: T.muted, flex: 1, textAlign: "center" }}>
+                            {FS_STEPS.map((_, i) => (i <= view.fs ? "●" : "○")).join("")}
+                          </span>
+                          <button onClick={() => setView((v) => ({ ...v, fs: Math.min(FS_STEPS.length - 1, v.fs + 1) }))} disabled={view.fs === FS_STEPS.length - 1} style={stepBtn(view.fs === FS_STEPS.length - 1)}>A＋</button>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+                          <span style={rowLabel}>行距</span>
+                          {LH_STEPS.map(([name], i) => (
+                            <button key={name} onClick={() => setView((v) => ({ ...v, lh: i }))} style={chipBtn(view.lh === i)}>{name}</button>
+                          ))}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+                          <span style={rowLabel}>底色</span>
+                          {[["dark", "玄墨"], ["paper", "素纸"]].map(([k, name]) => (
+                            <button key={k} onClick={() => setView((v) => ({ ...v, theme: k }))} style={chipBtn(view.theme === k)}>{name}</button>
+                          ))}
+                        </div>
+                        <div style={{ textAlign: "right", marginTop: 10 }}>
+                          <button onClick={() => setView({ ...VIEW_DEFAULT })} style={{ fontSize: 11, fontFamily: serif, color: T.faint, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline dotted" }}>恢复默认</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <Body text={cur.ch.text} hl={q.trim() || null} firstHitRef={firstHitEl} onCharClick={openPeek} activeCharKey={peek ? peek.key : null}
+                    fs={FS_STEPS[view.fs]} lh={LH_STEPS[view.lh][1]} pal={pal} />
                 </div>
-                <div style={{ maxWidth: bodyMaxWidth, display: "flex", justifyContent: "space-between", gap: 12, borderTop: `1px solid ${T.line}`, marginTop: 44, paddingTop: 14, ...(narrow ? null : { marginLeft: "auto", marginRight: "auto" }) }}>
-                  {prevCh ? <button onClick={() => jump(prevCh.path)} style={navBtn}>‹ {navLabel(prevCh)}</button> : <span />}
-                  {nextCh ? <button onClick={() => jump(nextCh.path)} style={navBtn}>{navLabel(nextCh)} ›</button> : <span />}
+                <div style={{ maxWidth: bodyMaxWidth, display: "flex", justifyContent: "space-between", gap: 12, borderTop: `1px solid ${pal.line}`, marginTop: 44, paddingTop: 14, ...(narrow || paper ? null : { marginLeft: "auto", marginRight: "auto" }) }}>
+                  {prevCh ? <button onClick={() => jump(prevCh.path)} style={paper ? { ...navBtn, color: PAPER.muted, border: `1px solid ${PAPER.line}` } : navBtn}>‹ {navLabel(prevCh)}</button> : <span />}
+                  {nextCh ? <button onClick={() => jump(nextCh.path)} style={paper ? { ...navBtn, color: PAPER.muted, border: `1px solid ${PAPER.line}` } : navBtn}>{navLabel(nextCh)} ›</button> : <span />}
+                </div>
                 </div>
               </div>
             </div>
           )}
         </div>
       </div>
-      {peek && <MarginNote peek={peek} bodyColRef={bodyColRef} onClose={closePeek} />}
+      {peek && <MarginNote peek={peek} bodyColRef={bodyColRef} onClose={closePeek} paper={paper} />}
     </div>
   );
 }

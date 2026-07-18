@@ -1,14 +1,20 @@
 /* ============================================================
    文庫 · 角色名詞條 (char-terms.js)
-   正文中可點出頁邊批注的角色名。純數據＋純函數、零依賴——
-   識別邏輯（scanCharTerms）可於 Node 直接測試。
-   新人物接入流程見 docs/wenku-margin-note.md：此處加詞條，
-   cangyun-data.js 對應人物加 readerNote，即接入完成。
-   同名／子串衝突之人工映射俟後續（見文檔待辦）。
+   正文中可點出頁邊批注的角色名。詞條以本名自 CHARACTERS 全量
+   自動派生（2026-07 全量接入）——新人物入庫即自動可點，
+   readerNote 缺者批注卡自動回退官職身份摘要。
+   衝突防線：同名（term 重複）由 scripts/check-data.js 報錯攔下，
+   屆時以 TERM_EXCLUDE 摘除自動項、另立人工映射；正文誤中
+   常語之名（名恰為成詞者）亦以 TERM_EXCLUDE 摘除。
+   識別邏輯（scanCharTerms）純函數，可於 Node 直接測試。
+   維護流程見 docs/wenku-margin-note.md。
    ============================================================ */
-export const CHAR_TERMS = [
-  { term: "高垣", id: "gaoyuan" },
-];
+import { CHARACTERS } from "../cangyun-data.js";
+
+const TERM_EXCLUDE = new Set([]); /* 以人物 id 摘除，不參與正文識別 */
+export const CHAR_TERMS = CHARACTERS
+  .filter((c) => c.name && !TERM_EXCLUDE.has(c.id))
+  .map((c) => ({ term: c.name, id: c.id }));
 
 /* 長詞優先序：等位命中時長名先取，短名不吞長名（如有「陆危」「陆危楼」並存，
    「陆危楼」處必識別為三字名） */

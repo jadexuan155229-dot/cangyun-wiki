@@ -145,13 +145,16 @@ body {
   mask: url("/images/faction-marks/qixiu-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
-/* 岑荃：先以黑底版本隔离原图白底，再灰度化并以 screen 混合，保留团花内部明暗细节。 */
+/* 岑荃：黑底版本以 screen 混合，黑处自然透出，保留团花内部明暗细节——
+   故此纹独不走 mask（其余门派纹只取 alpha 作蒙版、颜色由 background-color 给）。
+   图已预先灰度化：filter 的 grayscale(1) 本就丢弃彩色，存灰度可省逾九成体积，
+   两者渲染结果一致，故 filter 保留不动（幂等）。 */
 .faction-watermark--cenquan {
   width: 580px;
   max-height: 84%;
   right: -45px;
   top: 21%;
-  background: url("/images/faction-marks/cenquan-mark-black.png") center / contain no-repeat;
+  background: url("/images/faction-marks/cenquan-mark-black.webp") center / contain no-repeat;
   filter: grayscale(1) contrast(0.9);
   mix-blend-mode: screen;
   opacity: 0.075;

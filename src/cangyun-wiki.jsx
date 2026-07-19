@@ -115,7 +115,7 @@ function Seal({ ch, size = 15, useSvg = false }) {
     return (
       <span className="seal-svg-shell" style={box} title="品评">
         <span style={{ fontSize: `${chScale}em`, visibility: "hidden" }}>{ch}</span>
-        <img className="seal-svg" src="/images/seals/lvdingyi-qiao.svg" alt=""
+        <img className="seal-svg" src={`${import.meta.env.BASE_URL}images/seals/lvdingyi-qiao.svg`} alt=""
           style={{ transform: `translateY(${SEAL_SVG_NUDGE_Y}px) scale(${sm ? SEAL_SVG_SCALE.sm : SEAL_SVG_SCALE.lg})` }} />
       </span>
     );

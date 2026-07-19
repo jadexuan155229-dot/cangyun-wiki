@@ -56,7 +56,10 @@
 - `vite.config.js` 设 `base: '/cangyun-wiki/'`：站点不在根域，资产须带此前缀，否则从根请求全部 404。index.html、CSS `url()`、Vite 处理的资产均由构建自动重写。
 - 唯一漏网是 `cangyun-wiki.jsx` 里印章 `img` 的硬编码 `src="/images/seals/…"`——JS 字符串字面量 Vite 不重写，改走 `import.meta.env.BASE_URL` 拼接。哈希路由不受子路径影响，无需 SPA rewrite。
 - 新增 `.github/workflows/deploy.yml`：`npm ci` + build 后经 `actions/upload-pages-artifact` 与 `deploy-pages` 发布 `dist`；`dist` 仍 gitignore，由 CI 现构建、不入库。首轮因新仓 Pages 未启用而失败，启用（源＝GitHub Actions）后重跑 build ✓ deploy ✓，线上入口／JS／CSS／三图 webp／印章 svg／favicon 抽验皆 200、类型正确。
-- **待办**：`og:image` 尚缺一张卡图，俟定图后补入 `index.html` 并验 OG 卡片。
+
+### og:image 分享卡
+
+补上分享到聊天／社交时的预览卡图（`index.html` 之 `og:image`、`twitter:card`）。取站点人物档案首页截图（2511×1143），等比缩至 1200 宽后置于 1200×630 深色画布、上下衬边 42px——衬色取截图自身背景 `#15181D`（恰为 `theme-color`），标题、整条导航、门派筛选条与人物卡尽收、无一裁切。产物 `public/og.png` 149 KB。`og:image` 用线上绝对 URL，另补 `og:url`、`twitter:card=summary_large_image` 与宽高。
 
 ---
 
@@ -76,7 +79,6 @@
 
 ## 待办
 
-- **og:image**：站点已上线（见上「上线 GitHub Pages」），尚缺一张分享卡图。定图后补入 `index.html` 的 `og:image`（须用线上绝对 URL），并以调试器验 OG 卡片。
 - **C2 正文按章懒加载**：等正文体量上来再做，连带把档案弹窗「見於文庫」的同步扫描改为异步（代码注释有提示）。
 - **`readerNote` 按人补写**：无此字段者回退为摘要，现状可用，不必赶工。
 

@@ -48,8 +48,8 @@ body {
   right: -85px;
   top: 16%;
   background-color: #6f7f8f;
-  -webkit-mask: url("/images/cangyun-mark.webp") center / contain no-repeat;
-  mask: url("/images/cangyun-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/cangyun-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/cangyun-mark.webp") center / contain no-repeat;
   opacity: 0.065;
 }
 /* 天策：與蒼雲同為 alpha mask + 單色染色（偏暖鐵灰），紅圖直出在深底上不穩定故棄用。
@@ -63,8 +63,8 @@ body {
   right: -120px;
   top: 8%;
   background-color: #847A74;
-  -webkit-mask: url("/images/tiance-mark.webp") center / contain no-repeat;
-  mask: url("/images/tiance-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/tiance-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/tiance-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 明教：圖案佔幅與天策相近（寬約 55%），故複用天策的灰度參數。
@@ -77,8 +77,8 @@ body {
   right: -120px;
   top: 8%;
   background-color: #847A74;
-  -webkit-mask: url("/images/mingjiao-mark.webp") center / contain no-repeat;
-  mask: url("/images/mingjiao-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/mingjiao-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/mingjiao-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 霸刀：灰度參數同天策、明教。圖案較寬（約佔圖幅 63%），框寬按比例縮至 700px
@@ -90,8 +90,8 @@ body {
   right: -75px; /* 圖案右緣弧線較他派更靠右，多收 30px 以避開滾動條 */
   top: 8%;
   background-color: #847A74;
-  -webkit-mask: url("/images/badao-mark.webp") center / contain no-repeat;
-  mask: url("/images/badao-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/badao-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/badao-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 長歌：灰度參數同前。琴形纖長（寬僅約佔圖幅 33%），本體止於圖幅 83%。
@@ -104,8 +104,8 @@ body {
   top: 12%;
   transform: scaleY(1.06);
   background-color: #847A74;
-  -webkit-mask: url("/images/changge-mark.webp") center / contain no-repeat;
-  mask: url("/images/changge-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/changge-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/changge-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 凌雪閣：灰度參數同前。圖案幾乎撐滿圖幅（寬約 67%、豎向 6%–95%，留白極少），
@@ -117,8 +117,8 @@ body {
   right: -85px;
   top: 16%;
   background-color: #847A74;
-  -webkit-mask: url("/images/lingxuege-mark.webp") center / contain no-repeat;
-  mask: url("/images/lingxuege-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/lingxuege-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/lingxuege-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 萬花：灰度參數同前。花鳥紋佔幅與天策相近（寬約 55%、本體止於圖幅 85%），
@@ -129,8 +129,8 @@ body {
   right: -120px;
   top: 8%;
   background-color: #847A74;
-  -webkit-mask: url("/images/wanhua-mark.webp") center / contain no-repeat;
-  mask: url("/images/wanhua-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/wanhua-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/wanhua-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 七秀：灰度參數同前。扇形橫寬豎扁（寬約佔圖幅 75%、豎向僅 27%–71%），
@@ -141,9 +141,20 @@ body {
   right: -20px;
   top: 21%;
   background-color: #847A74;
-  -webkit-mask: url("/images/qixiu-mark.webp") center / contain no-repeat;
-  mask: url("/images/qixiu-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/qixiu-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/qixiu-mark.webp") center / contain no-repeat;
   opacity: 0.08;
+}
+/* 岑荃：先以黑底版本隔离原图白底，再灰度化并以 screen 混合，保留团花内部明暗细节。 */
+.faction-watermark--cenquan {
+  width: 580px;
+  max-height: 84%;
+  right: -45px;
+  top: 21%;
+  background: url("/images/faction-marks/cenquan-mark-black.png") center / contain no-repeat;
+  filter: grayscale(1) contrast(0.9);
+  mix-blend-mode: screen;
+  opacity: 0.075;
 }
 /* 純陽：灰度參數同前。陰陽圓紋緻密（寬約 57%、豎向 21%–79%），
    750px 框 + top 10% + max-height 95%，圓心約落在卡高 58% 處 */
@@ -153,8 +164,8 @@ body {
   right: -100px;
   top: 10%;
   background-color: #847A74;
-  -webkit-mask: url("/images/chunyang-mark.webp") center / contain no-repeat;
-  mask: url("/images/chunyang-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/chunyang-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/chunyang-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 丐幫：灰度參數同前。酒葫蘆（寬約 59%、本體止於圖幅 80%），
@@ -165,8 +176,8 @@ body {
   right: -60px;
   top: 14%;
   background-color: #847A74;
-  -webkit-mask: url("/images/gaibang-mark.webp") center / contain no-repeat;
-  mask: url("/images/gaibang-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/gaibang-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/gaibang-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 蓬萊：灰度參數同前。圓形波紋幾乎撐滿圖幅（寬高均約 80%，同凌雪閣情形），
@@ -177,8 +188,8 @@ body {
   right: -5px;
   top: 20%;
   background-color: #847A74;
-  -webkit-mask: url("/images/penglai-mark.webp") center / contain no-repeat;
-  mask: url("/images/penglai-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/penglai-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/penglai-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 藏劍：灰度參數同前。劍形豎長（寬約 49%、本體止於圖幅 86%），
@@ -189,8 +200,8 @@ body {
   right: -120px;
   top: 8%;
   background-color: #847A74;
-  -webkit-mask: url("/images/cangjian-mark.webp") center / contain no-repeat;
-  mask: url("/images/cangjian-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/cangjian-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/cangjian-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 唐門：灰度參數同前。面具紋豎長（寬約 52%、本體止於圖幅 86%），
@@ -201,8 +212,8 @@ body {
   right: -130px;
   top: 12%;
   background-color: #847A74;
-  -webkit-mask: url("/images/tangmen-mark.webp") center / contain no-repeat;
-  mask: url("/images/tangmen-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/tangmen-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/tangmen-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 五毒：灰度參數同前。薔薇圓紋緻密（寬約 61%、豎向 19%–79%），
@@ -213,8 +224,8 @@ body {
   right: -75px;
   top: 13%;
   background-color: #847A74;
-  -webkit-mask: url("/images/wudu-mark.webp") center / contain no-repeat;
-  mask: url("/images/wudu-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/wudu-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/wudu-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 少林：灰度參數同前。書法「佛」字（寬約 49%、本體止於圖幅 82%），
@@ -225,8 +236,8 @@ body {
   right: -130px;
   top: 12%;
   background-color: #847A74;
-  -webkit-mask: url("/images/shaolin-mark.webp") center / contain no-repeat;
-  mask: url("/images/shaolin-mark.webp") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/shaolin-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/shaolin-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 藥宗：葉焰紋極高（豎向 4%–91%，寬約 54%），框格縮至 600px。
@@ -238,7 +249,7 @@ body {
   max-height: 87%;
   right: -40px;
   top: 16%;
-  background: url("/images/yaozong-mark.webp") center / contain no-repeat;
+  background: url("/images/faction-marks/yaozong-mark.webp") center / contain no-repeat;
   /* 自定義灰度（濾鏡定義見 cangyun-wiki.jsx 水印層內的 #yaozong-tone）：
      藍通道負權重使中心黃芽（≈1.0）亮於白線（≈0.8），黃形輪廓可辨；
      外圍翠綠（≈0.46）、淺綠（≈0.69）維持原有深淺關係 */
@@ -253,8 +264,8 @@ body {
   right: 60px;
   top: 28%;
   background-color: #847A74;
-  -webkit-mask: url("/images/yantianzong-mark.png") center / contain no-repeat;
-  mask: url("/images/yantianzong-mark.png") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/yantianzong-mark.png") center / contain no-repeat;
+  mask: url("/images/faction-marks/yantianzong-mark.png") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 萬靈：灰度參數同前。鳳鳥紋幾乎撐滿圖幅（寬約 83%、豎向 8%–95%，
@@ -265,8 +276,8 @@ body {
   right: 25px;
   top: 23%;
   background-color: #847A74;
-  -webkit-mask: url("/images/wanling.png") center / contain no-repeat;
-  mask: url("/images/wanling.png") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/wanling.png") center / contain no-repeat;
+  mask: url("/images/faction-marks/wanling.png") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 段氏：火焰扇形橫寬豎扁（寬約佔圖幅 94%、豎向 11%–80%），460px 小框
@@ -278,9 +289,19 @@ body {
   max-height: 86%;
   right: 45px;
   top: 27%;
-  background: url("/images/duanshi-mark.png") center / contain no-repeat;
+  background: url("/images/faction-marks/duanshi-mark.png") center / contain no-repeat;
   filter: grayscale(1);
   opacity: 0.09;
+}
+/* 唐軍：原圖為滿幅彩繪，灰度化並壓低對比與透明度，保留中央人物輪廓而淡化紅色及繁密邊飾。 */
+.faction-watermark--tangjun {
+  width: 532px;
+  max-height: 82%;
+  right: -18px;
+  top: 22%;
+  background: url("/images/faction-marks/tangjun-mark.webp") center / contain no-repeat;
+  filter: grayscale(1) contrast(0.82) brightness(0.94);
+  opacity: 0.075;
 }
 
 /* 人物檔案卡網格（cangyun-wiki.jsx 檔案頁）：桌面首屏恰容三整行。
@@ -397,4 +418,20 @@ body {
   font-family: "Baoli SC", "Libian SC", "LiSu", "STLiti", "Kaiti SC", "STKaiti", "KaiTi",
     "Noto Serif SC", "Songti SC", "SimSun", serif;
   font-weight: 700;
+}
+/* SVG 印章（單人物試驗：吕定仪）。外殼的寬高與基線由內部隱藏字撐出，與文字印章逐像素一致；
+   img 絕對定位鋪滿外殼，故其縮放與位移只影響觀感、不影響任何排版 */
+.seal-svg-shell {
+  position: relative;
+}
+.seal-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transform-origin: center;
+  pointer-events: none;
 }

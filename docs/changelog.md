@@ -2,7 +2,9 @@
 
 ## 2026-07-19
 
-本日两批改动，均已真机／桌面验过，`npm run lint` 与 `npm run build` 皆过。
+**当日里程碑：站点正式上线。** 部署至 GitHub Pages —— **<https://jadexuan155229-dot.github.io/cangyun-wiki/>** ，公网公开可访问、链接可直接分享（源码仓 `jadexuan155229-dot/cangyun-wiki` 一并公开），此后 `push main` 即自动重新部署。此前项目只在本机与 zip 之间流转，至此有了对外地址。
+
+本日各批改动均已真机／桌面验过，`npm run lint` 与 `npm run build` 皆过，分记如下。
 
 ### 三图触屏适配（`01132bc`）
 

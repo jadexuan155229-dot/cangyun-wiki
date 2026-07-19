@@ -40,6 +40,24 @@
 
 此前全部提交用的是占位邮箱 `jade@example.com`（`example.com` 是保留域名，并非真实地址），GitHub 无从据此认人。已改为 noreply 匿名署名，并把既有 14 个提交的 author 与 committer 一并重写。因尚未推送至任何远程，此举无副作用；内容与重写前逐文件比对为零差异，只动元数据。
 
+### 门派纹三图再瘦身（`8c69152`）
+
+上线前把现存最大的三张 PNG 一并转 WebP：
+
+- **衍天宗 393 → 56 KB、万灵 150 → 33 KB**：二者在 CSS 里作 `mask`，只吃 alpha 通道（注释所谓「mask 會壓成剪影」），故丢弃 RGB、仅存原 alpha 转 lossless WebP。alpha 逐像素与原 PNG 比对为零差异，剪影不变。
+- **段氏 29 → 6 KB**：作 `background` 且本就带 `filter: grayscale(1)`，同岑荃底纹之法，预先灰度后转 WebP，不改渲染。
+- 删去初始模板带入、全站零引用的社交图标 sprite `icons.svg`（bluesky/discord/github/x…）。`public/` 整个原样进 `dist`，未引用者照样发到线上。
+- `dist` 由约 1.8 MB 降至 **1.4 MB**。
+
+### 上线 GitHub Pages（`ea4ec2f`）
+
+站点部署至项目子路径站 **<https://jadexuan155229-dot.github.io/cangyun-wiki/>**，push `main` 即经 Actions 自动 build 并发布，往后改动自动上线。
+
+- `vite.config.js` 设 `base: '/cangyun-wiki/'`：站点不在根域，资产须带此前缀，否则从根请求全部 404。index.html、CSS `url()`、Vite 处理的资产均由构建自动重写。
+- 唯一漏网是 `cangyun-wiki.jsx` 里印章 `img` 的硬编码 `src="/images/seals/…"`——JS 字符串字面量 Vite 不重写，改走 `import.meta.env.BASE_URL` 拼接。哈希路由不受子路径影响，无需 SPA rewrite。
+- 新增 `.github/workflows/deploy.yml`：`npm ci` + build 后经 `actions/upload-pages-artifact` 与 `deploy-pages` 发布 `dist`；`dist` 仍 gitignore，由 CI 现构建、不入库。首轮因新仓 Pages 未启用而失败，启用（源＝GitHub Actions）后重跑 build ✓ deploy ✓，线上入口／JS／CSS／三图 webp／印章 svg／favicon 抽验皆 200、类型正确。
+- **待办**：`og:image` 尚缺一张卡图，俟定图后补入 `index.html` 并验 OG 卡片。
+
 ---
 
 ## 2026-07-18
@@ -58,8 +76,7 @@
 
 ## 待办
 
-- **C1 部署管道**：GitHub Pages 或 Cloudflare Pages 二选一，仓库公开或私有需一并定（Pages 免费版要求公开仓，Cloudflare 私有仓亦可）。上线后补 `og:image` 并验 OG 卡片。
-- **余下两张 PNG 可再压**：`yantianzong-mark.png`（393 KB）与 `wanling.png`（150 KB）仍是 PNG，为现存最大的两张图。二者都只作 `-webkit-mask` 用——蒙版只取 alpha 通道，色彩数据全属白费——转为 WebP 应能省下大半。（岑荃那张 1.71 MB 已于本日处理完毕。）
+- **og:image**：站点已上线（见上「上线 GitHub Pages」），尚缺一张分享卡图。定图后补入 `index.html` 的 `og:image`（须用线上绝对 URL），并以调试器验 OG 卡片。
 - **C2 正文按章懒加载**：等正文体量上来再做，连带把档案弹窗「見於文庫」的同步扫描改为异步（代码注释有提示）。
 - **`readerNote` 按人补写**：无此字段者回退为摘要，现状可用，不必赶工。
 

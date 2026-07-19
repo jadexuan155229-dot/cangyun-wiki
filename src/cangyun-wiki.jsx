@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE } from "./cangyun-data";
-import { serif, T, useNarrow } from "./theme";
+import { serif, T, useNarrow, useCoarsePointer } from "./theme";
 import { parseRoute, routeHash } from "./router";
 import { FLAT } from "./novel";
 import NovelReader from "./novel-reader";
@@ -944,6 +944,127 @@ function Timeline({ onOpenChar }) {
   );
 }
 
+/* ---------------- 圖幅縮放平移：滑鼠與觸屏共用 ---------------- */
+/* 三幅圖（行星、群像、輿地）共用。k 為倍率，t 為平移（viewBox 座標）。
+   k===1 時一概不接管手勢：touchAction 交還瀏覽器，單指仍可劃過圖幅翻頁，
+   放大須先按 ＋；k>1 後才吃掉手勢，做單指平移與雙指捏合（以兩指中點為錨）。 */
+function usePanZoom(w, h) {
+  const [view, setView] = useState({ k: 1, tx: 0, ty: 0 });
+  /* 回調恒讀最新 view：pointerup 與排隊中的 pointermove 更新可交錯，
+     閉包裡的 view 會滯後，據之計算則圖幅跳變 */
+  const viewRef = useRef(view);
+  viewRef.current = view;
+  const ptsRef = useRef(new Map()); /* pointerId → 當前屏幕座標，多指並存 */
+  const dragRef = useRef(null);     /* 單指／滑鼠拖曳起點暫存 */
+  const pinchRef = useRef(null);    /* 捏合起手：兩指距離、中點、當時 view */
+  const movedRef = useRef(0);       /* 拖曳位移量：>5 則抑制本次點選，防拖後誤觸 */
+
+  const clampK = (k) => Math.min(8, Math.max(1, k));
+  /* 以幅面中心為錨：＋／－ 按鈕走此路 */
+  const zoomBy = (f) =>
+    setView((v) => {
+      const k2 = clampK(v.k * f);
+      if (k2 === 1) return { k: 1, tx: 0, ty: 0 };
+      const cx = w / 2, cy = h / 2;
+      return { k: k2, tx: cx - (k2 / v.k) * (cx - v.tx), ty: cy - (k2 / v.k) * (cy - v.ty) };
+    });
+  const reset = () => setView({ k: 1, tx: 0, ty: 0 });
+
+  const endPointer = (e) => {
+    const pts = ptsRef.current;
+    pts.delete(e.pointerId);
+    /* 安卓上指針或已自行釋放，release 之則擲 NotFoundError，故先問後放並兜住 */
+    try {
+      if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch { /* 已釋放，無妨 */ }
+    if (pts.size < 2) pinchRef.current = null;
+    /* 捏合鬆開一指：以殘留之指重新起手，免圖幅跳變 */
+    if (pts.size === 1) {
+      const [r] = [...pts.values()];
+      const v = viewRef.current;
+      dragRef.current = { x: r.x, y: r.y, tx: v.tx, ty: v.ty };
+    } else if (pts.size === 0) {
+      dragRef.current = null;
+    }
+  };
+
+  const handlers = {
+    onPointerDown: (e) => {
+      /* 位移量無條件歸零：k===1 時亦然。否則「放大→拖動→復位」後
+         movedRef 永停於 >5，此後一切點選盡被當作拖後誤觸吞掉 */
+      movedRef.current = 0;
+      const v = viewRef.current;
+      if (v.k === 1) return;
+      const pts = ptsRef.current;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* 捕獲不成則退為普通事件流 */ }
+      if (pts.size >= 2) {
+        const [a, b] = [...pts.values()];
+        pinchRef.current = {
+          d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2,
+          k: v.k, tx: v.tx, ty: v.ty,
+        };
+        dragRef.current = null;
+      } else {
+        dragRef.current = { x: e.clientX, y: e.clientY, tx: v.tx, ty: v.ty };
+      }
+    },
+    onPointerMove: (e) => {
+      const pts = ptsRef.current;
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const cw = e.currentTarget.clientWidth || e.currentTarget.getBoundingClientRect().width;
+      if (!cw) return; /* 幅面尚未布局，此刻換算必得 Infinity */
+      const s = w / cw; /* 屏幕像素 → viewBox 座標 */
+      const p = pinchRef.current;
+      if (p && pts.size >= 2) {
+        const [a, b] = [...pts.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (!d || !p.d) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        /* 起手中點所指之內容座標，須始終落在當下中點之下 */
+        const ax = (p.mx - rect.left) * s, ay = (p.my - rect.top) * s;
+        const gx = (ax - p.tx) / p.k, gy = (ay - p.ty) / p.k;
+        const cx = ((a.x + b.x) / 2 - rect.left) * s, cy = ((a.y + b.y) / 2 - rect.top) * s;
+        const k2 = clampK(p.k * (d / p.d));
+        movedRef.current = 99; /* 捏合畢不誤觸點選 */
+        setView({ k: k2, tx: cx - k2 * gx, ty: cy - k2 * gy });
+        return;
+      }
+      /* 必先取出快照再入 setView：updater 由 React 稍後執行，屆時
+         pointerup 可能已將 dragRef 置空，於彼時解引用即擲錯而白屏 */
+      const g = dragRef.current;
+      if (!g) return;
+      const dx = (e.clientX - g.x) * s, dy = (e.clientY - g.y) * s;
+      movedRef.current = Math.max(movedRef.current, Math.abs(dx) + Math.abs(dy));
+      setView((v) => ({ ...v, tx: g.tx + dx, ty: g.ty + dy }));
+    },
+    onPointerUp: endPointer,
+    onPointerCancel: endPointer,
+  };
+  /* 指針捕獲既已接管，拖出幅外不必中斷，故不掛 onPointerLeave */
+  const gestureStyle = {
+    cursor: view.k > 1 ? (dragRef.current ? "grabbing" : "grab") : "default",
+    touchAction: view.k > 1 ? "none" : "auto",
+  };
+  return { view, zoomBy, reset, handlers, gestureStyle, movedRef };
+}
+
+/* 縮放三鈕：放大／縮小／復位，三幅圖共用 */
+function ZoomBtns({ view, zoomBy, reset }) {
+  return (
+    <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: 6, zIndex: 3, alignItems: "center" }}>
+      {[["＋", () => zoomBy(1.5), "放大"], ["－", () => zoomBy(1 / 1.5), "縮小"], ["回", reset, "復位"]].map(([t, fn, tt]) => (
+        <button key={tt} title={tt} onClick={fn}
+          style={{ width: 30, height: 30, fontFamily: serif, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
+          {t}
+        </button>
+      ))}
+      {view.k > 1 && <span style={{ fontFamily: serif, fontSize: 10.5, color: T.faint }}>{view.k.toFixed(1)}×</span>}
+    </div>
+  );
+}
+
 /* ---------------- 行星式關係圖：雙星系統 ---------------- */
 /* 兩核：閔方城（蒼雲線）與程凱（天策線）。
    軌道悉由《事件与年份》與各核之共見計數自動生成；
@@ -951,6 +1072,8 @@ function Timeline({ onOpenChar }) {
    與兩核皆無共見者列於環抱全系之遠軌。 */
 function Planetary({ onOpenChar }) {
   const [hover, setHover] = useState(null);
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1200, 830);
+  const coarse = useCoarsePointer();
   const CX = [350, 850], CY = 410;
   const layout = useMemo(() => {
     const counts = CENTERS_META.map((m) => coCountsFor(m.id));
@@ -1017,7 +1140,7 @@ function Planetary({ onOpenChar }) {
   const Star = ({ k }) => {
     const c = byId[CENTERS_META[k].id];
     return (
-      <g style={{ cursor: "pointer" }} onClick={() => onOpenChar(c)}>
+      <g style={{ cursor: "pointer" }} onClick={() => { if (movedRef.current > 5) return; onOpenChar(c); }}>
         <text x={CX[k]} y={CY - 66} textAnchor="middle"
           style={{ fontFamily: serif, fontSize: 11.5, fill: fc(c.belong[0]), letterSpacing: "0.45em" }}>
           {CENTERS_META[k].tag}
@@ -1035,8 +1158,11 @@ function Planetary({ onOpenChar }) {
     const hi = hover === n.c.id;
     return (
       <g style={{ cursor: "pointer" }}
-        onMouseEnter={() => setHover(n.c.id)} onMouseLeave={() => setHover(null)}
-        onClick={() => onOpenChar(n.c)}>
+        onMouseEnter={() => { if (!coarse) setHover(n.c.id); }}
+        onMouseLeave={() => { if (!coarse) setHover(null); }}
+        /* 觸屏無懸停：首觸牽出其關係弧，再觸方開檔案 */
+        onClick={() => { if (movedRef.current > 5) return; if (coarse && hover !== n.c.id) { setHover(n.c.id); return; } onOpenChar(n.c); }}>
+        {coarse && <circle cx={n.x} cy={n.y} r={30} fill="transparent" />}
         <circle cx={n.x} cy={n.y} r={hi ? 24 : 20} fill={T.panel} stroke={fc(n.c.belong[0])} strokeWidth={1.6} />
         {n.c.belong.length > 1 && (
           <circle cx={n.x} cy={n.y} r={hi ? 28 : 24} fill="none" stroke={fc(n.c.belong[1])} strokeWidth={0.8} opacity={0.7} />
@@ -1056,8 +1182,15 @@ function Planetary({ onOpenChar }) {
   };
 
   return (
-    <div style={{ overflowX: "auto" }}>
-      <svg viewBox="0 0 1200 830" style={{ width: "100%", maxWidth: 1160, display: "block", margin: "0 auto" }}>
+    <div style={{ overflowX: "auto", position: "relative" }}>
+      <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
+      <svg viewBox="0 0 1200 830"
+        style={{ width: "100%", maxWidth: 1160, display: "block", margin: "0 auto", ...gestureStyle }}
+        {...handlers}>
+        <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
+        {/* 襯底：觸屏點空處即卸下所選人物，關係弦線隨之收起 */}
+        <rect x={-4000} y={-4000} width={9000} height={9000} fill="transparent"
+          onClick={() => { if (movedRef.current > 5) return; setHover(null); }} />
         {/* 遠軌橢圓 */}
         <ellipse cx={600} cy={CY} rx={layout.FAR.rx} ry={layout.FAR.ry} fill="none" stroke={T.line} strokeDasharray="2 5" />
         <text x={600} y={CY - layout.FAR.ry - 9} textAnchor="middle" style={{ fontFamily: serif, fontSize: 11, fill: T.faint }}>遠軌 0（與兩核俱無共見）</text>
@@ -1114,10 +1247,12 @@ function Planetary({ onOpenChar }) {
         )}
         {layout.bridge.map((n) => <Node key={n.c.id} n={n} countLabel={`閔 ${n.a} · 程 ${n.b}`} />)}
         {layout.farNodes.map((n) => <Node key={n.c.id} n={n} countLabel={null} />)}
+        </g>
       </svg>
       <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: serif }}>
         雙星系統：閔方城（蒼雲線）與程凱（天策線）同格為核。軌道由《事件与年份》中與各核共見事件之計數自動生成，線之粗細亦然；
-        與兩核共見皆不少於二事者為橋星，居雙星之間，雙繫於兩核。點選任一人開啟檔案。
+        與兩核共見皆不少於二事者為橋星，居雙星之間，雙繫於兩核。
+        {coarse ? "輕觸一人牽出其關係弦線，再觸方開檔案；放大後可雙指捏合、單指平移。" : "點選任一人開啟檔案。"}
       </div>
     </div>
   );
@@ -1128,16 +1263,8 @@ const PHASES = [["壹 · 前史", 744], ["貳 · 亂前", 750], ["叁 · 亂中"
 function Community({ onOpenChar }) {
   const [Y, setY] = useState(765);
   const [hover, setHover] = useState(null);
-  const [view, setView] = useState({ k: 1, tx: 0, ty: 0 }); /* 縮放平移：k 倍率，t 平移（viewBox 座標），同 GeoMap */
-  const dragRef = useRef(null);  /* 拖曳起點暫存 */
-  const movedRef = useRef(0);    /* 拖曳位移量：>5 則抑制本次點選，防拖後誤觸 */
-  const zoomBy = (f) =>
-    setView((v) => {
-      const k2 = Math.min(8, Math.max(1, v.k * f));
-      if (k2 === 1) return { k: 1, tx: 0, ty: 0 };
-      const cx = 560, cy = 525; /* 以幅面中心為錨縮放 */
-      return { k: k2, tx: cx - (k2 / v.k) * (cx - v.tx), ty: cy - (k2 / v.k) * (cy - v.ty) };
-    });
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1120, 1050);
+  const coarse = useCoarsePointer();
   const { nodes, pos, centers } = useMemo(() => {
     const groups = {};
     CHARACTERS.forEach((c) => {
@@ -1193,28 +1320,14 @@ function Community({ onOpenChar }) {
         <span style={{ fontSize: 11, fontFamily: serif, color: T.faint }}>虛線＝未遂／未說開／未見 · 硃砂點線＝歿後延續 · 虛環＝其人已歿</span>
       </div>
       <div style={{ overflowX: "auto", position: "relative" }}>
-        <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: 6, zIndex: 3, alignItems: "center" }}>
-          {[["＋", () => zoomBy(1.5), "放大"], ["－", () => zoomBy(1 / 1.5), "縮小"], ["回", () => setView({ k: 1, tx: 0, ty: 0 }), "復位"]].map(([t, fn, tt]) => (
-            <button key={tt} title={tt} onClick={fn}
-              style={{ width: 30, height: 30, fontFamily: serif, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
-              {t}
-            </button>
-          ))}
-          {view.k > 1 && <span style={{ fontFamily: serif, fontSize: 10.5, color: T.faint }}>{view.k.toFixed(1)}×</span>}
-        </div>
+        <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
         <svg viewBox="0 0 1120 1050"
-          style={{ width: "100%", maxWidth: 1100, display: "block", margin: "0 auto", cursor: view.k > 1 ? (dragRef.current ? "grabbing" : "grab") : "default", touchAction: view.k > 1 ? "none" : "auto" }}
-          onPointerDown={(e) => { if (view.k === 1) return; dragRef.current = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty }; movedRef.current = 0; }}
-          onPointerMove={(e) => {
-            if (!dragRef.current) return;
-            const s = 1120 / e.currentTarget.clientWidth; /* 屏幕像素 → viewBox 座標 */
-            const dx = (e.clientX - dragRef.current.x) * s, dy = (e.clientY - dragRef.current.y) * s;
-            movedRef.current = Math.max(movedRef.current, Math.abs(dx) + Math.abs(dy));
-            setView((v) => ({ ...v, tx: dragRef.current.tx + dx, ty: dragRef.current.ty + dy }));
-          }}
-          onPointerUp={() => { dragRef.current = null; }}
-          onPointerLeave={() => { dragRef.current = null; }}>
+          style={{ width: "100%", maxWidth: 1100, display: "block", margin: "0 auto", ...gestureStyle }}
+          {...handlers}>
           <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
+          {/* 襯底：觸屏點空處即卸下所選人物，關係邊隨之復原 */}
+          <rect x={-4000} y={-4000} width={9000} height={9000} fill="transparent"
+            onClick={() => { if (movedRef.current > 5) return; setHover(null); }} />
           {centers.map((g) => (
             <text key={g.f} x={g.gx} y={g.gy - g.cr - 10} textAnchor="middle"
               style={{ fontFamily: serif, fontSize: 13, fill: fc(g.f), letterSpacing: "0.3em", opacity: 0.8 }}>
@@ -1248,8 +1361,12 @@ function Community({ onOpenChar }) {
             const hi = hover === n.c.id;
             return (
               <g key={n.c.id} style={{ cursor: "pointer" }} opacity={dead ? 0.38 : 1}
-                onMouseEnter={() => setHover(n.c.id)} onMouseLeave={() => setHover(null)}
-                onClick={() => { if (movedRef.current > 5) return; onOpenChar(n.c); }}>
+                onMouseEnter={() => { if (!coarse) setHover(n.c.id); }}
+                onMouseLeave={() => { if (!coarse) setHover(null); }}
+                /* 觸屏無懸停：首觸顯其關係諸邊，再觸方開檔案 */
+                onClick={() => { if (movedRef.current > 5) return; if (coarse && hover !== n.c.id) { setHover(n.c.id); return; } onOpenChar(n.c); }}>
+                {/* 觸屏加大點選域：節點在窄屏上實徑僅數像素，另置一透明圓承接手指 */}
+                {coarse && <circle cx={n.x} cy={n.y} r={26} fill="transparent" />}
                 <circle cx={n.x} cy={n.y} r={hi ? 19 : 15.5} fill={T.panel}
                   stroke={fc(n.f)} strokeWidth={hi ? 2 : 1.3} strokeDasharray={dead ? "3 3" : "none"} />
                 <text x={n.x} y={n.y + 3.5} textAnchor="middle"
@@ -1304,16 +1421,8 @@ function GeoMap({ onOpenChar }) {
   const [sel, setSel] = useState(null); /* 選中地名（或 NOLOC_KEY）→ 側欄編年 */
   const [hover, setHover] = useState(null);
   const [allLabels, setAllLabels] = useState(false); /* 地名全顯開關 */
-  const [view, setView] = useState({ k: 1, tx: 0, ty: 0 }); /* 縮放平移：k 倍率，t 平移（viewBox 座標） */
-  const dragRef = useRef(null);  /* 拖曳起點暫存 */
-  const movedRef = useRef(0);    /* 拖曳位移量：>5 則抑制本次點選，防拖後誤觸 */
-  const zoomBy = (f) =>
-    setView((v) => {
-      const k2 = Math.min(8, Math.max(1, v.k * f));
-      if (k2 === 1) return { k: 1, tx: 0, ty: 0 };
-      const cx = 500, cy = 360; /* 以幅面中心為錨縮放 */
-      return { k: k2, tx: cx - (k2 / v.k) * (cx - v.tx), ty: cy - (k2 / v.k) * (cy - v.ty) };
-    });
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1000, 720);
+  const coarse = useCoarsePointer();
   const [trackSel, setTrackSel] = useState([]); /* 動線人物（點選即顯，至多三人；滿員再選則汰最舊） */
   const toggleTrack = (id) =>
     setTrackSel((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 3 ? [...prev.slice(1), id] : [...prev, id]));
@@ -1472,8 +1581,11 @@ function GeoMap({ onOpenChar }) {
     let acc = 0;
     return (
       <g style={{ cursor: n > 0 ? "pointer" : "default", opacity: dim, transition: "opacity .15s" }}
-        onMouseEnter={() => setHover(name)} onMouseLeave={() => setHover(null)}
+        onMouseEnter={() => { if (!coarse) setHover(name); }}
+        onMouseLeave={() => { if (!coarse) setHover(null); }}
         onClick={() => { if (movedRef.current > 5) return; if (n > 0) setSel(isSel ? null : name); }}>
+        {/* 觸屏加大點選域：小邑環徑不足指腹之半 */}
+        {coarse && n > 0 && <circle cx={c.x} cy={c.y} r={Math.max(r, 14 / z)} fill="transparent" />}
         {c.kind === "region" && (
           <ellipse cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} fill={segs[0] ? fc(segs[0][0]) : T.faint} opacity={0.10}
             transform={c.rot ? `rotate(${c.rot} ${c.x} ${c.y})` : undefined} stroke={T.line} strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
@@ -1531,7 +1643,8 @@ function GeoMap({ onOpenChar }) {
           const seg = spots.m[nm] ? Object.entries(spots.m[nm].tally).sort((a, c) => c[1] - a[1])[0] : null;
           return (
             <g key={nm} style={{ cursor: n > 0 ? "pointer" : "default", opacity: n > 0 ? 1 : 0.35 }}
-              onMouseEnter={() => setHover(nm)} onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => { if (!coarse) setHover(nm); }}
+              onMouseLeave={() => { if (!coarse) setHover(null); }}
               onClick={() => { if (movedRef.current > 5) return; if (n > 0) setSel(sel === nm ? null : nm); }}>
               <rect x={dir === "西" ? b.x : b.x - 92} y={y - 13} width={92} height={19}
                 fill={isSel ? T.panelHi : "none"} stroke={isSel || isHov ? T.accent : T.line} strokeWidth={1} />
@@ -1645,28 +1758,14 @@ function GeoMap({ onOpenChar }) {
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexDirection: narrow ? "column" : "row" }}>
         {/* 圖幅 */}
         <div style={{ flex: "1 1 auto", minWidth: 0, border: `1px solid ${T.line}`, background: T.panel, position: "relative" }}>
-          <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: 6, zIndex: 3, alignItems: "center" }}>
-            {[["＋", () => zoomBy(1.5), "放大"], ["－", () => zoomBy(1 / 1.5), "縮小"], ["回", () => setView({ k: 1, tx: 0, ty: 0 }), "復位"]].map(([t, fn, tt]) => (
-              <button key={tt} title={tt} onClick={fn}
-                style={{ width: 30, height: 30, fontFamily: serif, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
-                {t}
-              </button>
-            ))}
-            {view.k > 1 && <span style={{ fontFamily: serif, fontSize: 10.5, color: T.faint }}>{view.k.toFixed(1)}×</span>}
-          </div>
+          <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
           <svg viewBox="0 0 1000 720"
-            style={{ width: "100%", display: "block", cursor: view.k > 1 ? (dragRef.current ? "grabbing" : "grab") : "default", touchAction: view.k > 1 ? "none" : "auto" }}
-            onPointerDown={(e) => { if (view.k === 1) return; dragRef.current = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty }; movedRef.current = 0; }}
-            onPointerMove={(e) => {
-              if (!dragRef.current) return;
-              const s = 1000 / e.currentTarget.clientWidth; /* 屏幕像素 → viewBox 座標 */
-              const dx = (e.clientX - dragRef.current.x) * s, dy = (e.clientY - dragRef.current.y) * s;
-              movedRef.current = Math.max(movedRef.current, Math.abs(dx) + Math.abs(dy));
-              setView((v) => ({ ...v, tx: dragRef.current.tx + dx, ty: dragRef.current.ty + dy }));
-            }}
-            onPointerUp={() => { dragRef.current = null; }}
-            onPointerLeave={() => { dragRef.current = null; }}>
+            style={{ width: "100%", display: "block", ...gestureStyle }}
+            {...handlers}>
             <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
+            {/* 襯底：觸屏點空處即收起動線浮框 */}
+            <rect x={-4000} y={-4000} width={9000} height={9000} fill="transparent"
+              onClick={() => { if (movedRef.current > 5) return; setHoverSeg(null); }} />
             {/* 底圖：示意手繪 */}
             <path d={GEO_BASE.coast} fill="none" stroke={T.muted} strokeWidth={1.3} opacity={0.55} vectorEffect="non-scaling-stroke" />
             <path d={GEO_BASE.north} fill="none" stroke={T.faint} strokeWidth={1} strokeDasharray="6 5" opacity={0.6} vectorEffect="non-scaling-stroke" />
@@ -1704,8 +1803,13 @@ function GeoMap({ onOpenChar }) {
                         <path d={d} fill="none" stroke={t.color} strokeWidth={(segHov ? 2.8 : 1.7) / view.k}
                           opacity={segHov ? 1 : hoverSeg ? 0.3 : 0.9}
                           strokeDasharray={s.gapBefore ? `${5 / view.k} ${4 / view.k}` : undefined} />
-                        <path d={d} fill="none" stroke="transparent" strokeWidth={12 / view.k} style={{ pointerEvents: "stroke" }}
-                          onMouseEnter={onSegMove} onMouseMove={onSegMove} onMouseLeave={() => setHoverSeg(null)} />
+                        {/* 觸屏指腹粗於鼠尖，感應帶加寬一倍有餘 */}
+                        <path d={d} fill="none" stroke="transparent" strokeWidth={(coarse ? 26 : 12) / view.k} style={{ pointerEvents: "stroke" }}
+                          onMouseEnter={(ev2) => { if (!coarse) onSegMove(ev2); }}
+                          onMouseMove={(ev2) => { if (!coarse) onSegMove(ev2); }}
+                          onMouseLeave={() => { if (!coarse) setHoverSeg(null); }}
+                          /* 觸屏無懸停：輕觸此段即浮出繫此段之事，不轉開檔案——檔案由駐點與人名承接 */
+                          onClick={(ev2) => { if (!coarse) return; ev2.stopPropagation(); if (movedRef.current > 5) return; onSegMove(ev2); }} />
                       </g>
                     );
                   })}
@@ -1751,8 +1855,10 @@ function GeoMap({ onOpenChar }) {
           {hoverSeg && (() => {
             const flip = hoverSeg.x > hoverSeg.w * 0.55;
             const ttl = hoverSeg.s.ev.title;
+            /* 觸屏改浮於指上方，免為指腹所掩 */
+            const tf = [flip ? "translateX(-100%)" : "", coarse ? "translateY(-100%)" : ""].filter(Boolean).join(" ");
             return (
-              <div style={{ position: "absolute", left: hoverSeg.x + (flip ? -14 : 14), top: hoverSeg.y + 12, transform: flip ? "translateX(-100%)" : "none", maxWidth: 300, background: T.panelHi, border: `1px solid ${T.line}`, boxShadow: "0 4px 18px rgba(0,0,0,.45)", padding: "10px 13px", pointerEvents: "none", zIndex: 4 }}>
+              <div style={{ position: "absolute", left: hoverSeg.x + (flip ? -14 : 14), top: hoverSeg.y + (coarse ? -14 : 12), transform: tf || "none", maxWidth: 300, background: T.panelHi, border: `1px solid ${T.line}`, boxShadow: "0 4px 18px rgba(0,0,0,.45)", padding: "10px 13px", pointerEvents: "none", zIndex: 4 }}>
                 <div style={{ fontFamily: serif, fontSize: 12.5, color: hoverSeg.color, marginBottom: 4 }}>
                   {hoverSeg.name} · {hoverSeg.prev.loc}（迄{hoverSeg.prev.toYear ?? "起"}）→ {hoverSeg.s.loc}（{hoverSeg.s.year ?? "起"}）
                 </div>

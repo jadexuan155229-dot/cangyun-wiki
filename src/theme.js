@@ -19,3 +19,20 @@ export function useNarrow(bp = 780) {
   }, [bp]);
   return narrow;
 }
+
+/* 粗指針偵測：觸屏無懸停，凡「懸停方見」之信息須另闢點選之途。
+   隨設備接駁而變（平板外接滑鼠、二合一翻轉），故監聽而非只取初值 */
+export function useCoarsePointer() {
+  const q = "(pointer: coarse)";
+  const [coarse, setCoarse] = useState(
+    typeof window !== "undefined" && window.matchMedia ? window.matchMedia(q).matches : false
+  );
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia(q);
+    const onC = (e) => setCoarse(e.matches);
+    mq.addEventListener("change", onC);
+    return () => mq.removeEventListener("change", onC);
+  }, []);
+  return coarse;
+}

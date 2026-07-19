@@ -267,8 +267,8 @@ body {
   right: 60px;
   top: 28%;
   background-color: #847A74;
-  -webkit-mask: url("/images/faction-marks/yantianzong-mark.png") center / contain no-repeat;
-  mask: url("/images/faction-marks/yantianzong-mark.png") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/yantianzong-mark.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/yantianzong-mark.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 萬靈：灰度參數同前。鳳鳥紋幾乎撐滿圖幅（寬約 83%、豎向 8%–95%，
@@ -279,8 +279,8 @@ body {
   right: 25px;
   top: 23%;
   background-color: #847A74;
-  -webkit-mask: url("/images/faction-marks/wanling.png") center / contain no-repeat;
-  mask: url("/images/faction-marks/wanling.png") center / contain no-repeat;
+  -webkit-mask: url("/images/faction-marks/wanling.webp") center / contain no-repeat;
+  mask: url("/images/faction-marks/wanling.webp") center / contain no-repeat;
   opacity: 0.08;
 }
 /* 段氏：火焰扇形橫寬豎扁（寬約佔圖幅 94%、豎向 11%–80%），460px 小框
@@ -292,7 +292,7 @@ body {
   max-height: 86%;
   right: 45px;
   top: 27%;
-  background: url("/images/faction-marks/duanshi-mark.png") center / contain no-repeat;
+  background: url("/images/faction-marks/duanshi-mark.webp") center / contain no-repeat;
   filter: grayscale(1);
   opacity: 0.09;
 }

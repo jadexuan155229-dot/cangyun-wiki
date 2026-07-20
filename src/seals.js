@@ -6,8 +6,10 @@
    （如 lifei / 荔非承烈），故此處顯式列舉，不由 id 拼路徑。
    增刪即改此表一行；檔案缺失、id 不存在、品評字為空、
    目錄中有無人引用的孤兒圖，均由 scripts/check-data.js 攔下。
-   七圖同模板：紅面在 100×100 viewBox 中同位同尺寸
+   諸圖同模板：紅面在 100×100 viewBox 中同位同尺寸
    （x 6.73..93.51、y 6.40..93.76），故共用一組縮放係數。
+   新圖入表前可比對紅面路徑（class="st0" 的 d）是否與既有者逐字節相同，
+   相同即沿用現有係數，不必逐張再調。
    ============================================================ */
 export const SEAL_SVG_FILE = {
   lvdingyi: "lvdingyi-qiao.svg",
@@ -22,4 +24,8 @@ export const SEAL_SVG_FILE = {
   guanyue: "guanyue-jian.svg",
   lianshuo: "lianshuo-qi.svg",
   louqiao: "louqiao-xian.svg",
+  gaoyuan: "gaoyuan-di.svg",
+  gaoqian: "gaoqian-rui.svg",
+  xuanyang: "xuanyang-duan.svg",
+  xuankang: "xuankang-ji.svg",
 };

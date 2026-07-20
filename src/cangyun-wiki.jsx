@@ -3,6 +3,7 @@ import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_B
 import { serif, T, useNarrow, useCoarsePointer } from "./theme";
 import { parseRoute, routeHash } from "./router";
 import { FLAT } from "./novel";
+import { SEAL_SVG_FILE } from "./seals";
 import NovelReader from "./novel-reader";
 
 /* ============================================================
@@ -93,12 +94,12 @@ function coCountsFor(centerId) {
 const SEAL_FONT_VARIANT = "b";
 /* 筆畫繁複、小印中偏擠的字：dense 狀態下字形再縮約 5% */
 const SEAL_DENSE_CH = new Set(["峭", "霸", "敏", "逸", "健"]);
-/* SVG 印章（單人物試驗）：印面在 100×100 viewBox 中只佔約 87%，四邊各留約 6.5% 透明邊。
-   放大係數把紅面高度還原到與文字印章外框相當；NUDGE_Y 為視覺中心微調。
-   大印另調一檔：紅面按外框等高換算約需 1.15，實看偏輕，故加大到 1.20 */
+/* 改用 SVG 印章的人物見 seals.js。紅面僅佔 viewBox 約 87%，四邊各留約 6.5% 透明邊，
+   故放大係數把紅面還原到與文字印章外框相當；
+   大印按等高換算約需 1.15，實看偏輕故加大到 1.20；NUDGE_Y 為視覺中心微調 */
 const SEAL_SVG_SCALE = { sm: 1.15, lg: 1.2 };
 const SEAL_SVG_NUDGE_Y = 1;
-function Seal({ ch, size = 15, useSvg = false }) {
+function Seal({ ch, size = 15, svg }) {
   if (!ch) return null;
   const sm = size < 18;
   /* 小印字縮一成（繁複字再縮 5%）、橫向補回內邊距，外框尺寸不變；豎向由外層行高撐住 */
@@ -109,13 +110,13 @@ function Seal({ ch, size = 15, useSvg = false }) {
     padding: `${Math.round(size * 0.18)}px ${Math.round(size * 0.3) + (size * (1 - chScale)) / 2}px`,
     lineHeight: 1, display: "inline-block",
   };
-  /* 单人物視覺試驗：吕定仪走 SVG 印章。外殼用同一 box 加一枚隱藏字撐出等寬、等高、等基線的
-     占位盒，不套 .seal-stamp 的紅底／肌理／缺口；img 絕對定位鋪滿，縮放不參與排版 */
-  if (useSvg) {
+  /* SVG 印章：外殼用同一 box 加一枚隱藏字撐出等寬、等高、等基線的占位盒，
+     不套 .seal-stamp 的紅底／肌理／缺口；img 絕對定位鋪滿，縮放不參與排版 */
+  if (svg) {
     return (
       <span className="seal-svg-shell" style={box} title="品评">
         <span style={{ fontSize: `${chScale}em`, visibility: "hidden" }}>{ch}</span>
-        <img className="seal-svg" src={`${import.meta.env.BASE_URL}images/seals/lvdingyi-qiao.svg`} alt=""
+        <img className="seal-svg" src={`${import.meta.env.BASE_URL}images/seals/${svg}`} alt=""
           style={{ transform: `translateY(${SEAL_SVG_NUDGE_Y}px) scale(${sm ? SEAL_SVG_SCALE.sm : SEAL_SVG_SCALE.lg})` }} />
       </span>
     );
@@ -147,7 +148,7 @@ function CharCard({ c, onOpen }) {
         <div className="flex items-baseline flex-wrap" style={{ gap: 10 }}>
           <span style={{ fontFamily: serif, fontSize: 22, color: T.ink, fontWeight: 600 }}>{c.name}</span>
           {evCount > 0 && <span style={{ fontSize: 11, color: T.faint }}>繫年 {evCount} 事</span>}
-          <Seal ch={c.pin} size={15} useSvg={c.id === "lvdingyi"} />
+          <Seal ch={c.pin} size={15} svg={SEAL_SVG_FILE[c.id]} />
         </div>
         <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>
           {lifespan(c)}
@@ -317,7 +318,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
 .char-modal-scroll::-webkit-scrollbar-thumb:hover{background:var(--profile-accent-hover)}
 .char-modal-scroll::-webkit-scrollbar-button{background:var(--profile-accent-soft)}/* 僅著色：不設尺寸，環境無箭頭時此規則自然無效 */
 `}</style>
-        {c.pin && <div style={{ position: "absolute", top: 26, right: 60 }}><Seal ch={c.pin} size={22} useSvg={c.id === "lvdingyi"} /></div>}
+        {c.pin && <div style={{ position: "absolute", top: 26, right: 60 }}><Seal ch={c.pin} size={22} svg={SEAL_SVG_FILE[c.id]} /></div>}
         <button onClick={() => { setShowAll(false); onClose(); }} style={{ position: "absolute", top: 20, right: 22, color: T.muted, fontSize: 20, lineHeight: 1, background: "none", border: "none", cursor: "pointer" }}>×</button>
 
         <div className="flex items-baseline flex-wrap" style={{ gap: 12, paddingRight: 70 }}>

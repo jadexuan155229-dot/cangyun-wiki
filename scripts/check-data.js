@@ -9,6 +9,8 @@
    ============================================================ */
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS } from "../src/cangyun-data.js";
 import { CHAR_TERMS } from "../src/novel/char-terms.js";
+import { SEAL_SVG_FILE } from "../src/seals.js";
+import { readdirSync, existsSync } from "node:fs";
 
 const errors = [];
 const warns = [];
@@ -90,6 +92,28 @@ CHAR_TERMS.forEach((t, i) => {
 const termIds = new Set(CHAR_TERMS.map((t) => t.id));
 for (const c of CHARACTERS) {
   if (c.readerNote != null && !termIds.has(c.id)) warn(`CHARACTERS ${c.name}`, "有 readerNote 而無 CHAR_TERMS 詞條——正文名字不可點，接入未完成");
+}
+
+/* ---------- 印章圖 ---------- */
+/* 映射表指向的檔案若被改名或刪除，瀏覽器只渲染一枚破圖、構建不報錯，
+   故在此比對映射表、人物表與 public/images/seals/ 三方 */
+const SEAL_DIR = new URL("../public/images/seals/", import.meta.url);
+const sealFiles = new Set(
+  (existsSync(SEAL_DIR) ? readdirSync(SEAL_DIR) : []).filter((f) => f.endsWith(".svg"))
+);
+const usedSeal = new Set();
+for (const [id, file] of Object.entries(SEAL_SVG_FILE)) {
+  const tag = `SEAL_SVG_FILE.${id}`;
+  if (!charIds.has(id)) err(tag, `鍵引用不存在的人物 id（該人物查表得 undefined，將靜默退回文字印章）`);
+  else {
+    const c = CHARACTERS.find((x) => x.id === id);
+    if (!c.pin) err(tag, `${c.name} 無 pin（一字品評）——Seal 直接返回 null，印章不會出現`);
+  }
+  if (!sealFiles.has(file)) err(tag, `檔案不存在：public/images/seals/${file}（頁面將渲染破圖）`);
+  else usedSeal.add(file);
+}
+for (const f of sealFiles) {
+  if (!usedSeal.has(f)) warn(`public/images/seals/${f}`, "無人引用——上傳後忘了寫進 seals.js 的 SEAL_SVG_FILE？");
 }
 
 /* ---------- 地點 ---------- */

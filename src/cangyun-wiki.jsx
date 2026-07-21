@@ -3,6 +3,7 @@ import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_B
 import { serif, T, useNarrow, useCoarsePointer } from "./theme";
 import { parseRoute, routeHash } from "./router";
 import { FLAT } from "./novel";
+import NOVEL_MENTIONS from "virtual:novel-mentions";
 import { SEAL_SVG_FILE } from "./seals";
 import NovelReader from "./novel-reader";
 
@@ -184,7 +185,8 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [c, onClose]);
   /* 見於文庫：正文以本名精確計數（表字、別號短而易誤中，不入檢索）；
-     僅列有命中之章。正文隨構建打包，全量掃描僅開檔案時一算。
+     僅列有命中之章。計數於構建期預算（見 vite.config.js 之 virtual:novel-mentions），
+     故正文已切為懶加載塊、不入主包，此面板仍不需拉正文即秒出。
      按「線（·卷）」聚合為可展開塊——屬卷之章歸【線·卷】，散章歸【線】，
      同線可並出兩塊（卷與散章於目錄本同級）；塊上僅標章數，處數在章 chip */
   const mentionGroups = useMemo(() => {
@@ -192,10 +194,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
     const groups = [];
     const byKey = {};
     for (const f of FLAT) {
-      const text = f.ch.text;
-      if (!text) continue;
-      let n = 0, at = 0;
-      while ((at = text.indexOf(c.name, at)) !== -1) { n += 1; at += c.name.length; }
+      const n = (NOVEL_MENTIONS[f.ch.file] || {})[c.id] || 0;
       if (n === 0) continue;
       const key = f.group ? `${f.novel.id}/${f.group.id}` : f.novel.id;
       if (!byKey[key]) {

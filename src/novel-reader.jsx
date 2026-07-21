@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from "react";
 import { serif, T, useNarrow } from "./theme";
-import { NOVELS, FLAT } from "./novel";
+import { NOVELS, FLAT, loadTexts } from "./novel";
 import { CHAR_TERMS, scanCharTerms } from "./novel/char-terms";
 import { fc, CHARACTERS } from "./cangyun-data";
 
@@ -238,6 +238,15 @@ function MarginNote({ peek, bodyColRef, onClose, paper }) {
 
 export default function NovelReader({ path, onNav }) {
   const narrow = useNarrow();
+  /* 正文懶加載：進入文庫（本組件掛載）方動態拉入 texts.js 獨立塊，不佔首屏主包。
+     texts=null 為載入中；載入後為 { file: 正文 } 映射。各處取正文一律經 textOf。 */
+  const [texts, setTexts] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    loadTexts().then((t) => { if (alive) setTexts(t); }).catch(() => { /* 載入失敗：各章顯待錄，不崩 */ });
+    return () => { alive = false; };
+  }, []);
+  const textOf = (ch) => (texts && ch && ch.file ? texts[ch.file] : "");
   /* 章節由路由派生（#/novel/…，見 router.js）；壞路徑同無章 */
   const sel = path && byPath[path] ? path : null;
   /* 初訪 #/novel 無章：回上次閱讀處（replace 寫入不佔歷史，後退不折返）；
@@ -313,10 +322,12 @@ export default function NovelReader({ path, onNav }) {
   /* 滾動處恢復：僅回章那一次（restoreScrollTo 一致方行），正文渲染後定位 */
   useEffect(() => {
     if (!sel || restoreScrollTo.current !== sel) return;
+    /* 正文懶加載：待該章正文就位再定位，否則頁面尚矮、scrollTo 夠不到目標處 */
+    if (byPath[sel]?.ch.file && texts === null) return;
     restoreScrollTo.current = null;
     const s = readSavedScroll();
     if (s && s.path === sel) window.scrollTo({ top: s.y, behavior: "auto" });
-  }, [sel]);
+  }, [sel, texts]);
   /* 滾動處保存：節流 200ms；離章（清理時窗口尚在舊章滾動處）與 pagehide 各補記一次 */
   useEffect(() => {
     if (!sel) return;
@@ -387,7 +398,7 @@ export default function NovelReader({ path, onNav }) {
     for (const f of FLAT) {
       const titleHit = [f.novel.tag, f.novel.title, f.group && f.group.title, f.ch.title]
         .some((t) => t && t.toLowerCase().includes(kl));
-      const text = f.ch.text || "";
+      const text = (texts && f.ch.file && texts[f.ch.file]) || "";
       const tl = text.toLowerCase();
       let n = 0, first = -1, at = 0, p;
       while ((p = tl.indexOf(kl, at)) !== -1) { if (first < 0) first = p; n++; at = p + kl.length; }
@@ -404,7 +415,7 @@ export default function NovelReader({ path, onNav }) {
       out.push({ f, n, snip });
     }
     return out;
-  }, [q]);
+  }, [q, texts]);
 
   const cur = sel ? byPath[sel] : null;
   const idx = cur ? FLAT.findIndex((f) => f.path === sel) : -1;
@@ -419,7 +430,7 @@ export default function NovelReader({ path, onNav }) {
   const Leaf = ({ nv, group, ch }) => {
     const path = group ? `${nv.id}/${group.id}/${ch.id}` : `${nv.id}/${ch.id}`;
     const active = sel === path;
-    const n = wc(ch.text);
+    const n = wc(textOf(ch));
     return (
       <button onClick={() => jump(path)}
         {...hoverable(path, {
@@ -567,8 +578,8 @@ export default function NovelReader({ path, onNav }) {
                 <h2 style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: T.ink, margin: "10px 0 0", letterSpacing: "0.06em" }}>
                   {cur.group ? `${cur.group.title} · ` : ""}{cur.ch.title}
                 </h2>
-                {wc(cur.ch.text) > 0 && (
-                  <div style={{ fontFamily: serif, fontSize: 11, color: T.faint, marginTop: 8 }}>{wc(cur.ch.text)} 字</div>
+                {wc(textOf(cur.ch)) > 0 && (
+                  <div style={{ fontFamily: serif, fontSize: 11, color: T.faint, marginTop: 8 }}>{wc(textOf(cur.ch))} 字</div>
                 )}
               </div>
               {/* 分隔線寬屏獨立展寬：左端探入目錄與正文間的留白，右端對齊年表主區寬度；正文欄自身寬度不隨之改變 */}
@@ -618,8 +629,10 @@ export default function NovelReader({ path, onNav }) {
                       </div>
                     )}
                   </div>
-                  <Body text={cur.ch.text} hl={q.trim() || null} firstHitRef={firstHitEl} onCharClick={openPeek} activeCharKey={peek ? peek.key : null}
-                    fs={FS_STEPS[view.fs]} lh={LH_STEPS[view.lh][1]} pal={pal} />
+                  {cur.ch.file && texts === null
+                    ? <div style={{ fontFamily: serif, fontSize: 14, color: pal.faint, padding: "36px 0", letterSpacing: "0.15em" }}>正文载入中……</div>
+                    : <Body text={textOf(cur.ch)} hl={q.trim() || null} firstHitRef={firstHitEl} onCharClick={openPeek} activeCharKey={peek ? peek.key : null}
+                        fs={FS_STEPS[view.fs]} lh={LH_STEPS[view.lh][1]} pal={pal} />}
                 </div>
                 <div style={{ maxWidth: bodyMaxWidth, display: "flex", justifyContent: "space-between", gap: 12, borderTop: `1px solid ${pal.line}`, marginTop: 44, paddingTop: 14, ...(narrow || paper ? null : { marginLeft: "auto", marginRight: "auto" }) }}>
                   {prevCh ? <button onClick={() => jump(prevCh.path)} style={paper ? { ...navBtn, color: PAPER.muted, border: `1px solid ${PAPER.line}` } : navBtn}>‹ {navLabel(prevCh)}</button> : <span />}

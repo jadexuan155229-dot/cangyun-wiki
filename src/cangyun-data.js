@@ -251,7 +251,7 @@ export const CHARACTERS = [
   },
   {
     id: "jinghuishi", name: "景惠时", zi: "春沂", belong: ["苍云"], birth: 718, death: 761,
-    birthplace: "河东道 代州 雁门县", pin: "", epithet: "", hao: "",
+    birthplace: "河东道 代州 雁门县", pin: "懿", epithet: "", hao: "",
     gloss: "《诗经·邶风·燕燕》：“终温且惠，淑慎其身。”《論語·先進》：“莫春者，春服既成，冠者五六人，童子六七人，浴乎沂，風乎舞雩，詠而歸。”夫子喟然嘆曰：“吾與點也！”",
     profile: F(
       "军医。且因为久在苍云，也协助女卫营统领理事，管理军资药品。756年底朝廷旌表其门庭，称“节义”。",
@@ -395,7 +395,7 @@ export const CHARACTERS = [
   { id: "guanhuai", name: "关槐", zi: "", belong: ["苍云"], birth: 765, death: null, birthplace: "", pin: "", epithet: "", hao: "", gloss: "", profile: F("关岳之子，765年三月生。", "", "", "", "", "", "", "") },
   {
     id: "lubingyu", name: "卢秉毓", zi: "稚松", belong: ["霸刀", "苍云"], birth: 729, death: null,
-    birthplace: "河北道 幽州（范阳郡）", pin: "", epithet: "", hao: "冶山",
+    birthplace: "河北道 幽州（范阳郡）", pin: "思", epithet: "", hao: "冶山",
     gloss: "“毓金为体，秉火成身。”闲章「冶山」自刻——“同入此山，老死不返。”",
     profile: F(
       "霸刀府库守卫，居冰炎谷锻刀，或执行卫戍任务，外面是非一概不知。以能力论可入塞北营，终究是异姓人，不得机会。758年秋被逐出师门，转至苍云堡武库，在薛褚手下锻刀赎罪。",
@@ -450,7 +450,7 @@ export const CHARACTERS = [
   { id: "guanyu", name: "关榆", zi: "", belong: ["霸刀"], birth: 763, death: null, birthplace: "", pin: "", epithet: "", hao: "", gloss: "", profile: F("关岳之女，763年二月生。", "", "", "", "", "", "", "") },
   {
     id: "cenhan", name: "岑菡", zi: "芳隐", belong: ["长歌"], birth: 723, death: null,
-    birthplace: "山南东道 邓州（南阳郡）", pin: "", epithet: "", hao: "",
+    birthplace: "山南东道 邓州（南阳郡）", pin: "雅", epithet: "", hao: "",
     gloss: "《诗·陈风》：“彼泽之陂，有蒲菡萏。”《尔雅·释草》：“荷，芙蕖，其华菡萏。”《说文》：“菡萏。”徐曰：“菡，犹含也，未吐之意。”以“芳隐”应菡之含苞。",
     profile: F(
       "时任镇州（恒州）文学官。荫补弘文馆生，后入长歌门中书院学习，举进士，释褐授秘书省正字（掌雠校典籍），从九品上；后为恒州文学，正八品，主管教育和城内书院，京官外派在州内搜访图书。",
@@ -472,7 +472,7 @@ export const CHARACTERS = [
   },
   {
     id: "duzheng", name: "杜徵", zi: "闻卿", belong: ["长歌"], birth: 727, death: null,
-    birthplace: "河东道 并州（北都 太原府 晋阳县）", pin: "", epithet: "", hao: "",
+    birthplace: "河东道 并州（北都 太原府 晋阳县）", pin: "皎", epithet: "", hao: "",
     gloss: "《说文》：“行于微而文（闻）达者，即徵之。”",
     profile: F(
       "时为常山城内书院管事。不曾谋考官职，只以江湖身份在常山城内书院中协助办事。",
@@ -492,7 +492,7 @@ export const CHARACTERS = [
   },
   {
     id: "litingze", name: "李庭泽", zi: "润甫", belong: ["长歌"], birth: 726, death: null,
-    birthplace: "长安/太原", pin: "", epithet: "", hao: "",
+    birthplace: "长安/太原", pin: "怀", epithet: "", hao: "",
     gloss: "《礼记·聘义》：“夫昔者君子比德于玉焉：温润而泽，仁也。”甫，男子美称。",
     profile: F(
       "时任恒州常山郡司仓参军。少年出仕，入长歌。756年正月为救长官入敌营，中箭负伤被擒，与刺史、长史等州郡长官一同被叛军执送洛阳，五月与颜杲卿同在洛阳被斩。",
@@ -518,7 +518,7 @@ export const CHARACTERS = [
   },
   {
     id: "chengkai", name: "程凯", zi: "子阳", belong: ["天策"], birth: 723, death: 770,
-    birthplace: "都畿道 洛阳（论祖籍在济州东阿）", pin: "", epithet: "", hao: "知节殿", gloss: "「阿阳」是程凯生母为他起的小名，他自己留下了这个「阳」字。",
+    birthplace: "都畿道 洛阳（论祖籍在济州东阿）", pin: "烈", epithet: "", hao: "知节殿", gloss: "「阿阳」是程凯生母为他起的小名，他自己留下了这个「阳」字。",
     profile: F(
       "战前天策府天弓营副将，称「子阳将军」；752年秋与岚川云成婚。战后回府为正四品下，上轻车都尉，壮武将军，在府为教练使，驻知节殿——故府中上下也用「知节殿」代称他。",
       "初入府时瘦，而又能开强弓，看着凶险；后来着意练了气劲肌力，天天跑很远去山上劈很多柴又扛回，逐渐壮实起来。",
@@ -553,7 +553,7 @@ export const CHARACTERS = [
   },
   {
     id: "qisheng", name: "齐晟", zi: "广明", belong: ["天策"], birth: 722, death: 757,
-    birthplace: "关内道 华州 潼关", pin: "", epithet: "", hao: "", gloss: "《説文·日部新附字》：「晟，明也。」故以「广明」应「晟」。",
+    birthplace: "关内道 华州 潼关", pin: "果", epithet: "", hao: "", gloss: "《説文·日部新附字》：「晟，明也。」故以「广明」应「晟」。",
     profile: F(
       "从五品下，骑都尉，游击将军。早年随皇甫惟明在西北立功，战乱前常驻潼关大营负责守备训练。757年守太原战殁。",
       "天策几人中身量力气最高大者，但骨骼清奇，力量的强没有耽误他的柔韧，劈叉拿大顶轻飘飘。",
@@ -579,7 +579,7 @@ export const CHARACTERS = [
   },
   {
     id: "chengfeng", name: "程锋", zi: "履端", belong: ["天策", "唐军"], birth: 716, death: 780,
-    birthplace: "都畿道 洛阳", pin: "", epithet: "", hao: "",
+    birthplace: "都畿道 洛阳", pin: "景", epithet: "", hao: "",
     gloss: "《说文》：「锋，兵耑也。本作鏠，省作锋。」耑即端，兵器锐处；《释名》：「刀其末曰锋，言若锋刺之毒利也。」又军之前列，《前汉·黥布传》：「布为前锋。」因以「端」应「锋」，饰之以「履」，谓身先士卒，常蹈于军前。",
     profile: F(
       "程广嫡长子，程凯长兄。受荫而入天策，三年出，至边地，父亲麾下，为西北宿将。册从三品，云麾将军、护军。中原战乱而归；762年洛阳会战后遣陈瑞和救治闵方城。程凯亡后，771年领命往山南西道，镇梁州，以御京师。",
@@ -600,7 +600,7 @@ export const CHARACTERS = [
   },
   {
     id: "weiqian", name: "魏谦", zi: "思益", belong: ["天策"], birth: 733, death: 759,
-    birthplace: "河北道 幽州（范阳郡）", pin: "", epithet: "", hao: "",
+    birthplace: "河北道 幽州（范阳郡）", pin: "捷", epithet: "", hao: "",
     gloss: "《易·谦卦》：「天道亏盈而益谦。」故以「思益」应「谦」。",
     profile: F(
       "时为从七品上，翊麾校尉，军中统领斥候，隶岚川云统辖。759年3月邺城之战殁。",
@@ -673,7 +673,7 @@ export const CHARACTERS = [
   },
   {
     id: "chengzhao", name: "程钊", zi: "故廉", belong: ["唐军"], birth: null, death: null,
-    birthplace: "都畿道 洛阳", pin: "", epithet: "", hao: "",
+    birthplace: "都畿道 洛阳", pin: "贞", epithet: "", hao: "",
     gloss: "《说文·刀部》：「钊，刓也。」段玉裁注：「金有芒角，摩弄泯之。」《史记·淮阴侯列传》：「印刓敝，忍不能予。」是金磨损棱角为钊。廉，《玉篇》：棱也；《书·皋陶谟》：「简而廉」；《礼·儒行》：「砥砺廉隅」。",
     profile: F(
       "程家次子（行二），典型的世家将门继承者，承袭家族传统，仕途顺遂。安史乱前某一年与父程广一同战亡北庭。",
@@ -690,7 +690,7 @@ export const CHARACTERS = [
   },
   {
     id: "chengduo", name: "程铎", zi: "鸣治", belong: ["唐军"], birth: null, death: null,
-    birthplace: "都畿道 洛阳", pin: "", epithet: "", hao: "",
+    birthplace: "都畿道 洛阳", pin: "严", epithet: "", hao: "",
     gloss: "《论语·八佾》：「天下之无道也久矣，天将以夫子为木铎。」《国语·吴语》：「昧明，王乃秉枹，亲就鸣钟鼓、丁宁、錞于、振铎。」振铎使鸣以警众，或治军，或治民，其义一也，故以「鸣治」应「铎」。",
     profile: F(
       "程家第三子（行三），家族中最具军人风范的一位，将门典型。多年驻守蜀中。",
@@ -802,7 +802,7 @@ export const CHARACTERS = [
   },
   {
     id: "litingshen", name: "李庭深", zi: "弘隽", belong: ["天策"], birth: 725, death: 800,
-    birthplace: "京畿道 长安", pin: "", epithet: "", hao: "",
+    birthplace: "京畿道 长安", pin: "穆", epithet: "", hao: "",
     gloss: "深，深微也。《易·系辞》：「惟深也能通天下之志。」隽，《说文》：「肥肉也。从弓，所以射隹。」《前汉·蒯通传》：通论战国时说士权变，号曰隽永，注：隽，肥肉也，言其所论甘美而深长也；又《人物志》：「张良体弱而精彊，为众智之隽也。」故以「隽」应「深」，饰以「弘」，益其深广。",
     profile: F(
       "战前为曹参军事，在军师朱剑秋身边，称「李参军」；战后回府正四品上，上轻车都尉，忠武将军，在府为兵马使。765年后屡被借往灵州治军；程凯去后几年，上书乞骸骨，回乡看顾老父余年——一生不曾遂己心志，反而成了军中同袍之中唯一的身至高位又忠孝双全者，且有寿，善终。",
@@ -1201,7 +1201,7 @@ export const CHARACTERS = [
   },
   {
     id: "xuqiusheng", name: "许秋生", zi: "文湛", belong: ["万花"], birth: 730, death: null,
-    birthplace: "京畿道 雍州（京兆府）新丰县", pin: "", epithet: "", hao: "",
+    birthplace: "京畿道 雍州（京兆府）新丰县", pin: "翼", epithet: "", hao: "",
     gloss: "《楚辭·招魂》：「湛湛江水兮上有楓。」洪興祖補注：「楓…至霜後葉丹可愛，故騷人多稱之。」楓爲秋景，故以「湛」與「秋」應。秋在五行中属金，金又是兵象——感觉是命定的，要去以力相搏的地方，不是传统文人。",
     profile: F(
       "战乱来援，为李庭深营中军医；后授天策府医博士，终老天策府。收林叶矢为弟子。",

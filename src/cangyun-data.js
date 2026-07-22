@@ -377,7 +377,7 @@ export const CHARACTERS = [
     profile: F(
       "苍云新兵（758-759年间入营，在狄元恪治下二团受训）。父为交城守捉仓曹吏员，757年正月盖庭伦兵乱中遇难；随母东行逃难，为凉州驻留的连朔所部登验放行，凭父亲铜印与户籍残片以军户子弟身份编入。",
       "瘦削。",
-      "学得慢但学得稳的人——河西人特有的耐磨性，把每一个动作练到肌肉里，直到它成为第二天性。不哭也不闹。",
+      "学得慢但学得稳的人——河西人特有的耐磨性，把每一个动作练到肌肉里，直到它成为第二天性。",
       "",
       "武学起点不高；狄元恪教科书式的端正刀法于他反而是最合适的起点，因为他没有任何预设的路数需要打破。",
       "父亲留下的交城守捉铜印和一卷族谱残页。",
@@ -651,6 +651,20 @@ export const CHARACTERS = [
     ],
   },
   {
+    id: "mayi", name: "马翊", zi: "图南", belong: ["天策"], birth: 721, death: 757,
+    birthplace: "", pin: "", epithet: "", hao: "",
+    gloss: "《説文·羽部》：“翊，飛貌。” 飛翔、翺游義近，故取《逍遙遊》：“而后乃今将图南。”",
+    profile: F("", "", "", "", "", "", "", ""),
+    anecdotes: [
+      "东汉名将伏波将军马援之后。程凯、李庭深的师兄。（按：程凯所奉偶像正是马援——「男儿当死于边野，马革裹尸而还」「时年迫我」，见其档案偶像栏。）",
+      "“我何曾怕他越过我去？我怕他越过我，却担不起！”",
+      "“去吧！回头告诉阿凯，休忘了他那铁牢是跟着我练的！”",
+    ],
+    highlight: [
+      "757年秋收两京，大军集结前夕，李庭深这一营在山下为狼牙所围、不得出——他去破阵而身亡。（按：设想，俟作者定。）",
+    ],
+  },
+  {
     id: "chengyu", name: "程宇", zi: "镇洛 Āsemūn", belong: ["天策", "西域", "唐军"], birth: 746, death: 792,
     birthplace: "陇右道 庭州 北庭大都护府", pin: "", epithet: "", hao: "",
     gloss: "字「镇洛」为程凯所取——程锋世代边将，私心不想让儿子再受边陲之苦，程凯知晓其心意，愿其常镇洛阳便好，但终究没能改变其命运。波斯文名 آسمون（Asemoon，阿赛穆），意即天空。",
@@ -723,6 +737,12 @@ export const CHARACTERS = [
       "是程凯在家族中关系最亲近的兄长之一，曾教程凯如何躲避父兄的责罚，也曾带他偷跑去洛阳夜市。相比其他兄长，他最不在意程凯的出身，甚至戏称「你若无名无姓，倒也自在」。",
       "在程凯投军天策府后，曾偶然探望，带酒相赠，但也劝他不要过于执着家族认同。",
     ],
+  },
+  {
+    id: "chengguang", name: "程广", zi: "千里", belong: ["唐军"], birth: null, death: 747,
+    birthplace: "都畿道 洛阳", pin: "", epithet: "", hao: "",
+    gloss: "《说文》：“殿之大屋也。”《易·系辞》：“广大配天地。” 故以“千里”应“广”。",
+    profile: F("程凯生父。战亡西北。（按：既有编年系于747年、与次子程钊同战亡于北庭，见程钊档案与同年编年。）", "", "", "", "", "", "", ""),
   },
   {
     id: "chenruihe", name: "陈瑞和", zi: "信初", belong: ["万花"], birth: 732, death: null, birthplace: "淮南道 庐州 合肥县", pin: "", epithet: "", hao: "",
@@ -1084,7 +1104,7 @@ export const CHARACTERS = [
     id: "caiyao", name: "彩瑶", zi: "Ncaik Ya", belong: ["五毒"], birth: null, death: null,
     birthplace: "", pin: "", epithet: "", hao: "",
     gloss: "Ncaik，姑娘；Ya，柔和语气，无实义。",
-    profile: F("五毒女子。与天策府马翊有情（马翊档案待建，关系俟其建档后接入）。", "", "", "", "", "", "", ""),
+    profile: F("五毒女子。与天策府马翊有情。", "", "", "", "", "", "", ""),
   },
   {
     id: "mengping", name: "蒙萍", zi: "", belong: ["南诏"], birth: null, death: null,
@@ -2019,6 +2039,14 @@ export const RELATIONS = [
   { a: "chengduo", b: "chengkai", t: "亲缘·先斥后察", y0: 723 },
   { a: "chengjun", b: "chengkai", t: "亲缘·亲近", y0: 723 },
   { a: "chengduo", b: "chengfeng", t: "亲缘·辅佐", d: 1, y0: 723 },
+  { a: "chengguang", b: "chengkai", t: "亲缘·生父", y0: 723, y1: 747 },
+  { a: "chengguang", b: "chengfeng", t: "亲缘", y0: 716, y1: 747 },
+  { a: "chengguang", b: "chengzhao", t: "亲缘", y1: 747 },
+  { a: "chengguang", b: "chengduo", t: "亲缘", y1: 747 },
+  { a: "chengguang", b: "chengjun", t: "亲缘", y1: 747 },
+  { a: "mayi", b: "chengkai", t: "同门·师兄", y0: 739, y1: 757 },
+  { a: "mayi", b: "litingshen", t: "同门·师兄", y0: 741, y1: 757 },
+  { a: "mayi", b: "caiyao", t: "有情", y1: 757 },
   /* —— 以下增補：唐门／五毒／七秀／丐帮四派，依作者训诂文本所载关系 —— */
   { a: "tangzhe", b: "tangxuan", t: "亲缘·收养", y0: 730 },
   { a: "tangxuan", b: "yangxin", t: "伴侣" },

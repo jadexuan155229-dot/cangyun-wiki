@@ -28,7 +28,14 @@ export const NOVELS = [
   { id: "denglou", tag: "登楼", title: "未到关前", chapters: stdChapters({ dingchang: "denglou/dingchang.txt" }) },
   { id: "zhongtao", tag: "种桃", title: "负我蛾眉", chapters: stdChapters() },
   { id: "langxin", tag: "郎心", title: "他年对坐炉边", chapters: stdChapters() },
-  { id: "siting", tag: "思停", title: "那里没有麋鹿", chapters: stdChapters() },
+  {
+    id: "siting", tag: "思停", title: "那里没有麋鹿",
+    chapters: [
+      ...stdChapters(),
+      /* 【于林之下】為卷，與諸章同級，其下再分章 */
+      { id: "yulinzhixia", title: "于林之下", chapters: NUM.slice(0, 5).map((n, i) => ({ id: `y${i + 1}`, title: `第${n}章`, file: `siting/y${i + 1}.txt` })) },
+    ],
+  },
 ];
 
 /* 展平為閱讀順序，供上一章／下一章翻頁與路徑檢索；ch.file 攜正文檔名 */

@@ -114,7 +114,7 @@ export const CHARACTERS = [
   },
   {
     id: "lanchuanyun", name: "岚川云", zi: "千鹤", belong: ["天策", "苍云"], birth: 724, death: null,
-    birthplace: "日本奈良，后长于长安", pin: "", epithet: "", hao: "",
+    birthplace: "日本奈良，后长于长安", pin: "识", epithet: "", hao: "",
     gloss: "因其名云，以「鹤」应之；又「千鹤」也是日本女名，故有。（另一说：「千鹤」为天策府赐号，取义「千川振迅，鹤目九野」，喻其轻捷矫健与斥候眼目千里之能——两说并存，俟作者定。）",
     profile: F(
       "天策府称旅帅，辖斥候（747年擢任斥候首，训练新入府的斥候兵员），掌兵士遴训和一部分情报工作；752年与程凯成婚。757年末自我流放北上苍云，经闵方城上报统帅，在破阵营中任教官。762年回府，为从五品下，骑都尉，归德郎将。",
@@ -318,7 +318,7 @@ export const CHARACTERS = [
   },
   {
     id: "rujin", name: "茹锦", zi: "七襄", belong: ["苍云", "柔然"], birth: 734, death: null,
-    birthplace: "河东道 代州 雁门县", pin: "", epithet: "", hao: "",
+    birthplace: "河东道 代州 雁门县", pin: "适", epithet: "", hao: "",
     gloss: "茹氏出于蠕蠕（即柔然）。唐有茹义忠，本家雁门，为虢州金门府折冲，级叙忠武将军；茹锦即其族裔。",
     profile: F(
       "苍云专职皮甲工匠，十六岁纳入苍云，修习武艺。皮革匠户之女，父母早年入苍云军营后方为皮工匠。",
@@ -363,7 +363,7 @@ export const CHARACTERS = [
   },
   {
     id: "helan", name: "贺兰", zi: "谷馨", belong: ["苍云"], birth: 740, death: null,
-    birthplace: "河东道 朔州 马邑县", pin: "", epithet: "", hao: "",
+    birthplace: "河东道 朔州 马邑县", pin: "耘", epithet: "", hao: "",
     gloss: "",
     profile: F(
       "景惠时徒弟，在医帐帮忙；后继承景惠时“静息医帐”（心理疗愈理念）。安史乱中马邑为叛军攻陷，被掳为仆妇；756年正月闵方城复马邑，连朔为先登，从狼牙手中救下贺兰，后入苍云。",
@@ -745,7 +745,7 @@ export const CHARACTERS = [
     profile: F("程凯生父。战亡西北。（按：既有编年系于747年、与次子程钊同战亡于北庭，见程钊档案与同年编年。）", "", "", "", "", "", "", ""),
   },
   {
-    id: "chenruihe", name: "陈瑞和", zi: "信初", belong: ["万花"], birth: 732, death: null, birthplace: "淮南道 庐州 合肥县", pin: "", epithet: "", hao: "",
+    id: "chenruihe", name: "陈瑞和", zi: "信初", belong: ["万花"], birth: 732, death: null, birthplace: "淮南道 庐州 合肥县", pin: "恭", epithet: "", hao: "",
     gloss: "《説文·玉部》：瑞，以玉爲信也。以「信」应「瑞」，饰之以「初」，谓起心不渝。",
     profile: F(
       "万花「三星望月」侍卫首。757年领一队万花弟子赴睢阳助张巡守城，后回门派；758万花谷蒙难时冷静处之，为同辈中砥柱；762年十一月于程锋帐前随军，救治重伤的闵方城。江蓠夫。",
@@ -1127,7 +1127,7 @@ export const CHARACTERS = [
   },
   {
     id: "zhulu", name: "朱鹭", zi: "宛汀", belong: ["七秀"], birth: 735, death: null,
-    birthplace: "江南东道 苏州", pin: "", epithet: "", hao: "",
+    birthplace: "江南东道 苏州", pin: "容", epithet: "", hao: "",
     gloss: "《尔雅·释鸟疏》：楚威王时，有朱鹭合沓飞翔而来舞，则复有赤者；旧鼓吹朱鹭曲是也，然则鸟名白鹭，赤者少耳。《晋书·乐志》：汉时短箫铙歌之乐，其曲有《朱鹭》。《诗·陈风·宛丘》：「坎其击鼓，宛丘之下。无冬无夏，值其鹭羽。」谓巫女执鹭羽而舞；又《诗·周颂·振鹭》：「振鹭于飞，于彼西雍。」《毛传》：「雍，泽也。」一说雍为辟雍，辟雍四周有水，白鹭降此，故以「汀」应鹭降处。",
     profile: F(
       "七秀弟子。763年后为李庭深妻。",
@@ -1247,7 +1247,7 @@ export const CHARACTERS = [
   },
   {
     id: "jiangli", name: "江蓠", zi: "芷华", belong: ["万花"], birth: 736, death: null,
-    birthplace: "长安城郊（孤女，为万花谷中人救助带回）", pin: "", epithet: "", hao: "",
+    birthplace: "长安城郊（孤女，为万花谷中人救助带回）", pin: "慧", epithet: "", hao: "",
     gloss: "蓠，古香草也。《说文》：江蘺蘼芜。司马相如《上林赋》：被以江蘺。西晋陆机《拟青青河畔草》：「靡靡江离草，熠燿生河侧。」熠燿，光彩，犹飘扬貌。以「芷」言其香，「华」应其光。",
     profile: F(
       "军医。后在晴昼海旁安住，引授正意弟子修习基础。陈瑞和妻。",

@@ -333,7 +333,7 @@ export const CHARACTERS = [
   },
   {
     id: "louyi", name: "楼谊", zi: "贞顾", belong: ["苍云"], birth: 730, death: null,
-    birthplace: "河东道 代州 雁门县", pin: "", epithet: "", hao: "塔侯 · 楼官",
+    birthplace: "河东道 代州 雁门县", pin: "凌", epithet: "", hao: "塔侯 · 楼官",
     gloss: "东汉·张衡《东京赋》：“执谊顾主，夫怀贞节。”",
     profile: F(
       "雁塔守备长官。楼氏世代守塔，745年夏父楼准因狼牙偷袭坠塔身亡，十五岁临危受命——照常升灯、报讯、点兵、安排值守，塔没有乱。婚配朔州一崔姓官员。",
@@ -372,7 +372,7 @@ export const CHARACTERS = [
   },
   {
     id: "liaoqun", name: "廖群", zi: "莹中", belong: ["苍云"], birth: 740, death: null,
-    birthplace: "陇右道 凉州（武威郡）天宝县", pin: "", epithet: "", hao: "",
+    birthplace: "陇右道 凉州（武威郡）天宝县", pin: "璞", epithet: "", hao: "",
     gloss: "取“群玉”之“群”，群玉谓群玉山，《穆天子傳》谓之“群玉之山”，因玉之光辉而及产玉之山。《説文·玉部》：“莹，玉色也。”段玉裁注：“謂光明之貌。”《山海經·西山經》：“玉山，是西王母所居也。”郭璞注：“此山多玉石”，因以名云。",
     profile: F(
       "苍云新兵（758-759年间入营，在狄元恪治下二团受训）。父为交城守捉仓曹吏员，757年正月盖庭伦兵乱中遇难；随母东行逃难，为凉州驻留的连朔所部登验放行，凭父亲铜印与户籍残片以军户子弟身份编入。",
@@ -1084,7 +1084,7 @@ export const CHARACTERS = [
   },
   {
     id: "manran", name: "曼冉", zi: "Mait Rangs", belong: ["五毒"], birth: 716, death: null,
-    birthplace: "", pin: "", epithet: "", hao: "",
+    birthplace: "", pin: "灵", epithet: "", hao: "",
     gloss: "Mait，代表「姑娘」的几个音之一；Rangs，姓，以一种牲畜命此姓。",
     profile: F("五毒大祭司。", "", "", "", "", "", "", ""),
   },

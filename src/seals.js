@@ -41,4 +41,7 @@ export const SEAL_SVG_FILE = {
   xuqiusheng: "xvqiusheng-yi.svg",
   jinghuishi: "jinghuishi-yi.svg",
   weiqian: "weiqian-jie.svg",
+  zhuhongqu: "zhuhongqv-ying.svg",
+  liurong: "liurong-hao.svg",
+  luowenbi: "luowenbi-wei.svg",
 };

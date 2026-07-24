@@ -958,6 +958,7 @@ function usePanZoom(w, h) {
   const dragRef = useRef(null);     /* 單指／滑鼠拖曳起點暫存 */
   const pinchRef = useRef(null);    /* 捏合起手：兩指距離、中點、當時 view */
   const movedRef = useRef(0);       /* 拖曳位移量：>5 則抑制本次點選，防拖後誤觸 */
+  const wheelElRef = useRef(null);  /* 掛原生 wheel 監聽之幅面元素 */
 
   const clampK = (k) => Math.min(8, Math.max(1, k));
   /* 以幅面中心為錨：＋／－ 按鈕走此路 */
@@ -969,6 +970,35 @@ function usePanZoom(w, h) {
       return { k: k2, tx: cx - (k2 / v.k) * (cx - v.tx), ty: cy - (k2 / v.k) * (cy - v.ty) };
     });
   const reset = () => setView({ k: 1, tx: 0, ty: 0 });
+
+  /* 滾輪／觸控板捏合縮放：以游標為錨連續放縮。
+     React 19 於根節點掛 wheel 為 passive，JSX onWheel 內 preventDefault 無效，
+     故走原生 non-passive 監聽。靜止(k===1)時平常滾輪讓位頁面捲動；
+     唯捏合（觸控板雙指，瀏覽器合成 ctrlKey）可於原始大小起手放大——同 Google 地圖之例。 */
+  useEffect(() => {
+    const el = wheelElRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      const v = viewRef.current;
+      if (v.k === 1 && !e.ctrlKey) return;
+      const rect = el.getBoundingClientRect();
+      if (!rect.width) return;
+      const s = w / rect.width; /* 屏幕像素 → viewBox 座標 */
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16;             /* 行 → 像素 */
+      else if (e.deltaMode === 2) dy *= rect.height; /* 頁 → 像素 */
+      /* 捏合 delta 細碎、滾輪成塊，分授係數，手感歸一 */
+      const k2 = clampK(v.k * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0018)));
+      if (k2 === v.k) return; /* 已抵夾限，不攔頁面捲動 */
+      e.preventDefault();
+      if (k2 === 1) { setView({ k: 1, tx: 0, ty: 0 }); return; }
+      const cx = (e.clientX - rect.left) * s, cy = (e.clientY - rect.top) * s;
+      const gx = (cx - v.tx) / v.k, gy = (cy - v.ty) / v.k;
+      setView({ k: k2, tx: cx - k2 * gx, ty: cy - k2 * gy });
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [w, h]);
 
   const endPointer = (e) => {
     const pts = ptsRef.current;
@@ -1047,14 +1077,14 @@ function usePanZoom(w, h) {
     cursor: view.k > 1 ? (dragRef.current ? "grabbing" : "grab") : "default",
     touchAction: view.k > 1 ? "none" : "auto",
   };
-  return { view, zoomBy, reset, handlers, gestureStyle, movedRef };
+  return { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef };
 }
 
 /* 縮放三鈕：放大／縮小／復位，三幅圖共用 */
 function ZoomBtns({ view, zoomBy, reset }) {
   return (
     <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: 6, zIndex: 3, alignItems: "center" }}>
-      {[["＋", () => zoomBy(1.5), "放大"], ["－", () => zoomBy(1 / 1.5), "縮小"], ["回", reset, "復位"]].map(([t, fn, tt]) => (
+      {[["＋", () => zoomBy(1.3), "放大"], ["－", () => zoomBy(1 / 1.3), "縮小"], ["回", reset, "復位"]].map(([t, fn, tt]) => (
         <button key={tt} title={tt} onClick={fn}
           style={{ width: 30, height: 30, fontFamily: serif, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
           {t}
@@ -1072,7 +1102,7 @@ function ZoomBtns({ view, zoomBy, reset }) {
    與兩核皆無共見者列於環抱全系之遠軌。 */
 function Planetary({ onOpenChar }) {
   const [hover, setHover] = useState(null);
-  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1200, 830);
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef } = usePanZoom(1200, 830);
   const coarse = useCoarsePointer();
   const CX = [350, 850], CY = 410;
   const layout = useMemo(() => {
@@ -1184,7 +1214,7 @@ function Planetary({ onOpenChar }) {
   return (
     <div style={{ overflowX: "auto", position: "relative" }}>
       <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
-      <svg viewBox="0 0 1200 830"
+      <svg viewBox="0 0 1200 830" ref={wheelElRef}
         style={{ width: "100%", maxWidth: 1160, display: "block", margin: "0 auto", ...gestureStyle }}
         {...handlers}>
         <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
@@ -1263,7 +1293,7 @@ const PHASES = [["壹 · 前史", 744], ["貳 · 亂前", 750], ["叁 · 亂中"
 function Community({ onOpenChar }) {
   const [Y, setY] = useState(765);
   const [hover, setHover] = useState(null);
-  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1120, 1050);
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef } = usePanZoom(1120, 1050);
   const coarse = useCoarsePointer();
   const { nodes, pos, centers } = useMemo(() => {
     const groups = {};
@@ -1321,7 +1351,7 @@ function Community({ onOpenChar }) {
       </div>
       <div style={{ overflowX: "auto", position: "relative" }}>
         <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
-        <svg viewBox="0 0 1120 1050"
+        <svg viewBox="0 0 1120 1050" ref={wheelElRef}
           style={{ width: "100%", maxWidth: 1100, display: "block", margin: "0 auto", ...gestureStyle }}
           {...handlers}>
           <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
@@ -1421,7 +1451,7 @@ function GeoMap({ onOpenChar }) {
   const [sel, setSel] = useState(null); /* 選中地名（或 NOLOC_KEY）→ 側欄編年 */
   const [hover, setHover] = useState(null);
   const [allLabels, setAllLabels] = useState(false); /* 地名全顯開關 */
-  const { view, zoomBy, reset, handlers, gestureStyle, movedRef } = usePanZoom(1000, 720);
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef } = usePanZoom(1000, 720);
   const coarse = useCoarsePointer();
   const [trackSel, setTrackSel] = useState([]); /* 動線人物（點選即顯，至多三人；滿員再選則汰最舊） */
   const toggleTrack = (id) =>
@@ -1759,7 +1789,7 @@ function GeoMap({ onOpenChar }) {
         {/* 圖幅 */}
         <div style={{ flex: "1 1 auto", minWidth: 0, border: `1px solid ${T.line}`, background: T.panel, position: "relative" }}>
           <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
-          <svg viewBox="0 0 1000 720"
+          <svg viewBox="0 0 1000 720" ref={wheelElRef}
             style={{ width: "100%", display: "block", ...gestureStyle }}
             {...handlers}>
             <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>

@@ -53,4 +53,10 @@ export const SEAL_SVG_FILE = {
   louyi: "louyi-ling.svg",
   manran: "manran-ling.svg",
   liaoqun: "liaoqun-pu.svg",
+  linyeshi: "linyeshi-du.svg",
+  chengguang: "chengguang-gang.svg",
+  guanshan: "guanshan-yi.svg",
+  mayi: "mayi-zhuang.svg",
+  xiamingcang: "xiamingcang-xiu.svg",
+  shenhanying: "shenhanying-ai.svg",
 };

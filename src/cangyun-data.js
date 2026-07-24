@@ -273,7 +273,7 @@ export const CHARACTERS = [
   },
   {
     id: "guanshan", name: "关山", zi: "仁石", belong: ["苍云"], birth: 715, death: 745,
-    birthplace: "河东道 代州 雁门县", pin: "", epithet: "", hao: "",
+    birthplace: "河东道 代州 雁门县", pin: "夷", epithet: "", hao: "",
     gloss: "《论语·雍也》：“仁者乐山。”《诗经·小雅·节南山》：“节彼南山，维石岩岩。”",
     profile: F(
       "天宝四年（745）身故时是营中一个队正。",
@@ -652,7 +652,7 @@ export const CHARACTERS = [
   },
   {
     id: "mayi", name: "马翊", zi: "图南", belong: ["天策"], birth: 721, death: 757,
-    birthplace: "", pin: "", epithet: "", hao: "",
+    birthplace: "", pin: "庄", epithet: "", hao: "",
     gloss: "《説文·羽部》：“翊，飛貌。” 飛翔、翺游義近，故取《逍遙遊》：“而后乃今将图南。”",
     profile: F("", "", "", "", "", "", "", ""),
     anecdotes: [
@@ -740,7 +740,7 @@ export const CHARACTERS = [
   },
   {
     id: "chengguang", name: "程广", zi: "千里", belong: ["唐军"], birth: null, death: 747,
-    birthplace: "都畿道 洛阳", pin: "", epithet: "", hao: "",
+    birthplace: "都畿道 洛阳", pin: "刚", epithet: "", hao: "",
     gloss: "《说文》：“殿之大屋也。”《易·系辞》：“广大配天地。” 故以“千里”应“广”。",
     profile: F("程凯生父。战亡西北。（按：既有编年系于747年、与次子程钊同战亡于北庭，见程钊档案与同年编年。）", "", "", "", "", "", "", ""),
   },
@@ -766,7 +766,7 @@ export const CHARACTERS = [
     ],
   },
   {
-    id: "xiamingcang", name: "夏明沧", zi: "", belong: ["药宗", "靺鞨"], birth: 736, death: null, birthplace: "靺鞨族部落", pin: "", epithet: "", hao: "", gloss: "",
+    id: "xiamingcang", name: "夏明沧", zi: "", belong: ["药宗", "靺鞨"], birth: 736, death: null, birthplace: "靺鞨族部落", pin: "秀", epithet: "", hao: "", gloss: "",
     profile: F(
       "药宗弟子，靺鞨族，部落萨满助神人出身，孟雪萦之夫。家养梅鹿驯鹿为业；八九岁时父母冬捕坠冰窟冻溺而亡，被部族萨满收养，在其身边学习歌舞声乐、记诵历史仪礼，视其如祖母。部族居处在药宗故地与白霜谷间，少年即拜师入门；渐有所成后出山，常在东北边境行医，游弋营州。763年三月应柳戎之邀，从药宗南下医治一度失去视力的闵方城。",
       "",
@@ -1191,7 +1191,7 @@ export const CHARACTERS = [
   /* —— 万花「医渡组·藏之名山」：依《医渡组》与《朱鹭·叶添灯》两份人设故事文本增補；生年悉依 Notion 档案库，卒年库中未著者从文本明文 —— */
   {
     id: "shenhanying", name: "沈含英", zi: "粲容", belong: ["万花"], birth: 726, death: 756,
-    birthplace: "京畿道 雍州（京兆府）长安县", pin: "", epithet: "", hao: "",
+    birthplace: "京畿道 雍州（京兆府）长安县", pin: "蔼", epithet: "", hao: "",
     gloss: "《詩·鄭風·羔裘》：「羔裘晏兮，三英粲兮。彼其之子，邦之彦兮。」《毛诗序》：「《羔裘》，刺朝也。言古之君子以风其朝也。」因将「粲」与「英」相应。此一首为赞美士诗，讽朝无忠臣。",
     profile: F(
       "万花「医渡组」大师兄。早年随师父至天策府为侍医数年，后返门中；战乱再带师弟妹来援前线。",
@@ -1269,7 +1269,7 @@ export const CHARACTERS = [
   },
   {
     id: "linyeshi", name: "林叶矢", zi: "", belong: ["万花"], birth: 750, death: 773,
-    birthplace: "日本", pin: "", epithet: "", hao: "",
+    birthplace: "日本", pin: "渡", epithet: "", hao: "",
     gloss: "はやし きょうや。「余は彼の燈火の海を渡り來て」——我由灯火之彼岸渡海而来。渡海是岚川一家的注脚，也是叶矢的注脚。",
     profile: F(
       "万花，许秋生弟子；岚川云养子。初为许秋生药童。",

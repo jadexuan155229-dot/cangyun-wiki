@@ -19,7 +19,7 @@ export const NOVELS = [
   {
     id: "shengfeng", tag: "生逢", title: "大寺烈焰冲天",
     chapters: [
-      ...stdChapters(),
+      ...stdChapters({ dingchang: "shengfeng/dingchang.txt", xu: "shengfeng/xu.txt" }),
       /* 【门墙】為卷，與諸章同級，其下再分章 */
       { id: "menqiang", title: "门墙", chapters: NUM.slice(0, 5).map((n, i) => ({ id: `m${i + 1}`, title: `第${n}章`, file: `shengfeng/m${i + 1}.txt` })) },
     ],
@@ -31,7 +31,7 @@ export const NOVELS = [
   {
     id: "siting", tag: "思停", title: "那里没有麋鹿",
     chapters: [
-      ...stdChapters(),
+      ...stdChapters({ dingchang: "siting/dingchang.txt", xu: "siting/xu.txt" }),
       /* 【于林之下】為卷，與諸章同級，其下再分章 */
       { id: "yulinzhixia", title: "于林之下", chapters: NUM.slice(0, 5).map((n, i) => ({ id: `y${i + 1}`, title: `第${n}章`, file: `siting/y${i + 1}.txt` })) },
     ],

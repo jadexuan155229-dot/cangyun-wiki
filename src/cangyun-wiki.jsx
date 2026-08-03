@@ -130,32 +130,88 @@ function Seal({ ch, size = 15, svg }) {
   );
 }
 
+/* 宣紙肌理範圍：全站人物，無一例外——初時只及馬翊一卡，繼而天策、蒼雲，今遍及一百二十人。
+   此判定遂恆真，暫留作單一開關：若日後要收回某派或某人，改此一處即可，
+   大小兩卡與 index.css 諸規則悉聽其令，不必四處翻找。
+   （若確定不再收回，可連同各處 tt 分支一併化去，屆時 index.css 中
+     .texture-test-sm 的幾條 !important 覆寫亦宜併回 CharCard 的內聯樣式。）
+   綾邊底色隨門派而變，全站計有二十五色；門派為空者（程鈞）落到 fc 的中立灰回退。
+   樣式見 index.css 同名段。大小兩卡皆據此判定：
+     小卡 .texture-test-sm —— 紙紋（減配）+ 斑駁 + 左側綾邊（承原頂部門派色條），
+                              且字號自豎排左欄改為橫綴於名後、名下漸變金線分隔、
+                              線下生卒／出身／事件三行標目；
+     詳情卡 .texture-test  —— 紙紋 + 斑駁 + 名號行下漸變金線 + 檔案行線左端泛金。
+   範圍外之人一律照舊；試驗作廢時刪此函數與其數處引用、並刪 index.css 同名段。 */
+const isTextureTest = () => true;
+
+
+/* 試驗卡的隨派色變量，一併注入大小兩卡。皆自 fc(belong[0])（即原頂部色條之色）派生，
+   dimAccent 之 grayT 取 0 即循原色相不作灰化，故各派自帶其色。
+   band-a/b/c 綾邊底色三檔（僅小卡用）：×0.72 / ×0.52 / ×0.70，
+     代入天策 #7E3038 仍得原先的 #5B2328 / #42191D / #582227，故天策諸卡觀感不變。
+     初版就地寫死天策派生值，趙廷之（平民·天策，belong[0] 為平民）一入範圍即不敷用。
+   stain 斑駁右上那圈的暈色（大小兩卡皆用）：原取全站高亮橘紅 #B5442D，
+     那本是通用強調色、非門派色，只是恰與天策相得；蒼雲一入範圍，冷鐵灰的卡上憑空一團暖紅，
+     突兀可見。故一併改隨派色——天策仍暖，蒼雲轉冷，各如其分。
+     透明度自 0.06 提至 0.07：門派色多較 #B5442D 為暗，同透明度下浮色更淺，略補之 */
+const ttVars = (main) => ({
+  "--tt-band-a": dimAccent(fc(main), 0, 0.28, 1),
+  "--tt-band-b": dimAccent(fc(main), 0, 0.48, 1),
+  "--tt-band-c": dimAccent(fc(main), 0, 0.30, 1),
+  "--tt-stain": dimAccent(fc(main), 0, 0, 0.07),
+});
+
 /* ---------------- 檔案卡 ---------------- */
 function CharCard({ c, onOpen }) {
   const main = c.belong[0];
   const evCount = EVENTS.filter((e) => e.chars.includes(c.id)).length;
+  const tt = isTextureTest(c);
   return (
     <div
       onClick={() => onOpen(c)}
-      className="cursor-pointer flex"
-      style={{ background: T.panel, border: `1px solid ${T.line}`, borderTop: `3px solid ${fc(main)}`, padding: "16px 14px 14px 16px", gap: 12, transition: "background .15s" }}
+      className={`cursor-pointer flex${tt ? " texture-test-sm" : ""}`}
+      style={{ background: T.panel, border: `1px solid ${T.line}`, borderTop: `3px solid ${fc(main)}`, padding: "16px 14px 14px 16px", gap: 12, transition: "background .15s", ...(tt ? ttVars(main) : null) }}
       onMouseEnter={(e) => (e.currentTarget.style.background = T.panelHi)}
       onMouseLeave={(e) => (e.currentTarget.style.background = T.panel)}
     >
-      <div style={{ writingMode: "vertical-rl", fontFamily: serif, fontSize: 12, letterSpacing: "0.35em", color: T.faint, borderRight: `1px solid ${T.line}`, paddingRight: 8, minHeight: 88 }}>
-        {c.zi ? `字 ${c.zi}` : "字号待补"}
-      </div>
+      {!tt && (
+        <div style={{ writingMode: "vertical-rl", fontFamily: serif, fontSize: 12, letterSpacing: "0.35em", color: T.faint, borderRight: `1px solid ${T.line}`, paddingRight: 8, minHeight: 88 }}>
+          {c.zi ? `字 ${c.zi}` : "字号待补"}
+        </div>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="flex items-baseline flex-wrap" style={{ gap: 10 }}>
+        {/* 試驗卡的欄距放寬到 14，並於字號後另加 6px 右外距（合即 20），
+            使印章距姓名約 14 + 字號寬 + 20 ≈ 77px——與原版「姓名 + 繫年N事 + 印」
+            所形成的間距（約 75px）相當。原版諸卡欄距 10 不變 */}
+        <div className="flex items-baseline flex-wrap" style={{ gap: tt ? 14 : 10 }}>
           <span style={{ fontFamily: serif, fontSize: 22, color: T.ink, fontWeight: 600 }}>{c.name}</span>
-          {evCount > 0 && <span style={{ fontSize: 11, color: T.faint }}>繫年 {evCount} 事</span>}
+          {tt && <span style={{ fontFamily: serif, fontSize: 13, color: c.zi ? T.muted : T.faint, marginRight: 6 }}>{c.zi ? `字 ${c.zi}` : "字号待补"}</span>}
+          {!tt && evCount > 0 && <span style={{ fontSize: 11, color: T.faint }}>繫年 {evCount} 事</span>}
           <Seal ch={c.pin} size={15} svg={SEAL_SVG_FILE[c.id]} />
         </div>
-        <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>
-          {lifespan(c)}
-          {c.birthplace && <><span style={{ margin: "0 8px", color: T.faint }}>·</span>{c.birthplace}</>}
-        </div>
-        <div className="flex flex-wrap" style={{ gap: 6, marginTop: 10 }}>
+        {tt ? (
+          /* 金線下改為標目分行：生卒／出身／事件各佔一行，仿詳情卡「檔案」區的標目體例
+             （左標目定寬、右值自適應），惟字級與行距按小卡收緊。
+             原先擠作一行、以「·」相隔的寫法，遇程凱這等籍貫帶括注者即折成三四行而失序。
+             值為空仍留行（同詳情卡檔案區之例），使名單內諸卡結構齊一、便於並置對照 */
+          /* 行距按壓緊後的定值：行內距 1、行高 1.5——三行合約 62px，
+             較初版（行內距 2、行高 1.65）省下 12px */
+          <div style={{ marginTop: 1 }}>
+            {[["生卒", lifespan(c)], ["出身", c.birthplace], ["事件", evCount > 0 ? `繫年 ${evCount} 事` : ""]].map(([k, v]) => (
+              <div key={k} style={{ display: "flex", gap: 10, padding: "1px 0" }}>
+                <div style={{ minWidth: 34, fontFamily: serif, fontSize: 11, letterSpacing: "0.12em", color: T.faint, paddingTop: 1 }}>{k}</div>
+                <div style={{ flex: 1, minWidth: 0, fontFamily: serif, fontSize: 12.5, color: v ? T.muted : T.faint, lineHeight: 1.5 }}>{v || ""}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>
+            {lifespan(c)}
+            {c.birthplace && <><span style={{ margin: "0 8px", color: T.faint }}>·</span>{c.birthplace}</>}
+          </div>
+        )}
+        {/* 門派籤：試驗卡於標目三行之下另起一行，留白略寬於行距即可分出層次（14 → 9，壓緊） */}
+        <div className="flex flex-wrap" style={{ gap: 6, marginTop: tt ? 9 : 10 }}>
           {(c.belong.length ? c.belong : ["门派待补"]).map((f) => (
             <span key={f} style={{ fontSize: 11, color: fc(f), border: `1px solid ${fc(f)}55`, padding: "1px 7px", borderRadius: "3px" }}>{f}</span>
           ))}
@@ -216,6 +272,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
       return next;
     });
   if (!c) return null;
+  const tt = isTextureTest(c); /* 宣紙肌理試驗範圍，見文件上方 */
   const related = EVENTS.filter((e) => e.chars.includes(c.id)).sort(sortEvents);
   const co = {};
   for (const e of related) for (const id of e.chars) if (id !== c.id) co[id] = (co[id] || 0) + 1;
@@ -292,7 +349,8 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(10,12,15,.72)", zIndex: 50, padding: 20 }} onClick={() => { setShowAll(false); onClose(); }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: T.panel, border: `1px solid ${T.line}`, maxWidth: 700, width: "100%", maxHeight: "86vh", position: "relative", overflow: "hidden", isolation: "isolate", display: "flex", flexDirection: "column" }}>
+      {/* 宣紙肌理試驗：範圍見上方 isTextureTest，樣式全在 index.css 同名段 */}
+      <div className={tt ? "texture-test" : undefined} onClick={(e) => e.stopPropagation()} style={{ ...(tt ? ttVars(c.belong[0]) : null), background: T.panel, border: `1px solid ${T.line}`, maxWidth: 700, width: "100%", maxHeight: "86vh", position: "relative", overflow: "hidden", isolation: "isolate", display: "flex", flexDirection: "column" }}>
         {factionMark && (
           <div className={`faction-watermark faction-watermark--${factionMark}`} aria-hidden="true">
             {/* 藥宗自定義灰度：feColorMatrix 藍通道負權重，使黃（低藍）亮於白（高藍），
@@ -320,9 +378,18 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
         {c.pin && <div style={{ position: "absolute", top: 26, right: 60 }}><Seal ch={c.pin} size={22} svg={SEAL_SVG_FILE[c.id]} /></div>}
         <button onClick={() => { setShowAll(false); onClose(); }} style={{ position: "absolute", top: 20, right: 22, color: T.muted, fontSize: 20, lineHeight: 1, background: "none", border: "none", cursor: "pointer" }}>×</button>
 
-        <div className="flex items-baseline flex-wrap" style={{ gap: 12, paddingRight: 70 }}>
+        {/* 試驗卡的欄距 12 → 14，字號再加 6px 左外距，故姓名與其後小字相距 20px。
+            按小卡的比例折算（22px 名配 14px 距，約 0.64 倍字高），30px 名恰配 19–20px。
+            此處無印章之慮（印為絕對定位，浮於卡角，不入此行），故不設右外距。
+            範圍外諸卡維持 12。
+
+            tt-rule（名號行下的漸變金線）僅在無稱號時掛：
+            有稱號者，其下本就自帶一道下劃線，那才是此卡的主分隔線——
+            金線漸變由 index.css 的「檔案行線」規則一併罩到它身上，不必在此重複一道；
+            兩線相距僅三十餘像素，並出則刺目。馬翊、程凱等無稱號者，此線正補其位 */}
+        <div className={`flex items-baseline flex-wrap${tt && !c.epithet ? " tt-rule" : ""}`} style={{ gap: tt ? 14 : 12, paddingRight: 70 }}>
           <span style={{ fontFamily: serif, fontSize: 30, color: T.ink, fontWeight: 700 }}>{c.name}</span>
-          {c.zi && <span style={{ fontFamily: serif, fontSize: 15, color: T.muted }}>字 {c.zi}</span>}
+          {c.zi && <span style={{ fontFamily: serif, fontSize: 15, color: T.muted, marginLeft: tt ? 6 : 0 }}>字 {c.zi}</span>}
           {c.hao && <span style={{ fontFamily: serif, fontSize: 13, color: T.faint }}>「{c.hao}」</span>}
         </div>
         {c.epithet && (

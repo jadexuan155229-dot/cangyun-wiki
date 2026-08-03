@@ -438,3 +438,189 @@ body {
   transform-origin: center;
   pointer-events: none;
 }
+
+/* ══ 宣紙肌理試驗（單人物：馬翊）══════════════════════════════════════════
+   兩處掛鉤，皆以 c.id === "mayi" 為條件（見 cangyun-wiki.jsx）：
+     .texture-test    → DetailPanel 詳情卡（全套：紙紋 + 斑駁 + 左側綾邊）
+     .texture-test-sm → CharCard 網格小卡（減配：紙紋降至六成 + 縮尺斑駁，不加綾邊——
+                        9px 窄條在 ~300px 寬的小卡上佔比過重）
+   其餘人物卡一律照舊，便於並置對照；試驗作廢時刪本段 + 那兩處條件即可，別無牽連。
+
+   零圖片：五幅 feTurbulence 噪點皆寫作 data:image/svg+xml，
+   一律 feColorMatrix type="saturate" values="0" 去色，逐層透明度烘進 rect 的 opacity
+   （單元素多值背景無法逐層設 CSS opacity，故前移到 SVG 內）。
+   各幅 filter 顯式設 x/y/width/height=0/0/100%/100% 並加 stitchTiles="stitch"，
+   使濾鏡區不外擴、噪點在 tile 邊界接縫連續（否則平鋪處可見規則格線）。
+
+   不新增節點：容器僅得 ::before / ::after 兩個偽元素，故
+     ::before = 紙紋三層（各自 blend 由 background-blend-mode 承擔，整體再 overlay 壓卡面）
+     ::after  = 斑駁暈染 + 左側綾邊（皆常規混合，合於一元素）
+   兩者同 z-index: 0，與門派底紋（.faction-watermark）同級，
+   繪製序按文檔序：::before → 底紋 → ::after → 正文層（.char-modal-scroll，z-index: 1），
+   故紙紋墊在底紋之下、暈染與綾邊罩在底紋之上，三者皆不及正文。 */
+.texture-test {
+  /* 容器內聯已有 position:relative + overflow:hidden（綾邊與紙紋溢出由此裁齊）；
+     此處重申，內聯若日後變動亦不致失效 */
+  position: relative;
+  overflow: hidden;
+  /* 全站未設 CSS 變量體系，本試驗自備一枚：值同 theme.js 的 T.line */
+  --border: #2E3640;
+}
+
+/* 紙紋：細顆粒（240 tile / 0.16）+ 中頻雲絮（320 tile / 0.10）+ 長纖維（400 tile / 0.12）。
+   長纖維 baseFrequency 橫低豎高（0.012 0.25），拉出近水平的長絲，即宣紙的簾紋走向。
+   大小兩卡共用此三幅（紋理尺度本應與卡片大小無關，一縮小便成另一種紙）；
+   小卡的減配只靠下方一句 opacity 整體壓到六成，不另備低透明度的 SVG。 */
+.texture-test::before,
+.texture-test-sm::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='a' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23a)' opacity='0.16'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='b' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.055' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23b)' opacity='0.1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.25' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23c)' opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 240px 240px, 320px 320px, 400px 400px;
+  background-blend-mode: overlay, overlay, soft-light;
+  mix-blend-mode: overlay;
+}
+
+/* 斑駁暈染（三圈徑向：右上淡橘紅、左下重壓角、中部極淡提亮）。
+   詳情卡曾試過在此再疊一道左側綾邊窄條（9px → 加強至 11px），後按作者定奪撤去：
+   詳情卡幅面大、門派底紋已佔右半，左緣再壓一條深色實邊顯得逼仄。
+   綾邊的整套寫法移交網格小卡承接（見下方 .texture-test-sm::after，
+   那裡它同時充當原頂部門派色條）。此處遂只剩暈染三圈，正文左內距亦隨之免去覆寫。 */
+.texture-test::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(500px 300px at 82% 6%, var(--tt-stain, rgba(181, 68, 45, 0.07)), transparent 70%),
+    radial-gradient(380px 340px at 6% 98%, rgba(0, 0, 0, 0.35), transparent 72%),
+    radial-gradient(220px 160px at 55% 45%, rgba(231, 226, 214, 0.02), transparent 75%);
+}
+
+/* 卡內橫分隔線（檔案各行）改為左端泛金、四成處回到原線色，呼應綾邊金線。
+   走 border-image 而非 border-bottom：後者已由內聯設定，前者內聯未涉，
+   無須 !important 即可生效；左右上三邊 border-width 為 0，故只現於底邊。
+   選擇器取「內聯設過 border-bottom 者」——CSSOM 序列化必含此串（簡寫或 -width 長寫），
+   不匹配顏色部分（各瀏覽器會把 #2E364044 正規化成 rgba(...)，形式不一）。
+   限 div 以避開四邊皆有框的關係／文庫按鈕；
+   :not([style*="border-left"]) 以避開高光塊（四邊框 + 粗左框，其框色本就隨門派）。 */
+.texture-test .char-modal-scroll div[style*="border-bottom"]:not([style*="border-left"]) {
+  border-image: linear-gradient(90deg, rgba(191, 155, 90, 0.35), var(--border) 40%) 1;
+}
+
+/* ── 網格小卡（CharCard）減配版 ────────────────────────────────────────
+   小卡內聯未設 position / overflow / isolation，故此處三者皆可直接聲明，無須 !important。
+   isolation: isolate 是關鍵：唯有小卡自成層疊上下文，z-index: -1 的偽元素才會落在
+   「卡片自身背景之上、正文之下」；否則負層級會被推到小卡背景之後而全然不可見。
+   如此無須給兩列子元素補 position/z-index，正文一字未動。
+   （詳情卡走的是另一路：那邊正文層本就有 z-index: 1，故偽元素用 z-index: 0 即可。）
+   小卡背景在 hover 時由內聯 JS 改寫（T.panel ↔ T.panelHi），
+   紙紋以 mix-blend-mode 壓在其上，故懸停時肌理隨底色一同變化，不會脫節。 */
+.texture-test-sm {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 門派色條改走左側綾邊（同詳情卡）：頂部 3px 橫條讓位。
+   邊框寬歸零而非抹成透明——overflow: hidden 裁在 padding box，
+   偽元素夠不到邊框帶，綾邊頂端會缺 3px 一截；寬度歸零後 padding box 直抵卡片上緣，
+   綾邊方能貫通全高。
+   歸零讓出的 3px 由上內距補回（16 → 19），故盒高與內容基線同鄰卡逐像素一致。
+
+   左右內距重定，以糾正字號豎欄撤去後文字整體左傾：
+   原卡的正文起於「1 邊框 + 16 內距 + 豎欄約 23 + 12 欄距」≈ 卡緣 52px 處；
+   豎欄一撤，正文驟然前移到 21px，遂顯得緊貼綾邊。
+   今以綾邊右緣（padding box 的 11px）為視覺左界重新分配留白：
+   左內距 31（= 綾邊 11 + 留白 20）、右內距 14 → 20，使兩側各餘 20px 而對稱，
+   正文起於卡緣 32px——介乎原先的 52 與方才的 21 之間。
+   下內距 14 → 12，同為壓緊卡高之故（見下）。
+   上內距一度取 19（= 鄰卡的 3 邊框 + 16 內距），求姓名頂緣與鄰卡絕對齊平；
+   今改回 16 —— 鄰卡那 3px 是實色門派條，眼裡讀作卡框而非留白，
+   故其「框內留白」實為 16；此卡既無色條，19 就整整多出一道空隙，姓名顯得下沉。
+   對齊的參照遂由絕對位置改為框內留白，與舊版卡的內部節奏一致（代價：姓名比同行舊版卡高 3px）。
+   五者對應的內聯簡寫（border-top / padding）皆已設值，故須 !important。 */
+.texture-test-sm {
+  border-top-width: 0 !important;
+  padding-top: 16px !important;
+  padding-right: 20px !important;
+  padding-bottom: 12px !important;
+  padding-left: 31px !important;
+}
+
+/* 等高：原豎排字號欄以 minHeight: 88 撐住卡高，欄一撤，此卡便比鄰卡矮一截。
+   桌面視口有 .char-grid 的 grid-auto-rows: minmax(...) 把整行拉平，看不出來；
+   窄屏／移動端無那條媒體查詢，落差就顯出來了。
+   故把 88 原樣移交給僅存的正文欄——它同是 flex item，align-items 默認 stretch，
+   與原先豎欄撐高的機制分毫不差。 */
+.texture-test-sm > div {
+  min-height: 88px;
+}
+
+/* 名號行下的漸變金線。兩卡共用同一道漸變（自左端泛金向右淡出，與綾邊金線同源），
+   走 border-image 而非實色 border——內聯未涉此屬性，無須 !important。
+   小卡：承接原豎排左欄退場後留下的分區職責，行內為「姓名 + 字 X + 印」，
+         線下方為生卒、出身、事件三行標目與門派籤。小卡不渲染稱號，故此線恆在。
+   詳情卡：僅無稱號者掛 .tt-rule（見 cangyun-wiki.jsx）——有稱號者，
+         稱號塊自帶的下劃線即其主分隔線，已由下方「檔案行線」規則一併染成金漸變，
+         此處不宜再出一道。
+   小卡側沿用 .items-baseline 這個全站工具類，已由 .texture-test-sm 圈定；
+   詳情卡側則另掛 .tt-rule，不必再靠選擇器層級去猜。 */
+.texture-test .tt-rule,
+.texture-test-sm .items-baseline {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(191, 155, 90, 0.5), rgba(191, 155, 90, 0.14) 40%, transparent 88%) 1;
+}
+/* 行距各按其卡的疏密：小卡緊湊；詳情卡本就寬綽，且生卒行自帶 marginTop: 10，
+   故此處只給下內距、不另加下外距 */
+.texture-test-sm .items-baseline {
+  padding-bottom: 6px;
+  margin-bottom: 3px;
+}
+.texture-test .tt-rule {
+  padding-bottom: 12px;
+}
+
+/* 紙紋三層與詳情卡共用（見上方合併選擇器），此處僅改層級與總強度：
+   0.62 使細顆粒實效約 0.10、雲絮 0.062、長纖維 0.075，
+   小卡幅面小、密集排布，再重就成了髒點 */
+.texture-test-sm::before {
+  z-index: -1;
+  opacity: 0.62;
+}
+
+/* 斑駁暈染（小卡專用縮尺版）+ 左側綾邊（承原頂部門派色條）：
+   詳情卡那三圈是按 700×~600 定的，原尺寸挪到 ~300×122 的小卡上會只剩一片均勻色，
+   故按卡幅重定半徑；左下壓角同時由 0.35 減到 0.28——小卡左下正是門派籤所在，壓太重會吃掉籤色。
+
+   綾邊層序、噪點與金線的做法全同詳情卡（11px 寬、11px 窗口看 120/80 噪場），
+   只有底色改從門派色派生：三檔壓暗值由 JSX 注入（見 ttBandVars，
+   取 fc(belong[0]) 即原頂部色條之色，依次 ×0.72 / ×0.52 / ×0.70）。
+   之所以不就地寫死：趙廷之屬「平民·天策」，belong[0] 為平民，其色條本非天策紅。
+   回退值仍填天策派生色，以防變量未注入時綾邊塌成透明。 */
+.texture-test-sm::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, transparent 10px, rgba(191, 155, 90, 0.45) 10px, rgba(191, 155, 90, 0.45) 11px, transparent 11px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='120'%3E%3Cfilter id='d' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.09 0.35' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23d)' opacity='0.55'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='80'%3E%3Cfilter id='e' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23e)' opacity='0.4'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, var(--tt-band-a, #5B2328), var(--tt-band-b, #42191D) 52%, var(--tt-band-c, #582227)),
+    radial-gradient(210px 130px at 82% 6%, var(--tt-stain, rgba(181, 68, 45, 0.07)), transparent 70%),
+    radial-gradient(160px 140px at 6% 98%, rgba(0, 0, 0, 0.28), transparent 72%),
+    radial-gradient(95px 70px at 55% 45%, rgba(231, 226, 214, 0.02), transparent 75%);
+  background-size: 11px 100%, 11px 120px, 11px 80px, 11px 100%, auto, auto, auto;
+  background-position: left top, left top, left top, left top, 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, repeat-y, repeat-y, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-blend-mode: normal, overlay, soft-light, normal, normal, normal, normal;
+}

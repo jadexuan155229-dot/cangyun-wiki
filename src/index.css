@@ -422,7 +422,8 @@ body {
     "Noto Serif SC", "Songti SC", "SimSun", serif;
   font-weight: 700;
 }
-/* SVG 印章（單人物試驗：吕定仪）。外殼的寬高與基線由內部隱藏字撐出，與文字印章逐像素一致；
+/* SVG 印章（始於吕定仪一人的試點，今全站有 pin 者四十七人盡走此式，見 src/seals.js）。
+   外殼的寬高與基線由內部隱藏字撐出，與文字印章逐像素一致；
    img 絕對定位鋪滿外殼，故其縮放與位移只影響觀感、不影響任何排版 */
 .seal-svg-shell {
   position: relative;
@@ -439,12 +440,17 @@ body {
   pointer-events: none;
 }
 
-/* ══ 宣紙肌理試驗（單人物：馬翊）══════════════════════════════════════════
-   兩處掛鉤，皆以 c.id === "mayi" 為條件（見 cangyun-wiki.jsx）：
-     .texture-test    → DetailPanel 詳情卡（全套：紙紋 + 斑駁 + 左側綾邊）
-     .texture-test-sm → CharCard 網格小卡（減配：紙紋降至六成 + 縮尺斑駁，不加綾邊——
-                        9px 窄條在 ~300px 寬的小卡上佔比過重）
-   其餘人物卡一律照舊，便於並置對照；試驗作廢時刪本段 + 那兩處條件即可，別無牽連。
+/* ══ 宣紙肌理 ══════════════════════════════════════════════════════════
+   範圍由 cangyun-wiki.jsx 的 isTextureTest() 單點把關，現恆真——全站一百二十人，
+   無一例外（初時只及馬翊一卡，繼而天策、蒼雲，終遍及全站）。兩處掛鉤：
+     .texture-test    → DetailPanel 詳情卡：紙紋 + 斑駁 + 名號行下漸變金線（僅無稱號者掛）
+                        + 檔案行線左端泛金。左側綾邊曾試於此，後撤去、整套移交小卡（見下方
+                        .texture-test::after 之注）
+     .texture-test-sm → CharCard 網格小卡：紙紋（整體壓到六成）+ 縮尺斑駁
+                        + 左側 11px 綾邊（承原頂部 3px 門派色條）+ 名號行下漸變金線（恆掛）
+   綾邊底色與斑駁暈色皆隨門派而變，變量由 JSX 的 ttVars 注入（--tt-band-a/b/c、--tt-stain）。
+   日後若要收回某派某人，改 isTextureTest 一處即可，本段諸規則悉聽其令；
+   全然作廢時刪本段 + 那個判定 + 各處 tt 分支即可，別無牽連。
 
    零圖片：五幅 feTurbulence 噪點皆寫作 data:image/svg+xml，
    一律 feColorMatrix type="saturate" values="0" 去色，逐層透明度烘進 rect 的 opacity
@@ -454,16 +460,17 @@ body {
 
    不新增節點：容器僅得 ::before / ::after 兩個偽元素，故
      ::before = 紙紋三層（各自 blend 由 background-blend-mode 承擔，整體再 overlay 壓卡面）
-     ::after  = 斑駁暈染 + 左側綾邊（皆常規混合，合於一元素）
-   兩者同 z-index: 0，與門派底紋（.faction-watermark）同級，
+     ::after  = 斑駁暈染（小卡另於此層併入綾邊，皆常規混合，合於一元素）
+   詳情卡側，兩者同 z-index: 0，與門派底紋（.faction-watermark）同級，
    繪製序按文檔序：::before → 底紋 → ::after → 正文層（.char-modal-scroll，z-index: 1），
-   故紙紋墊在底紋之下、暈染與綾邊罩在底紋之上，三者皆不及正文。 */
+   故紙紋墊在底紋之下、暈染罩在底紋之上，三者皆不及正文。
+   小卡側無底紋、亦無現成的正文層級，故走 z-index: -1 另一路，見下方 .texture-test-sm 一節。 */
 .texture-test {
   /* 容器內聯已有 position:relative + overflow:hidden（綾邊與紙紋溢出由此裁齊）；
      此處重申，內聯若日後變動亦不致失效 */
   position: relative;
   overflow: hidden;
-  /* 全站未設 CSS 變量體系，本試驗自備一枚：值同 theme.js 的 T.line */
+  /* 全站未設 CSS 變量體系，本段自備一枚：值同 theme.js 的 T.line */
   --border: #2E3640;
 }
 
@@ -600,8 +607,8 @@ body {
    詳情卡那三圈是按 700×~600 定的，原尺寸挪到 ~300×122 的小卡上會只剩一片均勻色，
    故按卡幅重定半徑；左下壓角同時由 0.35 減到 0.28——小卡左下正是門派籤所在，壓太重會吃掉籤色。
 
-   綾邊層序、噪點與金線的做法全同詳情卡（11px 寬、11px 窗口看 120/80 噪場），
-   只有底色改從門派色派生：三檔壓暗值由 JSX 注入（見 ttBandVars，
+   綾邊層序、噪點與金線的做法即詳情卡當初試過的那一套原樣挪來（11px 寬、11px 窗口看 120/80 噪場），
+   只有底色改從門派色派生：三檔壓暗值由 JSX 注入（見 ttVars，
    取 fc(belong[0]) 即原頂部色條之色，依次 ×0.72 / ×0.52 / ×0.70）。
    之所以不就地寫死：趙廷之屬「平民·天策」，belong[0] 為平民，其色條本非天策紅。
    回退值仍填天策派生色，以防變量未注入時綾邊塌成透明。 */

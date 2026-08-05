@@ -2001,7 +2001,7 @@ function GeoMap({ onOpenChar }) {
 }
 
 /* ---------------- 主應用 ---------------- */
-export default function CangyunWiki() {
+export default function CangyunWiki({ onOpenLanding }) {
   /* 路由：哈希為唯一事實源（見 router.js 體例）。寫入即改哈希，
      hashchange（含瀏覽器前進後退）回灌 state；nav 同步 setHash 一份，
      免事件異步間隙內連續導航取到舊值——事件再至時值相同，React 自行免渲染 */
@@ -2054,6 +2054,13 @@ export default function CangyunWiki() {
               {label}
             </button>
           ))}
+          {/* 回卷首：重開入站定場（landing.jsx），印形以應「入卷」朱印 */}
+          {onOpenLanding && (
+            <button onClick={onOpenLanding} title="回到卷首"
+              style={{ fontFamily: serif, fontSize: 13, padding: "5px 10px", marginLeft: 12, alignSelf: "center", background: "none", border: `1px solid ${T.seal}`, borderRadius: 3, color: T.seal, cursor: "pointer", letterSpacing: "0.2em", textIndent: "0.2em" }}>
+              卷首
+            </button>
+          )}
         </nav>
       </header>
 

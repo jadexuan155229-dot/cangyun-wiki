@@ -170,12 +170,12 @@ function CharCard({ c, onOpen }) {
     <div
       onClick={() => onOpen(c)}
       className={`cursor-pointer flex${tt ? " texture-test-sm" : ""}`}
-      style={{ background: T.panel, border: `1px solid ${T.line}`, borderTop: `3px solid ${fc(main)}`, padding: "16px 14px 14px 16px", gap: 12, transition: "background .15s", ...(tt ? ttVars(main) : null) }}
+      style={{ background: T.panel, border: `1px solid ${T.line}`, borderTop: `3px solid ${fc(main)}`, padding: "16px 14px 14px 16px", gap: 12, transition: "background .15s", fontFamily: "HuiwenZhengKai", ...(tt ? ttVars(main) : null) }}
       onMouseEnter={(e) => (e.currentTarget.style.background = T.panelHi)}
       onMouseLeave={(e) => (e.currentTarget.style.background = T.panel)}
     >
       {!tt && (
-        <div style={{ writingMode: "vertical-rl", fontFamily: serif, fontSize: 12, letterSpacing: "0.35em", color: T.faint, borderRight: `1px solid ${T.line}`, paddingRight: 8, minHeight: 88 }}>
+        <div style={{ writingMode: "vertical-rl", fontFamily: "HuiwenZhengKai", fontSize: 12, letterSpacing: "0.35em", color: T.faint, borderRight: `1px solid ${T.line}`, paddingRight: 8, minHeight: 88 }}>
           {c.zi ? `字 ${c.zi}` : "字号待补"}
         </div>
       )}
@@ -184,8 +184,8 @@ function CharCard({ c, onOpen }) {
             使印章距姓名約 14 + 字號寬 + 20 ≈ 77px——與原版「姓名 + 繫年N事 + 印」
             所形成的間距（約 75px）相當。原版諸卡欄距 10 不變 */}
         <div className="flex items-baseline flex-wrap" style={{ gap: tt ? 14 : 10 }}>
-          <span style={{ fontFamily: serif, fontSize: 22, color: T.ink, fontWeight: 600 }}>{c.name}</span>
-          {tt && <span style={{ fontFamily: serif, fontSize: 13, color: c.zi ? T.muted : T.faint, marginRight: 6 }}>{c.zi ? `字 ${c.zi}` : "字号待补"}</span>}
+          <span style={{ fontFamily: "HuiwenMingChao", fontSize: 22, color: T.ink, fontWeight: 400, fontSynthesis: "none" }}>{c.name}</span>
+          {tt && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 13, color: c.zi ? T.muted : T.faint, marginRight: 6 }}>{c.zi ? `字 ${c.zi}` : "字号待补"}</span>}
           {!tt && evCount > 0 && <span style={{ fontSize: 11, color: T.faint }}>繫年 {evCount} 事</span>}
           <Seal ch={c.pin} size={15} svg={SEAL_SVG_FILE[c.id]} />
         </div>
@@ -199,8 +199,8 @@ function CharCard({ c, onOpen }) {
           <div style={{ marginTop: 1 }}>
             {[["生卒", lifespan(c)], ["出身", c.birthplace], ["事件", evCount > 0 ? `繫年 ${evCount} 事` : ""]].map(([k, v]) => (
               <div key={k} style={{ display: "flex", gap: 10, padding: "1px 0" }}>
-                <div style={{ minWidth: 34, fontFamily: serif, fontSize: 11, letterSpacing: "0.12em", color: T.faint, paddingTop: 1 }}>{k}</div>
-                <div style={{ flex: 1, minWidth: 0, fontFamily: serif, fontSize: 12.5, color: v ? T.muted : T.faint, lineHeight: 1.5 }}>{v || ""}</div>
+                <div style={{ minWidth: 34, fontFamily: "HuiwenZhengKai", fontSize: 11, letterSpacing: "0.12em", color: T.faint, paddingTop: 1 }}>{k}</div>
+                <div style={{ flex: 1, minWidth: 0, fontFamily: "HuiwenZhengKai", fontSize: 12.5, color: v ? T.muted : T.faint, lineHeight: 1.5 }}>{v || ""}</div>
               </div>
             ))}
           </div>
@@ -364,7 +364,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
             )}
           </div>
         )}
-        <div className="char-modal-scroll" style={{ overflowY: "auto", minHeight: 0, padding: "28px 32px 32px", position: "relative", zIndex: 1, "--profile-accent": profileAccent, "--profile-accent-soft": profileAccentSoft, "--profile-accent-hover": profileAccentHover }}>
+        <div className="char-modal-scroll" style={{ overflowY: "auto", minHeight: 0, padding: "28px 32px 32px", position: "relative", zIndex: 1, fontFamily: "HuiwenZhengKai", "--profile-accent": profileAccent, "--profile-accent-soft": profileAccentSoft, "--profile-accent-hover": profileAccentHover }}>
         {/* 人物檔案彈窗縱向滾動條深色化：僅作用於 .char-modal-scroll，不及全站；
             thumb 取門派派生色（--profile-accent-soft/hover，自容器內聯變量注入），track 維持深灰透明 */}
         <style>{`
@@ -388,12 +388,12 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
             金線漸變由 index.css 的「檔案行線」規則一併罩到它身上，不必在此重複一道；
             兩線相距僅三十餘像素，並出則刺目。馬翊、程凱等無稱號者，此線正補其位 */}
         <div className={`flex items-baseline flex-wrap${tt && !c.epithet ? " tt-rule" : ""}`} style={{ gap: tt ? 14 : 12, paddingRight: 70 }}>
-          <span style={{ fontFamily: serif, fontSize: 30, color: T.ink, fontWeight: 700 }}>{c.name}</span>
-          {c.zi && <span style={{ fontFamily: serif, fontSize: 15, color: T.muted, marginLeft: tt ? 6 : 0 }}>字 {c.zi}</span>}
-          {c.hao && <span style={{ fontFamily: serif, fontSize: 13, color: T.faint }}>「{c.hao}」</span>}
+          <span style={{ fontFamily: "HuiwenMingChao", fontSize: 30, color: T.ink, fontWeight: 400, fontSynthesis: "none" }}>{c.name}</span>
+          {c.zi && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 15, color: T.muted, marginLeft: tt ? 6 : 0 }}>字 {c.zi}</span>}
+          {c.hao && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 13, color: T.faint }}>「{c.hao}」</span>}
         </div>
         {c.epithet && (
-          <div style={{ fontFamily: serif, fontSize: 16, color: T.ink, letterSpacing: "0.5em", marginTop: 10, paddingBottom: 10, borderBottom: `1px solid ${T.line}`, display: "inline-block", paddingRight: 24 }}>
+          <div style={{ fontFamily: "HuiwenZhengKai", fontSize: 16, color: T.ink, letterSpacing: "0.5em", marginTop: 10, paddingBottom: 10, borderBottom: `1px solid ${T.line}`, display: "inline-block", paddingRight: 24 }}>
             {c.epithet}
           </div>
         )}
@@ -410,7 +410,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
           /* 有門派底紋的人物：訓詁塊半透明底（alpha 0.58），讓底層紋樣連續透出；其餘人物維持不透明 */
           <div style={{ marginTop: 22, borderLeft: `2px solid ${profileAccent}`, background: factionMark ? `${T.panelHi}94` : T.panelHi, padding: "12px 16px" }}>
             <SectionLabel>名字訓詁</SectionLabel>
-            <div style={{ fontFamily: serif, fontSize: 13.5, color: T.muted, lineHeight: 2.05 }}>{c.gloss}</div>
+            <div style={{ fontFamily: "HuiwenZhengKai", fontSize: 13.5, color: T.muted, lineHeight: 2.05 }}>{c.gloss}</div>
           </div>
         )}
 
@@ -419,8 +419,8 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
             <SectionLabel>檔案</SectionLabel>
             {c.profile.map(([k, v]) => (
               <div key={k} style={{ display: "flex", gap: 14, padding: "7px 0", borderBottom: `1px solid ${T.line}44` }}>
-                <div style={{ minWidth: 68, fontSize: 12, letterSpacing: "0.12em", color: T.faint, fontFamily: serif, paddingTop: 3 }}>{k}</div>
-                <div style={{ flex: 1, fontFamily: serif, fontSize: 14, color: v ? T.ink : T.faint, lineHeight: 1.9, minHeight: 20 }}>{v || ""}</div>
+                <div style={{ minWidth: 68, fontSize: 12, letterSpacing: "0.12em", color: T.faint, fontFamily: "HuiwenZhengKai", paddingTop: 3 }}>{k}</div>
+                <div style={{ flex: 1, fontFamily: "HuiwenZhengKai", fontSize: 14, color: v ? T.ink : T.faint, lineHeight: 1.9, minHeight: 20 }}>{v || ""}</div>
               </div>
             ))}
           </div>
@@ -430,12 +430,12 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
           <div style={{ marginTop: 24 }}>
             <SectionLabel>個人軼事</SectionLabel>
             {shownAnecdotes.map((a, i) => (
-              <p key={i} style={{ fontFamily: serif, fontSize: 14, color: T.ink, lineHeight: 1.95, margin: "0 0 12px" }}>
+              <p key={i} style={{ fontFamily: "HuiwenZhengKai", fontSize: 14, color: T.ink, lineHeight: 1.95, margin: "0 0 12px" }}>
                 <span style={{ color: profileAccent, marginRight: 8 }}>・</span>{a}
               </p>
             ))}
             {anecdotes.length > 4 && (
-              <button onClick={() => setShowAll(!showAll)} style={{ fontFamily: serif, fontSize: 12.5, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "4px 14px", cursor: "pointer" }}>
+              <button onClick={() => setShowAll(!showAll)} style={{ fontFamily: "HuiwenZhengKai", fontSize: 12.5, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "4px 14px", cursor: "pointer" }}>
                 {showAll ? "收起" : `展開其餘 ${anecdotes.length - 4} 條`}
               </button>
             )}
@@ -446,7 +446,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
           <div style={{ marginTop: 24, border: `1px solid ${profileAccent}55`, borderLeft: `3px solid ${profileAccent}`, padding: "12px 16px" }}>
             <SectionLabel>高光</SectionLabel>
             {c.highlight.map((h, i) => (
-              <div key={i} style={{ fontFamily: serif, fontSize: 14, color: T.ink, lineHeight: 1.95 }}>{h}</div>
+              <div key={i} style={{ fontFamily: "HuiwenZhengKai", fontSize: 14, color: T.ink, lineHeight: 1.95 }}>{h}</div>
             ))}
           </div>
         )}
@@ -462,7 +462,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
                   const o = byId[r.a === c.id ? r.b : r.a];
                   return (
                     <button key={i} onClick={() => { setShowAll(false); onOpenChar(o); }}
-                      style={{ fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px ${r.da ? "dashed" : "solid"} ${relColor(r.t)}88`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer", textAlign: "left" }}>
+                      style={{ fontSize: 12.5, fontFamily: "HuiwenZhengKai", color: T.ink, background: T.panelHi, border: `1px ${r.da ? "dashed" : "solid"} ${relColor(r.t)}88`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer", textAlign: "left" }}>
                       {o.name}
                       <span style={{ color: relColor(r.t), marginLeft: 8, fontSize: 11 }}>{r.t}</span>
                       <span style={{ color: T.faint, marginLeft: 6, fontSize: 10.5 }}>
@@ -481,7 +481,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
             <SectionLabel>同事人物（共見事件計數）</SectionLabel>
             <div className="flex flex-wrap" style={{ gap: 8 }}>
               {coList.map(([id, n]) => (
-                <button key={id} onClick={() => { setShowAll(false); onOpenChar(byId[id]); }} style={{ fontSize: 13, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
+                <button key={id} onClick={() => { setShowAll(false); onOpenChar(byId[id]); }} style={{ fontSize: 13, fontFamily: "HuiwenZhengKai", color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
                   {byId[id].name}<span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{n}</span>
                 </button>
               ))}
@@ -500,21 +500,21 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
                 return (
                   <div key={i} style={{ display: "flex", gap: 14, marginTop: 10 }}>
                     <div style={{ minWidth: 78 }}>
-                      <div style={{ fontFamily: serif, color: T.accent, fontSize: 13 }}>
+                      <div style={{ fontFamily: "HuiwenZhengKai", color: T.accent, fontSize: 13 }}>
                         {e.year}{e.month != null && `·${e.month}月`}{e.seq && ` ${e.seq}`}
                       </div>
                       {firstOfYear && (
-                        <div style={{ fontFamily: serif, fontSize: 10.5, color: T.faint, marginTop: 1 }}>{eraOf(e.year)}</div>
+                        <div style={{ fontFamily: "HuiwenZhengKai", fontSize: 10.5, color: T.faint, marginTop: 1 }}>{eraOf(e.year)}</div>
                       )}
                     </div>
-                    <div style={{ fontSize: 13, color: T.ink, lineHeight: 1.75, fontFamily: serif }}>{e.title}</div>
+                    <div style={{ fontSize: 13, color: T.ink, lineHeight: 1.75, fontFamily: "HuiwenZhengKai" }}>{e.title}</div>
                   </div>
                 );
               });
             })()}
           </div>
         ) : (
-          <div style={{ marginTop: 24, fontSize: 13, color: T.faint, fontFamily: serif }}>事件庫中暫無此人繫年條目。</div>
+          <div style={{ marginTop: 24, fontSize: 13, color: T.faint, fontFamily: "HuiwenZhengKai" }}>事件庫中暫無此人繫年條目。</div>
         )}
 
         {mentionGroups.length > 0 && (
@@ -525,7 +525,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
               return (
                 <div key={g.key} style={{ marginBottom: 6 }}>
                   <button onClick={() => toggleGroup(g.key)}
-                    style={{ display: "block", textAlign: "left", fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
+                    style={{ display: "block", textAlign: "left", fontSize: 12.5, fontFamily: "HuiwenZhengKai", color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
                     <span style={{ color: T.accent, fontSize: 10, marginRight: 6 }}>{open ? "▾" : "▸"}</span>
                     【{g.label}】
                     <span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{g.chapters.length} 章</span>
@@ -534,7 +534,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
                     <div className="flex flex-wrap" style={{ gap: 8, margin: "8px 0 10px 22px" }}>
                       {g.chapters.map(({ f, n }) => (
                         <button key={f.path} onClick={() => { setShowAll(false); onOpenNovel(f.path); }}
-                          style={{ fontSize: 12.5, fontFamily: serif, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
+                          style={{ fontSize: 12.5, fontFamily: "HuiwenZhengKai", color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, padding: "4px 10px", borderRadius: "3px", cursor: "pointer" }}>
                           {f.ch.title}<span style={{ color: T.muted, marginLeft: 8, fontSize: 11 }}>{n} 处</span>
                         </button>
                       ))}

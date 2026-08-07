@@ -1,3 +1,15 @@
+@font-face {
+  font-family: "HuiwenZhengKai";
+  src: url("./assets/fonts/HuiwenZhengKai.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HuiwenMingChao";
+  src: url("./assets/fonts/HuiwenMingChao.ttf") format("truetype");
+  font-display: swap;
+}
+
 body {
   margin: 0;
 }
@@ -747,7 +759,7 @@ body {
 .cy-title {
   margin: 0;
   writing-mode: vertical-rl;
-  font-family: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+  font-family: "HuiwenZhengKai";
   font-weight: 600;
   font-size: clamp(50px, 12.5vh, 116px);
   letter-spacing: 0.14em;
@@ -759,7 +771,7 @@ body {
 }
 .cy-subtitle {
   writing-mode: vertical-rl;
-  font-family: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+  font-family: "HuiwenZhengKai";
   font-size: 13px;
   letter-spacing: 0.34em;
   color: #78818d;

@@ -603,25 +603,25 @@ function FacBand({ segs, none, height = 4, maxWidth }) {
 /* 事件行：年表主列表単條，供平鋪與月組兩種佈局共用 */
 function EvRow({ e, showYear, onOpenChar }) {
   return (
-    <div style={{ position: "relative", padding: "0 0 24px 26px" }}>
+    <div style={{ position: "relative", padding: "0 0 24px 26px", fontFamily: "HuiwenZhengKai" }}>
       <div style={{ position: "absolute", left: -5, top: 7, width: 9, height: 9, background: showYear ? T.accent : T.faint, transform: "rotate(45deg)" }} />
       {showYear && (
-        <div style={{ position: "absolute", left: -66, top: 1, fontFamily: serif, fontSize: 16, color: T.accent, width: 48, textAlign: "right" }}>{e.year}</div>
+        <div style={{ position: "absolute", left: -66, top: 1, fontFamily: "HuiwenZhengKai", fontSize: 16, color: T.accent, width: 48, textAlign: "right" }}>{e.year}</div>
       )}
       <div className="flex items-baseline flex-wrap" style={{ gap: 8 }}>
-        <span style={{ fontFamily: serif, fontSize: 12.5, color: T.muted, minWidth: 52 }}>
+        <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 12.5, color: T.muted, minWidth: 52 }}>
           {e.month != null ? `${e.month} 月` : "月份未标"}
         </span>
         {showYear && (
-          <span style={{ fontFamily: serif, fontSize: 12, color: T.muted }}>
+          <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 12, color: T.muted }}>
             （{eraOf(e.year)}{e.month != null ? ` ${CN_MONTH[e.month]}` : ""}{ERA_NOTES[e.year] ? `；${ERA_NOTES[e.year]}` : ""}）
           </span>
         )}
         {e.seq && (
-          <span style={{ fontSize: 11, fontFamily: serif, color: "#E7E2D6", background: T.accent, padding: "0 6px", borderRadius: "3px", lineHeight: "16px" }}>{e.seq}</span>
+          <span style={{ fontSize: 11, fontFamily: "HuiwenZhengKai", color: "#E7E2D6", background: T.accent, padding: "0 6px", borderRadius: "3px", lineHeight: "16px" }}>{e.seq}</span>
         )}
         {e.add && (
-          <span style={{ fontSize: 11, fontFamily: serif, color: "#C9A15C", border: "1px solid #C9A15C55", padding: "0 6px", borderRadius: "3px" }} title="採自人設文檔，尚未錄入 Notion 事件庫">增補</span>
+          <span style={{ fontSize: 11, fontFamily: "HuiwenZhengKai", color: "#C9A15C", border: "1px solid #C9A15C55", padding: "0 6px", borderRadius: "3px" }} title="採自人設文檔，尚未錄入 Notion 事件庫">增補</span>
         )}
         {e.fac.length === 0 && <span style={{ fontSize: 11, color: T.faint, border: `1px dashed ${T.faint}`, padding: "0 6px", borderRadius: "3px" }}>门派未标</span>}
         {e.fac.map((f) => (
@@ -631,11 +631,11 @@ function EvRow({ e, showYear, onOpenChar }) {
           <span key={l} style={{ fontSize: 11, color: T.faint }}>{l}</span>
         ))}
       </div>
-      <div style={{ fontFamily: serif, fontSize: 15, color: T.ink, lineHeight: 1.8, marginTop: 5, maxWidth: 660 }}>{e.title}</div>
+      <div style={{ fontFamily: "HuiwenZhengKai", fontSize: 15, color: T.ink, lineHeight: 1.8, marginTop: 5, maxWidth: 660 }}>{e.title}</div>
       {e.chars.length > 0 && (
         <div className="flex flex-wrap" style={{ gap: 6, marginTop: 7 }}>
           {e.chars.map((id) => (
-            <button key={id} onClick={() => onOpenChar(byId[id])} style={{ fontSize: 11.5, fontFamily: serif, color: fc(byId[id].belong[0]), border: `1px solid ${fc(byId[id].belong[0])}44`, background: "none", padding: "1px 8px", borderRadius: "3px", cursor: "pointer" }}>
+            <button key={id} onClick={() => onOpenChar(byId[id])} style={{ fontSize: 11.5, fontFamily: "HuiwenZhengKai", color: fc(byId[id].belong[0]), border: `1px solid ${fc(byId[id].belong[0])}44`, background: "none", padding: "1px 8px", borderRadius: "3px", cursor: "pointer" }}>
               {byId[id].name}
             </button>
           ))}
@@ -809,7 +809,7 @@ function Timeline({ onOpenChar }) {
 .toc-scroll::-webkit-scrollbar-thumb{background:#5B6470;border-radius:4px}
 .toc-scroll::-webkit-scrollbar-thumb:hover{background:#788493}
 `}</style>
-      <div style={{ fontSize: 10.5, letterSpacing: "0.4em", color: T.faint, marginBottom: 10 }}>分段目錄</div>
+      <div style={{ fontFamily: "HuiwenFangSong", fontSize: 10.5, letterSpacing: "0.4em", color: T.faint, marginBottom: 10 }}>分段目錄</div>
       {sections.map((s) => {
         const empty = s.evs.length === 0;
         const isActive = active === s.key;
@@ -832,8 +832,8 @@ function Timeline({ onOpenChar }) {
               borderRadius: hov ? "4px" : 0,
               transition: "transform .18s ease, box-shadow .18s ease, background .18s ease",
             }}>
-            <div style={{ fontFamily: serif, fontSize: 12.5, color: isActive ? T.ink : T.muted, lineHeight: 1.5 }}>{s.label}</div>
-            <div style={{ fontFamily: serif, fontSize: 10.5, color: T.faint, margin: "2px 0 5px" }}>
+            <div style={{ fontFamily: "HuiwenFangSong", fontSize: 12.5, color: isActive ? T.ink : T.muted, lineHeight: 1.5 }}>{s.label}</div>
+            <div style={{ fontFamily: "HuiwenFangSong", fontSize: 10.5, color: T.faint, margin: "2px 0 5px" }}>
               {secYears(s)} · {cnCount(s.evs.length)}事
             </div>
             <FacBand segs={s.segs} none={s.none} />
@@ -841,8 +841,8 @@ function Timeline({ onOpenChar }) {
         );
       })}
       <div className="flex" style={{ gap: 6, marginTop: 12, paddingLeft: 10 }}>
-        <button onClick={expandAll} style={{ fontSize: 11, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全部展開</button>
-        <button onClick={collapseAll} style={{ fontSize: 11, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全部收起</button>
+        <button onClick={expandAll} style={{ fontSize: 11, fontFamily: "HuiwenFangSong", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全部展開</button>
+        <button onClick={collapseAll} style={{ fontSize: 11, fontFamily: "HuiwenFangSong", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全部收起</button>
       </div>
     </div>
   );
@@ -859,7 +859,7 @@ function Timeline({ onOpenChar }) {
             disabled={empty}
             onClick={() => jumpTo(s.key)}
             style={{
-              flexShrink: 0, fontFamily: serif, fontSize: 11.5,
+              flexShrink: 0, fontFamily: "HuiwenFangSong", fontSize: 11.5,
               color: isActive ? "#E7E2D6" : T.muted,
               background: isActive ? T.accent : "transparent",
               border: `1px solid ${isActive ? T.accent : T.line}`,
@@ -869,8 +869,8 @@ function Timeline({ onOpenChar }) {
           </button>
         );
       })}
-      <button onClick={expandAll} style={{ flexShrink: 0, fontSize: 11, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全展</button>
-      <button onClick={collapseAll} style={{ flexShrink: 0, fontSize: 11, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全收</button>
+      <button onClick={expandAll} style={{ flexShrink: 0, fontSize: 11, fontFamily: "HuiwenFangSong", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全展</button>
+      <button onClick={collapseAll} style={{ flexShrink: 0, fontSize: 11, fontFamily: "HuiwenFangSong", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 8px", cursor: "pointer" }}>全收</button>
     </div>
   );
 
@@ -881,48 +881,48 @@ function Timeline({ onOpenChar }) {
         {!narrow && <Toc />}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: fsel === "all" ? 18 : 10 }}>
-            <Chip active={fsel === "all"} onClick={() => { setFsel("all"); setWho("all"); }} label="全部" />
+            <Chip active={fsel === "all"} onClick={() => { setFsel("all"); setWho("all"); }} label="全部" fontFamily="HuiwenFangSong" />
             {facList.main.map(({ f, n }) => (
-              <Chip key={f} active={fsel === f} onClick={() => { setFsel(f); setWho("all"); }} label={`${f} ${n}`} />
+              <Chip key={f} active={fsel === f} onClick={() => { setFsel(f); setWho("all"); }} label={`${f} ${n}`} fontFamily="HuiwenFangSong" />
             ))}
             {facList.ethnic.length > 0 && (
               <Chip
                 active={fsel === ETH_GROUP || isEthnic(fsel)}
                 onClick={() => { setFsel(ETH_GROUP); setWho("all"); }}
-                label={`族属/地属 ${facList.ethnicUnion}`} />
+                label={`族属/地属 ${facList.ethnicUnion}`} fontFamily="HuiwenFangSong" />
             )}
             {facList.none > 0 && (
-              <Chip active={fsel === NONE_FAC} onClick={() => { setFsel(NONE_FAC); setWho("all"); }} label={`门派未标 ${facList.none}`} />
+              <Chip active={fsel === NONE_FAC} onClick={() => { setFsel(NONE_FAC); setWho("all"); }} label={`门派未标 ${facList.none}`} fontFamily="HuiwenFangSong" />
             )}
           </div>
           {(fsel === ETH_GROUP || isEthnic(fsel)) && (
             <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: isEthnic(fsel) ? 10 : 18, paddingLeft: 4, borderLeft: `2px solid ${T.line}` }}>
-              <span style={{ fontSize: 11, fontFamily: serif, color: T.faint, margin: "0 4px" }}>族属/地属 · 标签</span>
+              <span style={{ fontSize: 11, fontFamily: "HuiwenFangSong", color: T.faint, margin: "0 4px" }}>族属/地属 · 标签</span>
               {facList.ethnic.map(({ f, n }) => (
                 <Chip key={f} active={fsel === f}
                   onClick={() => { setFsel((prev) => (prev === f ? ETH_GROUP : f)); setWho("all"); }}
-                  label={`${f} ${n}`} />
+                  label={`${f} ${n}`} fontFamily="HuiwenFangSong" />
               ))}
             </div>
           )}
           {fsel !== "all" && fsel !== ETH_GROUP && (
             <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 18, paddingLeft: 4, borderLeft: `2px solid ${T.line}` }}>
-              <span style={{ fontSize: 11, fontFamily: serif, color: T.faint, margin: "0 4px" }}>
+              <span style={{ fontSize: 11, fontFamily: "HuiwenFangSong", color: T.faint, margin: "0 4px" }}>
                 {fsel === NONE_FAC ? "未标事件 · 人物" : `${fsel} · 人物`}
               </span>
               {subPersons.map((id) => (
-                <Chip key={id} active={who === id} onClick={() => setWho((prev) => (prev === id ? "all" : id))} label={byId[id].name} />
+                <Chip key={id} active={who === id} onClick={() => setWho((prev) => (prev === id ? "all" : id))} label={byId[id].name} fontFamily="HuiwenFangSong" />
               ))}
               {subPersons.length === 0 && (
-                <span style={{ fontSize: 11.5, fontFamily: serif, color: T.faint }}>此標籤下無入事人物檔案</span>
+                <span style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.faint }}>此標籤下無入事人物檔案</span>
               )}
             </div>
           )}
           <div style={{ marginBottom: 18 }}>
             <span style={{ position: "relative", display: "inline-block" }}>
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="檢索事名、人物、地點、門派、紀年"
-                style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 13, fontFamily: serif, padding: "6px 12px 6px 34px", outline: "none", minWidth: 300 }} />
-              <SearchTag />
+                style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 13, fontFamily: "HuiwenZhengKai", padding: "6px 12px 6px 34px", outline: "none", minWidth: 300 }} />
+              <SearchTag fontFamily="HuiwenZhengKai" />
             </span>
           </div>
           {sections.every((s) => s.evs.length === 0) && (
@@ -944,14 +944,14 @@ function Timeline({ onOpenChar }) {
                   }}>
                   <div className="flex items-baseline flex-wrap" style={{ gap: 10 }}>
                     <span style={{ color: T.accent, fontSize: 12, width: 13, display: "inline-block" }}>{open ? "▾" : "▸"}</span>
-                    <span style={{ fontFamily: serif, fontSize: 15.5, color: T.ink }}>{s.label}</span>
-                    <span style={{ fontFamily: serif, fontSize: 12, color: T.muted }}>
+                    <span style={{ fontFamily: "HuiwenMingChao", fontSize: 15.5, color: T.ink }}>{s.label}</span>
+                    <span style={{ fontFamily: "HuiwenMingChao", fontSize: 12, color: T.muted }}>
                       {secYears(s)} · {empty ? "無事" : `${cnCount(s.evs.length)}事`}
                     </span>
                     {s.byMonth && open && !searching && (
                       <button
                         onClick={(ev) => { ev.stopPropagation(); toggleAllMonths(s); }}
-                        style={{ marginLeft: "auto", fontSize: 11, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "1px 8px", cursor: "pointer" }}>
+                        style={{ marginLeft: "auto", fontSize: 11, fontFamily: "HuiwenMingChao", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "1px 8px", cursor: "pointer" }}>
                         {monthKeysOf(s).every((k) => expandedMonths.has(k)) ? "收起諸月" : "展開諸月"}
                       </button>
                     )}
@@ -989,11 +989,11 @@ function Timeline({ onOpenChar }) {
                               style={{ position: "relative", padding: "0 0 18px 26px", cursor: "pointer", userSelect: "none" }}>
                               <div style={{ position: "absolute", left: -8, top: 4, width: 13, height: 13, border: `1px solid ${T.accent}`, background: gOpen ? T.accent : T.bg, transform: "rotate(45deg)" }} />
                               <span style={{ color: T.accent, fontSize: 11, marginRight: 8 }}>{gOpen ? "▾" : "▸"}</span>
-                              <span style={{ fontFamily: serif, fontSize: 13.5, color: gOpen ? T.ink : T.muted }}>{mLabel}</span>
+                              <span style={{ fontFamily: "HuiwenMingChao", fontSize: 13.5, color: gOpen ? T.ink : T.muted }}>{mLabel}</span>
                               {g.m !== -1 && (
-                                <span style={{ fontFamily: serif, fontSize: 11.5, color: T.faint, marginLeft: 8 }}>{eraOfYM(s.from, g.m)}{mLabel}</span>
+                                <span style={{ fontFamily: "HuiwenMingChao", fontSize: 11.5, color: T.faint, marginLeft: 8 }}>{eraOfYM(s.from, g.m)}{mLabel}</span>
                               )}
-                              <span style={{ fontFamily: serif, fontSize: 11.5, color: T.faint, marginLeft: 10 }}>{cnCount(g.evs.length)}事</span>
+                              <span style={{ fontFamily: "HuiwenMingChao", fontSize: 11.5, color: T.faint, marginLeft: 10 }}>{cnCount(g.evs.length)}事</span>
                             </div>
                             {gOpen && g.evs.map((e, i) => row(e, `${gk}-${i}`))}
                           </div>
@@ -1483,17 +1483,17 @@ function Community({ onOpenChar }) {
   );
 }
 
-function Chip({ active, onClick, label }) {
+function Chip({ active, onClick, label, fontFamily = serif }) {
   return (
-    <button onClick={onClick} style={{ fontSize: 12.5, fontFamily: serif, color: active ? "#E7E2D6" : T.muted, background: active ? T.accent : "transparent", border: `1px solid ${active ? T.accent : T.line}`, padding: "3px 12px", borderRadius: "3px", cursor: "pointer" }}>
+    <button onClick={onClick} style={{ fontSize: 12.5, fontFamily, color: active ? "#E7E2D6" : T.muted, background: active ? T.accent : "transparent", border: `1px solid ${active ? T.accent : T.line}`, padding: "3px 12px", borderRadius: "3px", cursor: "pointer" }}>
       {label}
     </button>
   );
 }
 
 /* 檢索框內「查」字小方標：純視覺標識，不可點——配合外層 position:relative 容器與 input 左側讓位 padding 使用 */
-const SearchTag = () => (
-  <span style={{ position: "absolute", left: 6, top: 6, bottom: 6, width: 18, display: "flex", alignItems: "center", justifyContent: "center", background: T.accent, color: "#E7E2D6", fontSize: 11, fontFamily: serif, borderRadius: "3px", pointerEvents: "none" }}>查</span>
+const SearchTag = ({ fontFamily = serif }) => (
+  <span style={{ position: "absolute", left: 6, top: 6, bottom: 6, width: 18, display: "flex", alignItems: "center", justifyContent: "center", background: T.accent, color: "#E7E2D6", fontSize: 11, fontFamily, borderRadius: "3px", pointerEvents: "none" }}>查</span>
 );
 
 const NOLOC_KEY = "__noloc__"; /* 無地點事件之內部鍵 */
@@ -1762,70 +1762,70 @@ function GeoMap({ onOpenChar }) {
     <div>
       {/* 一級：門派及同級標籤 */}
       <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
-        <Chip active={fsel === "all"} onClick={() => { setFsel("all"); setWho("all"); }} label={`全部 ${EVENTS.length}`} />
+        <Chip active={fsel === "all"} onClick={() => { setFsel("all"); setWho("all"); }} label={`全部 ${EVENTS.length}`} fontFamily="HuiwenFangSong" />
         {facList.main.map(({ f, n }) => (
-          <Chip key={f} active={fsel === f} onClick={() => { setFsel(fsel === f ? "all" : f); setWho("all"); }} label={`${f} ${n}`} />
+          <Chip key={f} active={fsel === f} onClick={() => { setFsel(fsel === f ? "all" : f); setWho("all"); }} label={`${f} ${n}`} fontFamily="HuiwenFangSong" />
         ))}
         {facList.ethnic.length > 0 && (
           <Chip active={fsel === ETH_GROUP || facList.ethnic.some((x) => x.f === fsel)}
-            onClick={() => { setFsel(fsel === ETH_GROUP ? "all" : ETH_GROUP); setWho("all"); }} label="【族属/地属】" />
+            onClick={() => { setFsel(fsel === ETH_GROUP ? "all" : ETH_GROUP); setWho("all"); }} label="【族属/地属】" fontFamily="HuiwenFangSong" />
         )}
         {facList.none > 0 && (
-          <Chip active={fsel === NONE_FAC} onClick={() => { setFsel(fsel === NONE_FAC ? "all" : NONE_FAC); setWho("all"); }} label={`门派未标 ${facList.none}`} />
+          <Chip active={fsel === NONE_FAC} onClick={() => { setFsel(fsel === NONE_FAC ? "all" : NONE_FAC); setWho("all"); }} label={`门派未标 ${facList.none}`} fontFamily="HuiwenFangSong" />
         )}
       </div>
       {/* 族屬傘形展開之次級標籤 */}
       {fsel === ETH_GROUP && (
         <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
           {facList.ethnic.map(({ f, n }) => (
-            <Chip key={f} active={false} onClick={() => { setFsel(f); setWho("all"); }} label={`${f} ${n}`} />
+            <Chip key={f} active={false} onClick={() => { setFsel(f); setWho("all"); }} label={`${f} ${n}`} fontFamily="HuiwenFangSong" />
           ))}
         </div>
       )}
       {facList.ethnic.some((x) => x.f === fsel) && (
         <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
-          <span style={{ fontSize: 11.5, fontFamily: serif, color: T.faint }}>【族属/地属】·</span>
-          <Chip active={true} onClick={() => setFsel(ETH_GROUP)} label={fsel} />
+          <span style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.faint }}>【族属/地属】·</span>
+          <Chip active={true} onClick={() => setFsel(ETH_GROUP)} label={fsel} fontFamily="HuiwenFangSong" />
         </div>
       )}
       {/* 二級：人物 */}
       {fsel !== "all" && subPersons.length > 0 && (
         <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
-          <span style={{ fontSize: 11.5, fontFamily: serif, color: T.faint }}>屬下之人 ·</span>
-          <Chip active={who === "all"} onClick={() => setWho("all")} label="不限" />
+          <span style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.faint }}>屬下之人 ·</span>
+          <Chip active={who === "all"} onClick={() => setWho("all")} label="不限" fontFamily="HuiwenFangSong" />
           {subPersons.map((id) => (
-            <Chip key={id} active={who === id} onClick={() => setWho(who === id ? "all" : id)} label={byId[id].name} />
+            <Chip key={id} active={who === id} onClick={() => setWho(who === id ? "all" : id)} label={byId[id].name} fontFamily="HuiwenFangSong" />
           ))}
         </div>
       )}
       <div style={{ marginBottom: 8 }}>
         <span style={{ position: "relative", display: "inline-block" }}>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="檢索事名、人物、地點、門派、年號"
-            style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 12.5, fontFamily: serif, padding: "5px 10px 5px 32px", outline: "none", minWidth: 200 }} />
-          <SearchTag />
+            style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 12.5, fontFamily: "HuiwenZhengKai", padding: "5px 10px 5px 32px", outline: "none", minWidth: 200 }} />
+          <SearchTag fontFamily="HuiwenZhengKai" />
         </span>
       </div>
       <div className="flex items-center" style={{ gap: 12, marginBottom: 6 }}>
-        <span style={{ fontSize: 12, fontFamily: serif, color: T.muted }}>計入 {shown.length} 事 · {Object.keys(spots.m).length} 地</span>
-        <Chip active={allLabels} onClick={() => setAllLabels(!allLabels)} label="地名全顯" />
+        <span style={{ fontSize: 12, fontFamily: "HuiwenFangSong", color: T.muted }}>計入 {shown.length} 事 · {Object.keys(spots.m).length} 地</span>
+        <Chip active={allLabels} onClick={() => setAllLabels(!allLabels)} label="地名全顯" fontFamily="HuiwenFangSong" />
         {spots.noloc > 0 && (
           <button onClick={() => setSel(sel === NOLOC_KEY ? null : NOLOC_KEY)}
-            style={{ fontSize: 11.5, fontFamily: serif, color: sel === NOLOC_KEY ? T.ink : T.faint, background: "none", border: `1px dashed ${sel === NOLOC_KEY ? T.accent : T.faint}`, padding: "2px 10px", borderRadius: "3px", cursor: "pointer" }}>
+            style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: sel === NOLOC_KEY ? T.ink : T.faint, background: "none", border: `1px dashed ${sel === NOLOC_KEY ? T.accent : T.faint}`, padding: "2px 10px", borderRadius: "3px", cursor: "pointer" }}>
             無地點 {spots.noloc} 事
           </button>
         )}
       </div>
       {/* 時間滑桿：全程／累積至／僅當年 */}
       <div className="flex flex-wrap items-center" style={{ gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 11.5, fontFamily: serif, color: T.faint }}>時間 ·</span>
-        <Chip active={tmode === "all"} onClick={() => setTmode("all")} label="全程" />
-        <Chip active={tmode === "cum"} onClick={() => setTmode("cum")} label="累積至" />
-        <Chip active={tmode === "year"} onClick={() => setTmode("year")} label="僅當年" />
+        <span style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.faint }}>時間 ·</span>
+        <Chip active={tmode === "all"} onClick={() => setTmode("all")} label="全程" fontFamily="HuiwenFangSong" />
+        <Chip active={tmode === "cum"} onClick={() => setTmode("cum")} label="累積至" fontFamily="HuiwenFangSong" />
+        <Chip active={tmode === "year"} onClick={() => setTmode("year")} label="僅當年" fontFamily="HuiwenFangSong" />
         {tmode !== "all" && (
           <>
             <input type="range" min={YR.min} max={YR.max} value={tyear} onChange={(e) => setTyear(+e.target.value)}
               style={{ width: 280, accentColor: T.accent, verticalAlign: "middle" }} />
-            <span style={{ fontFamily: serif, fontSize: 14, color: T.ink }}>
+            <span style={{ fontFamily: "HuiwenFangSong", fontSize: 14, color: T.ink }}>
               {tyear}
               <span style={{ fontSize: 12, color: T.muted }}>{eraOf(tyear) ? `（${eraOf(tyear)}）` : ""}</span>
             </span>
@@ -1834,10 +1834,10 @@ function GeoMap({ onOpenChar }) {
       </div>
       {/* 動線選人行：點選即顯，至多三人並比 */}
       <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 11.5, fontFamily: serif, color: T.faint }}>動線（點選即顯，至多三人）·</span>
+        <span style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.faint }}>動線（點選即顯，至多三人）·</span>
         {trackSel.length > 0 && (
           <button onClick={() => setTrackSel([])}
-            style={{ fontSize: 11.5, fontFamily: serif, color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 10px", cursor: "pointer" }}>
+            style={{ fontSize: 11.5, fontFamily: "HuiwenFangSong", color: T.muted, background: "none", border: `1px solid ${T.line}`, padding: "2px 10px", cursor: "pointer" }}>
             清空
           </button>
         )}
@@ -1845,7 +1845,7 @@ function GeoMap({ onOpenChar }) {
           const ti = trackSel.indexOf(id);
           return (
             <button key={id} onClick={() => toggleTrack(id)}
-              style={{ fontSize: 12, fontFamily: serif, padding: "2px 10px", cursor: "pointer", background: ti >= 0 ? T.panelHi : "none", color: ti >= 0 ? TRACK_COLORS[ti] : T.muted, border: `1px solid ${ti >= 0 ? TRACK_COLORS[ti] : T.line}`, borderRadius: "3px" }}>
+              style={{ fontSize: 12, fontFamily: "HuiwenFangSong", padding: "2px 10px", cursor: "pointer", background: ti >= 0 ? T.panelHi : "none", color: ti >= 0 ? TRACK_COLORS[ti] : T.muted, border: `1px solid ${ti >= 0 ? TRACK_COLORS[ti] : T.line}`, borderRadius: "3px" }}>
               {byId[id].name}
             </button>
           );
@@ -2042,22 +2042,22 @@ export default function CangyunWiki({ onOpenLanding }) {
     <div style={{ minHeight: "100vh", background: T.bg, color: T.ink, padding: "0 0 60px" }}>
       <header style={{ borderBottom: `1px solid ${T.line}`, padding: "34px 28px 22px", display: "flex", alignItems: "flex-end", gap: 20, flexWrap: "wrap" }}>
         <div>
-          <div style={{ fontSize: 11, letterSpacing: "0.5em", color: T.faint }}>七一五 — 八〇〇 · 開元三年至貞元十六年</div>
-          <h1 style={{ fontFamily: serif, fontSize: 34, fontWeight: 700, margin: "6px 0 0", letterSpacing: "0.08em" }}>
+          <div style={{ fontFamily: "HuiwenZhengKai", fontSize: 11, letterSpacing: "0.5em", color: T.faint }}>七一五 — 八〇〇 · 開元三年至貞元十六年</div>
+          <h1 style={{ fontFamily: "HuiwenZhengKai", fontSize: 34, fontWeight: 700, margin: "6px 0 0", letterSpacing: "0.08em" }}>
             人山人海 <span style={{ color: T.accent }}>·</span> 檔案
           </h1>
         </div>
         <nav style={{ display: "flex", gap: 4, marginLeft: "auto" }}>
           {[["chars", "人物檔案"], ["timeline", "事件年表"], ["map", "山河輿圖"], ["network", "行星關係圖"], ["community", "群像網絡"], ["novel", "文庫"]].map(([k, label]) => (
             <button key={k} onClick={() => setTab(k)}
-              style={{ fontFamily: serif, fontSize: 15, padding: "8px 18px", background: "none", border: "none", borderBottom: tab === k ? `2px solid ${T.accent}` : "2px solid transparent", color: tab === k ? T.ink : T.muted, cursor: "pointer" }}>
+              style={{ fontFamily: "HuiwenFangSong", fontSize: 15, padding: "8px 18px", background: "none", border: "none", borderBottom: tab === k ? `2px solid ${T.accent}` : "2px solid transparent", color: tab === k ? T.ink : T.muted, cursor: "pointer" }}>
               {label}
             </button>
           ))}
           {/* 回卷首：重開入站定場（landing.jsx），印形以應「入卷」朱印 */}
           {onOpenLanding && (
             <button onClick={onOpenLanding} title="回到卷首"
-              style={{ fontFamily: serif, fontSize: 13, padding: "5px 10px", marginLeft: 12, alignSelf: "center", background: "none", border: `1px solid ${T.seal}`, borderRadius: 3, color: T.seal, cursor: "pointer", letterSpacing: "0.2em", textIndent: "0.2em" }}>
+              style={{ fontFamily: "HuiwenFangSong", fontSize: 13, padding: "5px 10px", marginLeft: 12, alignSelf: "center", background: "none", border: `1px solid ${T.seal}`, borderRadius: 3, color: T.seal, cursor: "pointer", letterSpacing: "0.2em", textIndent: "0.2em" }}>
               卷首
             </button>
           )}
@@ -2069,14 +2069,14 @@ export default function CangyunWiki({ onOpenLanding }) {
           <>
             <div className="flex flex-wrap items-center" style={{ gap: 8, marginBottom: 20 }}>
               {factions.map((f) => (
-                <Chip key={f} active={faction === f} onClick={() => setFaction(f)} label={f} />
+                <Chip key={f} active={faction === f} onClick={() => setFaction(f)} label={f} fontFamily="HuiwenFangSong" />
               ))}
             </div>
             <div style={{ marginBottom: 20 }}>
               <span style={{ position: "relative", display: "inline-block" }}>
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="檢索姓名、表字、概覽、品評"
-                  style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 13, fontFamily: serif, padding: "6px 12px 6px 34px", outline: "none", minWidth: 220 }} />
-                <SearchTag />
+                  style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: "3px", color: T.ink, fontSize: 13, fontFamily: "HuiwenZhengKai", padding: "6px 12px 6px 34px", outline: "none", minWidth: 220 }} />
+                <SearchTag fontFamily="HuiwenZhengKai" />
               </span>
             </div>
             <div className="char-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", columnGap: 14 }}>

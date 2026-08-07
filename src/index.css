@@ -10,6 +10,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "HuiwenFangSong";
+  src: url("./assets/fonts/HuiwenFangSong.ttf") format("truetype");
+  font-display: swap;
+}
+
 body {
   margin: 0;
 }
@@ -802,7 +808,7 @@ body {
 }
 .cy-seal > span {
   writing-mode: vertical-rl;
-  font-family: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+  font-family: "HuiwenMingChao";
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 0.12em;

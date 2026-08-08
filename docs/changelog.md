@@ -1,5 +1,16 @@
 # 更新记录
 
+## 2026-08-08
+
+### 局部字体分层：界面、文库阅读与人物信息
+
+本轮只调整既有局部样式的 `fontFamily`；不改布局、字号、字重、颜色、间距、交互或数据，亦不改 `cangyun-data.js`。两次验证均执行 `npm run lint`（12 条既有 warning 未增，数据校验通过）及 `npm run build`（通过）。
+
+- **界面方宋替换试验**：新增并注册 `JingHuaLaoSong` 字体文件；`HuiwenFangSong` 的原有 `@font-face` 与字体文件保留，方便回退。`cangyun-wiki.jsx` 内此前明确指定 `HuiwenFangSong` 的 41 处局部控件——年表目录、筛选标签/按钮、地图控制项、顶部页签及门派筛选——全部改为 `JingHuaLaoSong`。`HuiwenZhengKai`、`HuiwenMingChao` 和任何全局默认字体均未动。
+- **文库目录与阅读正文**：左侧目录（含作品/卷/章节、字数、展开子目录、目录检索结果及窄屏目录标题）统一为 `HuiwenMingChao`；右侧作品提示、章节标题、标题下字数及正文（含载入/待录提示）统一为 `JingHuaLaoSong`。正文人物名点击 span 不覆写字体，继续继承正文，并保留原 hover、键盘与批注交互。
+- **文库搜索与页边批注**：左侧搜索输入、placeholder 与「查」改为 `HuiwenZhengKai`，盒模型、颜色及定位不变。`MarginNote` 批注卡中，人物姓名与「字」使用 `HuiwenMingChao`；称号、门派标签、生卒/出身与 `readerNote`/简介文字使用 `HuiwenZhengKai`。卡片尺寸、引导线、圆点、背景及关闭/定位逻辑未动。
+- **人物大小档案卡**：紧随人物姓名的「字 xx」在 `CharCard` 小卡和 `DetailPanel` 详情大卡中均改为 `HuiwenMingChao`，与姓名一致；其余档案字段保持原样。
+
 ## 2026-08-06
 
 ### 定场页金脉改形：垂发变骨架

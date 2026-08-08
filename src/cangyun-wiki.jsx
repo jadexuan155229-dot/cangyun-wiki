@@ -185,7 +185,7 @@ function CharCard({ c, onOpen }) {
             所形成的間距（約 75px）相當。原版諸卡欄距 10 不變 */}
         <div className="flex items-baseline flex-wrap" style={{ gap: tt ? 14 : 10 }}>
           <span style={{ fontFamily: "HuiwenMingChao", fontSize: 22, color: T.ink, fontWeight: 400, fontSynthesis: "none" }}>{c.name}</span>
-          {tt && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 13, color: c.zi ? T.muted : T.faint, marginRight: 6 }}>{c.zi ? `字 ${c.zi}` : "字号待补"}</span>}
+          {tt && <span style={{ fontFamily: "HuiwenMingChao", fontSize: 13, color: c.zi ? T.muted : T.faint, marginRight: 6 }}>{c.zi ? `字 ${c.zi}` : "字号待补"}</span>}
           {!tt && evCount > 0 && <span style={{ fontSize: 11, color: T.faint }}>繫年 {evCount} 事</span>}
           <Seal ch={c.pin} size={15} svg={SEAL_SVG_FILE[c.id]} />
         </div>
@@ -389,7 +389,7 @@ function DetailPanel({ c, onClose, onOpenChar, onOpenNovel }) {
             兩線相距僅三十餘像素，並出則刺目。馬翊、程凱等無稱號者，此線正補其位 */}
         <div className={`flex items-baseline flex-wrap${tt && !c.epithet ? " tt-rule" : ""}`} style={{ gap: tt ? 14 : 12, paddingRight: 70 }}>
           <span style={{ fontFamily: "HuiwenMingChao", fontSize: 30, color: T.ink, fontWeight: 400, fontSynthesis: "none" }}>{c.name}</span>
-          {c.zi && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 15, color: T.muted, marginLeft: tt ? 6 : 0 }}>字 {c.zi}</span>}
+          {c.zi && <span style={{ fontFamily: "HuiwenMingChao", fontSize: 15, color: T.muted, marginLeft: tt ? 6 : 0 }}>字 {c.zi}</span>}
           {c.hao && <span style={{ fontFamily: "HuiwenZhengKai", fontSize: 13, color: T.faint }}>「{c.hao}」</span>}
         </div>
         {c.epithet && (

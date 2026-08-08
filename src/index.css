@@ -1,24 +1,18 @@
 @font-face {
   font-family: "HuiwenZhengKai";
-  src: url("./assets/fonts/HuiwenZhengKai.ttf") format("truetype");
+  src: url("./assets/fonts/HuiwenZhengKai.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "HuiwenMingChao";
-  src: url("./assets/fonts/HuiwenMingChao.ttf") format("truetype");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "HuiwenFangSong";
-  src: url("./assets/fonts/HuiwenFangSong.ttf") format("truetype");
+  src: url("./assets/fonts/HuiwenMingChao.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "JingHuaLaoSong";
-  src: url("./assets/fonts/JingHuaLaoSong.ttf") format("truetype");
+  src: url("./assets/fonts/JingHuaLaoSong.woff2") format("woff2");
   font-display: swap;
 }
 

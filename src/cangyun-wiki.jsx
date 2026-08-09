@@ -918,6 +918,8 @@ function Timeline({ onOpenChar }) {
               )}
             </div>
           )}
+          {/* 色例：年表分段之門派色帶（FacBand）舊惟浮字可辨，今於此可查全譜 */}
+          <div style={{ marginBottom: 10 }}><FactionKey /></div>
           <div style={{ marginBottom: 18 }}>
             <span style={{ position: "relative", display: "inline-block" }}>
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="檢索事名、人物、地點、門派、紀年"
@@ -1010,6 +1012,13 @@ function Timeline({ onOpenChar }) {
     </div>
   );
 }
+
+/* 三幅圖（行星、群像、輿地）之字：舊皆作 serif 回退系統宋體，全站既已遷入汇文字族，
+   獨此三幅仍是另一套字。今從站內既有之例分派——人名從人物卡姓名之例用明朝體，
+   其餘（地名、門派、紀年、軌名、圖例、說明、浮框）從界面控件之例用京華老宋。
+   兩者皆已註冊於 index.css；老宋未裁子集，明朝之子集經核可覆全站可渲染漢字，無回退之虞。 */
+const gName = `"HuiwenMingChao",${serif}`;
+const gUI = `"JingHuaLaoSong",${serif}`;
 
 /* ---------------- 圖幅縮放平移：滑鼠與觸屏共用 ---------------- */
 /* 三幅圖（行星、群像、輿地）共用。k 為倍率，t 為平移（viewBox 座標）。
@@ -1153,11 +1162,11 @@ function ZoomBtns({ view, zoomBy, reset }) {
     <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: 6, zIndex: 3, alignItems: "center" }}>
       {[["＋", () => zoomBy(1.3), "放大"], ["－", () => zoomBy(1 / 1.3), "縮小"], ["回", reset, "復位"]].map(([t, fn, tt]) => (
         <button key={tt} title={tt} onClick={fn}
-          style={{ width: 30, height: 30, fontFamily: serif, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
+          style={{ width: 30, height: 30, fontFamily: gUI, fontSize: 14, color: T.ink, background: T.panelHi, border: `1px solid ${T.line}`, borderRadius: "3px", cursor: "pointer", padding: 0, opacity: tt !== "放大" && view.k === 1 ? 0.45 : 1 }}>
           {t}
         </button>
       ))}
-      {view.k > 1 && <span style={{ fontFamily: serif, fontSize: 10.5, color: T.faint }}>{view.k.toFixed(1)}×</span>}
+      {view.k > 1 && <span style={{ fontFamily: gUI, fontSize: 10.5, color: T.faint }}>{view.k.toFixed(1)}×</span>}
     </div>
   );
 }
@@ -1183,6 +1192,41 @@ function ellipseAngles(rx, ry, n) {
   return out;
 }
 
+/* 門派色例：FACTION_COLORS 今定三十二色、人物庫在用者三十一，此前無一處可查其全——
+   （按：CharCard 一節舊注尚云「全站計有二十五色」，數已不符，其數屢增而注未隨。此處故不寫死。）
+   人物卡的門派籤雖著色，只見其人所屬；
+   篩選籤又是中性色，不載門派之義。而年表色帶、輿圖環段、行星與群像諸圖，色即是義，
+   無例可對則色成謎。故立此共用色例，默認收起，一按展開；計數取自人物庫，
+   故所列即全站在用之色，門派增刪自隨數據而動，不另立表以免與 fc 失步。
+   「门派未标」一項落到 fc 的中立灰回退，與圖中無門派者同色，非為虛設。 */
+const FACTION_KEY_LIST = (() => {
+  const n = {};
+  for (const c of CHARACTERS) for (const f of (c.belong.length ? c.belong : ["门派未标"])) n[f] = (n[f] || 0) + 1;
+  return Object.entries(n).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+})();
+function FactionKey() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button onClick={() => setOpen(!open)}
+        style={{ fontSize: 11.5, fontFamily: gUI, color: open ? T.ink : T.muted, background: "none", border: `1px solid ${open ? T.accent : T.line}`, padding: "2px 10px", borderRadius: "3px", cursor: "pointer" }}>
+        門派色例 {open ? "收起" : `${FACTION_KEY_LIST.length} 色`}
+      </button>
+      {open && (
+        <div className="flex flex-wrap" style={{ gap: "7px 15px", marginTop: 8 }}>
+          {FACTION_KEY_LIST.map(([f, n]) => (
+            <span key={f} className="flex items-center" style={{ gap: 5, fontSize: 11.5, fontFamily: gUI, color: T.muted }}>
+              {/* 作圈而非實心塊：與圖中星體之描邊同其形，一望即知所指 */}
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: T.panel, border: `1.6px solid ${fc(f)}`, flex: "0 0 auto" }} />
+              {f}<span style={{ color: T.faint }}>{n}</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* 軌道星之徑：環已判三檔（≥6／3–5／1–2），徑則於檔內再別多寡，尺寸一通道舊本閒置。
    開方而非按數——n 自一至二十，線性則巨細懸絕，一事者小不可辨。今得 17–23.9px。
    橋星雙繫兩核、不入任一檔，故存中庸之徑；遠軌俱零共見，一律最小。 */
@@ -1190,17 +1234,30 @@ const orbitR = (n) => 15 + Math.sqrt(n) * 2;
 /* 線寬同理開方：舊作 0.5+0.28n，一事得 0.78px 幾不可見、二十事得 6.1px 粗如短棒，
    八倍之差兩端俱失。今收於 1.7–5.5px，細者可辨、粗者不橫。 */
 const linkW = (n) => 0.6 + Math.sqrt(n) * 1.1;
+/* 圈內姓名之字號：舊按字數分三檔而不問圈之大小，故四字名於小圈中擠出邊外。
+   今取「字數所定之上限」與「圈徑所容之寬」二者之小——圈大則止於上限不至肥大，
+   圈小則隨徑而縮。下限 7.5px：再小則不可讀，寧令長名微溢圈緣（鄰星尚有數像素之隙）。 */
+const NAME_CAP = { 2: [12.5, 11], 3: [10.5, 9], 4: [9, 8] };
+function nodeFontSize(len, r, dim) {
+  const cap = (NAME_CAP[Math.min(Math.max(len, 2), 4)] || NAME_CAP[4])[dim ? 1 : 0];
+  return Math.max(7.5, Math.min(cap, (r * 1.8) / Math.max(len, 1)));
+}
 
 /* ---------------- 行星式關係圖：雙星系統 ---------------- */
 /* 兩核：閔方城（蒼雲線）與程凱（天策線）。
    軌道悉由《事件与年份》與各核之共見計數自動生成；
    與兩核共見皆 ≥2 者為「橋星」，居於雙星連線之中央；
    與兩核皆無共見者列於環抱全系之遠軌。 */
+/* 幅面：舊作 1200×830，於 maxWidth 1160 下渲染得 802px 高，尋常筆記本一屏不納。
+   今收至 760（渲染 735px）。所省之高，一半出自遠軌圓點由 15 收至 14——
+   點小一像素，橢圓即可矮三十，而餘隙反持平（7.9px，舊 8.0px）；
+   餘者出自三環與雙星間距同比略縮。W/H 立為常量，viewBox 與手勢層共讀，免二處失步。 */
+const PW = 1200, PH = 760, PCX = [360, 840], PCY = PH / 2, FAR_R = 14;
 function Planetary({ onOpenChar }) {
   const [hover, setHover] = useState(null);
-  const { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef } = usePanZoom(1200, 830);
+  const { view, zoomBy, reset, handlers, gestureStyle, movedRef, wheelElRef } = usePanZoom(PW, PH);
   const coarse = useCoarsePointer();
-  const CX = [350, 850], CY = 410;
+  const CX = PCX, CY = PCY;
   const layout = useMemo(() => {
     const counts = CENTERS_META.map((m) => coCountsFor(m.id));
     /* 外軌收至 218：兩核相距 500，舊值 248 令兩系外軌之間僅餘四像素，
@@ -1209,9 +1266,9 @@ function Planetary({ onOpenChar }) {
        橋線所經在外，故外環讓足 0.27 圈，內環去核近、不涉其事，讓 0.21 即可。
        此一鬆，蒼雲系內軌九人之封頂星距由 53.5px 昇至 58px，全幅最緊處遂不復在此。 */
     const RINGS = [
-      { label: "內軌", note: "共見 ≥6 事", r: 105, maxSpan: 0.79, test: (n) => n >= 6 },
-      { label: "中軌", note: "共見 3–5 事", r: 168, maxSpan: 0.76, test: (n) => n >= 3 && n <= 5 },
-      { label: "外軌", note: "共見 1–2 事", r: 218, maxSpan: 0.73, test: (n) => n >= 1 && n <= 2 },
+      { label: "內軌", note: "共見 ≥6 事", r: 102, maxSpan: 0.79, test: (n) => n >= 6 },
+      { label: "中軌", note: "共見 3–5 事", r: 163, maxSpan: 0.76, test: (n) => n >= 3 && n <= 5 },
+      { label: "外軌", note: "共見 1–2 事", r: 211, maxSpan: 0.73, test: (n) => n >= 1 && n <= 2 },
     ];
     const centerIds = CENTERS_META.map((m) => m.id);
     const shared = [], far = [], sys = [[], []];
@@ -1249,14 +1306,14 @@ function Planetary({ onOpenChar }) {
     });
     /* 橋星：居雙星連線中央，縱向錯落 */
     const bridge = shared.map((m, i) => ({
-      ...m, r: 20, x: 600, y: CY + (i - (shared.length - 1) / 2) * 72,
+      ...m, r: 20, x: PW / 2, y: CY + (i - (shared.length - 1) / 2) * 72,
     }));
     /* 遠軌：環抱全系之橢圓。人多而環促——與兩核俱無共見者常逾七十，
        舊法按等角平鋪，長軸兩端最近鄰僅二十九像素而圓徑四十，過半相疊。
        今改等弧長取位，復令奇偶兩列內外錯開（LANE），同列間距倍之。
        數為奇時末一枚落回中列，免首尾同列於接縫處相撞。 */
-    /* 徑略收（552→540 / 356→348），為軌外之門派署名讓出邊白。 */
-    const FAR = { rx: 540, ry: 348 }, LANE = 16;
+    /* 徑略收（552→540 / 356→322）：橫者為軌外之門派署名讓出邊白，縱者為收幅面之高。 */
+    const FAR = { rx: 540, ry: 322 }, LANE = 16;
     const sortedFar = far.sort((x, y) => (x.belong[0] || "").localeCompare(y.belong[0] || ""));
     const nf = sortedFar.length;
     /* 取兩倍之角：偶位為星體所居，奇位為兩星之間的半步，門派弧段即以半步為界 */
@@ -1265,7 +1322,7 @@ function Planetary({ onOpenChar }) {
     const farNodes = sortedFar.map((c, i) => {
       const ang = farAng(2 * i);
       const d = nf % 2 === 1 && i === nf - 1 ? 0 : i % 2 ? LANE : -LANE;
-      return { c, r: 15, x: 600 + (FAR.rx + d) * Math.cos(ang), y: CY + (FAR.ry + d) * Math.sin(ang) };
+      return { c, r: FAR_R, x: PW / 2 + (FAR.rx + d) * Math.cos(ang), y: CY + (FAR.ry + d) * Math.sin(ang) };
     });
     /* 遠軌本已按門派排序、色塊天然成段，舊時軌線卻是通體一色的虛線，
        七十七枚散點遂只讀作噪。今於軌線上按段著門派之色，逾三人者更署其名，
@@ -1296,14 +1353,14 @@ function Planetary({ onOpenChar }) {
     return (
       <g style={{ cursor: "pointer" }} onClick={() => { if (movedRef.current > 5) return; onOpenChar(c); }}>
         <text x={CX[k]} y={CY - 66} textAnchor="middle"
-          style={{ fontFamily: serif, fontSize: 11.5, fill: fc(c.belong[0]), letterSpacing: "0.45em" }}>
+          style={{ fontFamily: gUI, fontSize: 11.5, fill: fc(c.belong[0]), letterSpacing: "0.45em" }}>
           {CENTERS_META[k].tag}
         </text>
         <circle cx={CX[k]} cy={CY} r={40} fill={T.panel} stroke={T.accent} strokeWidth={2.4} />
         <circle cx={CX[k]} cy={CY} r={47} fill="none" stroke={T.accent} strokeWidth={0.7} opacity={0.5} />
-        <text x={CX[k]} y={CY - 7} textAnchor="middle" style={{ fontFamily: serif, fontSize: 16, fill: T.ink, fontWeight: 700 }}>{c.name}</text>
-        <text x={CX[k]} y={CY + 10} textAnchor="middle" style={{ fontFamily: serif, fontSize: 10.5, fill: T.muted }}>{c.birth} — {c.death}</text>
-        <text x={CX[k]} y={CY + 24} textAnchor="middle" style={{ fontFamily: serif, fontSize: 8.5, fill: T.faint }}>{eraOf(c.birth)} — {eraOf(c.death)}</text>
+        <text x={CX[k]} y={CY - 7} textAnchor="middle" style={{ fontFamily: gName, fontSize: 16, fill: T.ink, fontWeight: 700 }}>{c.name}</text>
+        <text x={CX[k]} y={CY + 10} textAnchor="middle" style={{ fontFamily: gUI, fontSize: 10.5, fill: T.muted }}>{c.birth} — {c.death}</text>
+        <text x={CX[k]} y={CY + 24} textAnchor="middle" style={{ fontFamily: gUI, fontSize: 8.5, fill: T.faint }}>{eraOf(c.birth)} — {eraOf(c.death)}</text>
       </g>
     );
   };
@@ -1315,9 +1372,7 @@ function Planetary({ onOpenChar }) {
     const hi = hover === n.c.id;
     const soft = dim && !hi;
     const r0 = n.r + (hi ? (dim ? 4 : 3) : 0);
-    const fs = dim
-      ? n.c.name.length > 3 ? 8 : n.c.name.length > 2 ? 9 : 11
-      : n.c.name.length > 3 ? 9 : n.c.name.length > 2 ? 10.5 : 12.5;
+    const fs = nodeFontSize(n.c.name.length, n.r, dim);
     return (
       <g style={{ cursor: "pointer" }}
         onMouseEnter={() => { if (!coarse) setHover(n.c.id); }}
@@ -1332,14 +1387,14 @@ function Planetary({ onOpenChar }) {
             strokeWidth={0.8} opacity={soft ? 0.35 : 0.7} />
         )}
         <text x={n.x} y={n.y + 4} textAnchor="middle"
-          style={{ fontFamily: serif, fontSize: fs, fill: soft ? T.muted : T.ink }}>
+          style={{ fontFamily: gName, fontSize: fs, fill: soft ? T.muted : T.ink }}>
           {n.c.name}
         </text>
         {/* 共見數改懸停始現：四十條同級灰字常駐，鋪成一層霧而已；
             其量今由徑與線寬並載，欲知確數者懸停（觸屏首觸）即得。 */}
         {countLabel && hi && (
           <text x={n.x} y={n.y + r0 + 15} textAnchor="middle"
-            style={{ fontFamily: serif, fontSize: 10.5, fill: T.accent }}>
+            style={{ fontFamily: gUI, fontSize: 10.5, fill: T.accent }}>
             {countLabel}
           </text>
         )}
@@ -1350,7 +1405,7 @@ function Planetary({ onOpenChar }) {
   return (
     <div style={{ overflowX: "auto", position: "relative" }}>
       <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
-      <svg viewBox="0 0 1200 830" ref={wheelElRef}
+      <svg viewBox={`0 0 ${PW} ${PH}`} ref={wheelElRef}
         style={{ width: "100%", maxWidth: 1160, display: "block", margin: "0 auto", ...gestureStyle }}
         {...handlers}>
         <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
@@ -1361,8 +1416,8 @@ function Planetary({ onOpenChar }) {
             署名沿軌切向書寫，故無論名之長短，徑向只佔字高十許像素，不慮出幅。 */}
         {(() => {
           const { rx, ry } = layout.FAR, PAD = 0.012;
-          const pt = (a, dr) => [600 + (rx + dr) * Math.cos(a), CY + (ry + dr) * Math.sin(a)];
-          const LAB = layout.LANE + 15 + 17; /* 外列圓心 + 圓徑 + 留白 */
+          const pt = (a, dr) => [PW / 2 + (rx + dr) * Math.cos(a), CY + (ry + dr) * Math.sin(a)];
+          const LAB = layout.LANE + FAR_R + 17; /* 外列圓心 + 圓徑 + 留白 */
           return layout.farRuns.map((run) => {
             const a0 = layout.farAng(2 * run.i0 - 1) + PAD, a1 = layout.farAng(2 * run.i1 + 1) - PAD;
             const sweep = ((a1 - a0) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
@@ -1380,7 +1435,7 @@ function Planetary({ onOpenChar }) {
                 {run.i1 - run.i0 >= 2 && (
                   <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central"
                     transform={`rotate(${rot.toFixed(2)} ${lx.toFixed(1)} ${ly.toFixed(1)})`}
-                    style={{ fontFamily: serif, fontSize: 9.5, fill: col, opacity: 0.75, letterSpacing: "0.08em" }}>
+                    style={{ fontFamily: gUI, fontSize: 9.5, fill: col, opacity: 0.75, letterSpacing: "0.08em" }}>
                     {run.f || "無門派"}
                   </text>
                 )}
@@ -1400,9 +1455,9 @@ function Planetary({ onOpenChar }) {
             又正壓十二點鐘方向之星體；今並歸幅左之空處，環上不再有壓字。
             此隅在遠軌橢圓之外，四環由內而外以縮進示之。 */}
         <g transform="translate(28, 40)">
-          <text x={0} y={0} style={{ fontFamily: serif, fontSize: 11, fill: T.muted }}>虛線諸環：與本系之核共見事數</text>
+          <text x={0} y={0} style={{ fontFamily: gUI, fontSize: 11, fill: T.muted }}>虛線諸環：與本系之核共見事數</text>
           {[...layout.RINGS.map((r) => [r.label, r.note]), ["遠軌", "與兩核俱無共見（作淡圓點）"]].map(([nm, note], i) => (
-            <text key={nm} x={i * 8} y={20 + i * 15} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint }}>
+            <text key={nm} x={i * 8} y={20 + i * 15} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.faint }}>
               {nm}　{note}
             </text>
           ))}
@@ -1431,13 +1486,13 @@ function Planetary({ onOpenChar }) {
         {chords.map((r, i) => {
           const p1 = pos[r.a], p2 = pos[r.b];
           const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-          const dx = mx - 600, dy = my - CY, dl = Math.sqrt(dx * dx + dy * dy) || 1;
+          const dx = mx - PW / 2, dy = my - CY, dl = Math.sqrt(dx * dx + dy * dy) || 1;
           const cx = mx + (dx / dl) * 70, cy = my + (dy / dl) * 70;
           return (
             <g key={"ch" + i}>
               <path d={`M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`} fill="none"
                 stroke={relColor(r.t)} strokeWidth={1.3} strokeDasharray={r.da ? "5 4" : "none"} opacity={0.9} />
-              <text x={cx} y={cy} textAnchor="middle" style={{ fontFamily: serif, fontSize: 10, fill: relColor(r.t) }}>{r.t}</text>
+              <text x={cx} y={cy} textAnchor="middle" style={{ fontFamily: gUI, fontSize: 10, fill: relColor(r.t) }}>{r.t}</text>
             </g>
           );
         })}
@@ -1452,12 +1507,13 @@ function Planetary({ onOpenChar }) {
         {layout.farNodes.map((n) => <Node key={n.c.id} n={n} countLabel={null} dim />)}
         </g>
       </svg>
-      <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: serif }}>
+      <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: gUI }}>
         雙星系統：閔方城（蒼雲線）與程凱（天策線）同格為核。軌道由《事件与年份》中與各核共見事件之計數自動生成，圈徑與線粗亦然（皆按開方），
         環之弧長即其人數；懸停一人即見確數。與兩核共見皆不少於二事者為橋星，居雙星之間，雙繫於兩核，不入軌檔故存中庸之徑。
         遠軌之線按門派分段著色，逾三人者署名於軌外。
         {coarse ? "輕觸一人牽出其關係弦線，再觸方開檔案；放大後可雙指捏合、單指平移。" : "點選任一人開啟檔案。"}
       </div>
+      <FactionKey />
     </div>
   );
 }
@@ -1513,15 +1569,15 @@ function Community({ onOpenChar }) {
         ))}
         <input type="range" min={730} max={765} value={Y} onChange={(e) => setY(+e.target.value)}
           style={{ flex: 1, minWidth: 180, accentColor: T.accent }} />
-        <span style={{ fontFamily: serif, fontSize: 16, color: T.accent, minWidth: 170, textAlign: "right" }}>
+        <span style={{ fontFamily: gUI, fontSize: 16, color: T.accent, minWidth: 170, textAlign: "right" }}>
           {Y}（{eraOf(Y)}）
         </span>
       </div>
       <div className="flex flex-wrap" style={{ gap: 14, marginBottom: 4, justifyContent: "center" }}>
         {[["傳承", "#7FB0D8"], ["遺承", "#9B7EC8"], ["情愛", "#D88BA8"], ["恩義", "#C9A15C"], ["誼", "#7FA980"], ["親緣", "#B08968"], ["嫌隙", "#C8B45A"], ["殺伐", "#C05050"]].map(([l, cc]) => (
-          <span key={l} style={{ fontSize: 11, fontFamily: serif, color: cc }}>— {l}</span>
+          <span key={l} style={{ fontSize: 11, fontFamily: gUI, color: cc }}>— {l}</span>
         ))}
-        <span style={{ fontSize: 11, fontFamily: serif, color: T.faint }}>虛線＝未遂／未說開／未見 · 硃砂點線＝歿後延續 · 虛環＝其人已歿</span>
+        <span style={{ fontSize: 11, fontFamily: gUI, color: T.faint }}>虛線＝未遂／未說開／未見 · 硃砂點線＝歿後延續 · 虛環＝其人已歿</span>
       </div>
       <div style={{ overflowX: "auto", position: "relative" }}>
         <ZoomBtns view={view} zoomBy={zoomBy} reset={reset} />
@@ -1534,7 +1590,7 @@ function Community({ onOpenChar }) {
             onClick={() => { if (movedRef.current > 5) return; setHover(null); }} />
           {centers.map((g) => (
             <text key={g.f} x={g.gx} y={g.gy - g.cr - 10} textAnchor="middle"
-              style={{ fontFamily: serif, fontSize: 13, fill: fc(g.f), letterSpacing: "0.3em", opacity: 0.8 }}>
+              style={{ fontFamily: gUI, fontSize: 13, fill: fc(g.f), letterSpacing: "0.3em", opacity: 0.8 }}>
               {g.f}
             </text>
           ))}
@@ -1552,7 +1608,7 @@ function Community({ onOpenChar }) {
                   opacity={dim ? 0.07 : posth ? 0.5 : hi ? 1 : 0.45} />
                 {hi && (
                   <text x={(p1.x + p2.x) / 2} y={(p1.y + p2.y) / 2 - 4} textAnchor="middle"
-                    style={{ fontFamily: serif, fontSize: 10.5, fill: posth ? T.accent : relColor(r.t) }}>
+                    style={{ fontFamily: gUI, fontSize: 10.5, fill: posth ? T.accent : relColor(r.t) }}>
                     {r.t}{posth ? "（歿後）" : ""}
                   </text>
                 )}
@@ -1574,7 +1630,7 @@ function Community({ onOpenChar }) {
                 <circle cx={n.x} cy={n.y} r={hi ? 19 : 15.5} fill={T.panel}
                   stroke={fc(n.f)} strokeWidth={hi ? 2 : 1.3} strokeDasharray={dead ? "3 3" : "none"} />
                 <text x={n.x} y={n.y + 3.5} textAnchor="middle"
-                  style={{ fontFamily: serif, fontSize: n.c.name.length > 3 ? 8 : n.c.name.length > 2 ? 9.5 : 11, fill: T.ink }}>
+                  style={{ fontFamily: gName, fontSize: n.c.name.length > 3 ? 8 : n.c.name.length > 2 ? 9.5 : 11, fill: T.ink }}>
                   {n.c.name}
                 </text>
               </g>
@@ -1583,14 +1639,14 @@ function Community({ onOpenChar }) {
           </g>
         </svg>
       </div>
-      <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: serif }}>
+      <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: gUI }}>
         諸邊依《人物关系》庫著錄，並自《东都天策府组人设》《西域组·大漠沙如雪》等諸人設文本增補——按門派聚類；拖動滑桿觀關係之生滅——邊之顯隱依起讫，硃砂點線為歿後之延續。兩核（閔方城、程凱）在此降格為普通節點：中心性不再被預設，而由網絡自證。
       </div>
     </div>
   );
 }
 
-function Chip({ active, onClick, label, fontFamily = serif }) {
+function Chip({ active, onClick, label, fontFamily = gUI }) {
   return (
     <button onClick={onClick} style={{ fontSize: 12.5, fontFamily, color: active ? "#E7E2D6" : T.muted, background: active ? T.accent : "transparent", border: `1px solid ${active ? T.accent : T.line}`, padding: "3px 12px", borderRadius: "3px", cursor: "pointer" }}>
       {label}
@@ -1599,7 +1655,7 @@ function Chip({ active, onClick, label, fontFamily = serif }) {
 }
 
 /* 檢索框內「查」字小方標：純視覺標識，不可點——配合外層 position:relative 容器與 input 左側讓位 padding 使用 */
-const SearchTag = ({ fontFamily = serif }) => (
+const SearchTag = ({ fontFamily = gUI }) => (
   <span style={{ position: "absolute", left: 6, top: 6, bottom: 6, width: 18, display: "flex", alignItems: "center", justifyContent: "center", background: T.accent, color: "#E7E2D6", fontSize: 11, fontFamily, borderRadius: "3px", pointerEvents: "none" }}>查</span>
 );
 
@@ -1820,7 +1876,7 @@ function GeoMap({ onOpenChar }) {
           const off = { n: [0, -r - 7 / z], s: [0, r + 15 / z], e: [r + 6 / z, 4 / z], w: [-r - 6 / z, 4 / z] }[c.la || "e"];
           return (
             <text x={c.x + off[0]} y={c.y + off[1]} textAnchor={c.la === "e" ? "start" : c.la === "w" ? "end" : "middle"}
-              style={{ fontFamily: serif, fontSize: (isSel || isHov ? 12.5 : 11) / z, fill: isSel || isHov ? T.ink : T.muted, paintOrder: "stroke", stroke: T.bg, strokeWidth: 3 / z }}>
+              style={{ fontFamily: gUI, fontSize: (isSel || isHov ? 12.5 : 11) / z, fill: isSel || isHov ? T.ink : T.muted, paintOrder: "stroke", stroke: T.bg, strokeWidth: 3 / z }}>
               {name}{n > 0 ? ` ${n}` : ""}
             </text>
           );
@@ -1837,7 +1893,7 @@ function GeoMap({ onOpenChar }) {
     const anchor = dir === "西" ? "start" : "end";
     return (
       <g>
-        <text x={b.x} y={b.y - 14} textAnchor={anchor} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint, letterSpacing: "0.3em" }}>
+        <text x={b.x} y={b.y - 14} textAnchor={anchor} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.faint, letterSpacing: "0.3em" }}>
           {dir === "西" ? "◁ 絕域之西" : "絕域之東 ▷"}
         </text>
         {names.map((nm, i) => {
@@ -1853,7 +1909,7 @@ function GeoMap({ onOpenChar }) {
               <rect x={dir === "西" ? b.x : b.x - 92} y={y - 13} width={92} height={19}
                 fill={isSel ? T.panelHi : "none"} stroke={isSel || isHov ? T.accent : T.line} strokeWidth={1} />
               <text x={dir === "西" ? b.x + 6 : b.x - 6} y={y} textAnchor={anchor}
-                style={{ fontFamily: serif, fontSize: 11, fill: seg ? fc(seg[0]) : T.muted }}>
+                style={{ fontFamily: gUI, fontSize: 11, fill: seg ? fc(seg[0]) : T.muted }}>
                 {nm}{n > 0 ? ` ${n}` : ""}
               </text>
             </g>
@@ -1939,6 +1995,8 @@ function GeoMap({ onOpenChar }) {
           </>
         )}
       </div>
+      {/* 色例：輿圖環段依門派著色（一地多門派分段），此可查其義 */}
+      <div style={{ marginBottom: 4 }}><FactionKey /></div>
       {/* 動線選人行：點選即顯，至多三人並比 */}
       <div className="flex flex-wrap items-center" style={{ gap: 6, marginBottom: 8 }}>
         <span style={{ fontSize: 11.5, fontFamily: "JingHuaLaoSong", color: T.faint }}>動線（點選即顯，至多三人）·</span>
@@ -1978,7 +2036,7 @@ function GeoMap({ onOpenChar }) {
             <path d={GEO_BASE.changjiang} fill="none" stroke="#5B7A93" strokeWidth={1.4} opacity={0.55} vectorEffect="non-scaling-stroke" />
             {GEO_BASE.labels.map((l) => (
               <text key={l.t} x={l.x} y={l.y} textAnchor="middle"
-                style={{ fontFamily: serif, fontSize: 13, fill: T.faint, letterSpacing: "0.5em", opacity: 0.65 }}>{l.t}</text>
+                style={{ fontFamily: gUI, fontSize: 13, fill: T.faint, letterSpacing: "0.5em", opacity: 0.65 }}>{l.t}</text>
             ))}
             {/* 泛稱面先繪（襯底），點位後繪 */}
             {Object.keys(LOC_COORDS).filter((nm) => LOC_COORDS[nm].kind === "region").map((nm) => <Spot key={nm} name={nm} />)}
@@ -2025,7 +2083,7 @@ function GeoMap({ onOpenChar }) {
                     const [x, y] = P(g);
                     return (
                       <text key={loc} x={x + 6 / view.k} y={y + (15 + t.ti * 11) / view.k}
-                        style={{ fontFamily: serif, fontSize: 9.5 / view.k, fill: t.color, paintOrder: "stroke", stroke: T.bg, strokeWidth: 2.5 / view.k }}>
+                        style={{ fontFamily: gUI, fontSize: 9.5 / view.k, fill: t.color, paintOrder: "stroke", stroke: T.bg, strokeWidth: 2.5 / view.k }}>
                         {g.visits.join("、")}
                       </text>
                     );
@@ -2034,7 +2092,7 @@ function GeoMap({ onOpenChar }) {
                     const [x, y] = P(t.stays[0]);
                     return (
                       <text x={x - 7 / view.k} y={y - 7 / view.k} textAnchor="end"
-                        style={{ fontFamily: serif, fontSize: 11.5 / view.k, fill: t.color, fontWeight: 700, paintOrder: "stroke", stroke: T.bg, strokeWidth: 3 / view.k }}>
+                        style={{ fontFamily: gName, fontSize: 11.5 / view.k, fill: t.color, fontWeight: 700, paintOrder: "stroke", stroke: T.bg, strokeWidth: 3 / view.k }}>
                         {byId[t.id].name}（起）
                       </text>
                     );
@@ -2047,12 +2105,12 @@ function GeoMap({ onOpenChar }) {
             <OffBox dir="東" />
             {/* 圖例 */}
             <g transform="translate(34, 620)">
-              <circle cx={6} cy={0} r={3.2} fill={T.ink} /><text x={16} y={4} style={{ fontFamily: serif, fontSize: 10.5, fill: T.muted }}>實名城邑</text>
-              <rect x={2} y={20} width={8} height={8} transform="rotate(45 6 24)" fill={T.panelHi} stroke={T.muted} strokeWidth={1} /><text x={16} y={28} style={{ fontFamily: serif, fontSize: 10.5, fill: T.muted }}>門派駐地／自設地</text>
-              <ellipse cx={6} cy={48} rx={9} ry={5} fill={T.faint} opacity={0.25} stroke={T.line} strokeDasharray="2 3" /><text x={16} y={52} style={{ fontFamily: serif, fontSize: 10.5, fill: T.muted }}>區域泛稱（事件計入面心）</text>
-              <text x={0} y={76} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint }}>環徑按事件數開方縮放；一地多門派以門派色分段。</text>
-              <text x={0} y={92} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint }}>底圖為示意手繪，方位可據、比例不稱。動線由事件推導、兼採作者訂正之補點，</text>
-              <text x={0} y={108} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint }}>僅表先後曾在、非循此路行；虛線段居間有無地點之事；駐點注「序·年」。</text>
+              <circle cx={6} cy={0} r={3.2} fill={T.ink} /><text x={16} y={4} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.muted }}>實名城邑</text>
+              <rect x={2} y={20} width={8} height={8} transform="rotate(45 6 24)" fill={T.panelHi} stroke={T.muted} strokeWidth={1} /><text x={16} y={28} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.muted }}>門派駐地／自設地</text>
+              <ellipse cx={6} cy={48} rx={9} ry={5} fill={T.faint} opacity={0.25} stroke={T.line} strokeDasharray="2 3" /><text x={16} y={52} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.muted }}>區域泛稱（事件計入面心）</text>
+              <text x={0} y={76} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.faint }}>環徑按事件數開方縮放；一地多門派以門派色分段。</text>
+              <text x={0} y={92} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.faint }}>底圖為示意手繪，方位可據、比例不稱。動線由事件推導、兼採作者訂正之補點，</text>
+              <text x={0} y={108} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.faint }}>僅表先後曾在、非循此路行；虛線段居間有無地點之事；駐點注「序·年」。</text>
             </g>
           </svg>
           {/* 動線悬浮框：繫此段之事——到達之首見；標題逾百字截斷，全文由側欄承接 */}
@@ -2063,17 +2121,17 @@ function GeoMap({ onOpenChar }) {
             const tf = [flip ? "translateX(-100%)" : "", coarse ? "translateY(-100%)" : ""].filter(Boolean).join(" ");
             return (
               <div style={{ position: "absolute", left: hoverSeg.x + (flip ? -14 : 14), top: hoverSeg.y + (coarse ? -14 : 12), transform: tf || "none", maxWidth: 300, background: T.panelHi, border: `1px solid ${T.line}`, boxShadow: "0 4px 18px rgba(0,0,0,.45)", padding: "10px 13px", pointerEvents: "none", zIndex: 4 }}>
-                <div style={{ fontFamily: serif, fontSize: 12.5, color: hoverSeg.color, marginBottom: 4 }}>
+                <div style={{ fontFamily: gUI, fontSize: 12.5, color: hoverSeg.color, marginBottom: 4 }}>
                   {hoverSeg.name} · {hoverSeg.prev.loc}（迄{hoverSeg.prev.toYear ?? "起"}）→ {hoverSeg.s.loc}（{hoverSeg.s.year ?? "起"}）
                 </div>
                 {hoverSeg.s.gapBefore && (
-                  <div style={{ fontFamily: serif, fontSize: 11, color: T.faint, marginBottom: 4 }}>其間有無地點之事，故弧作虛線。</div>
+                  <div style={{ fontFamily: gUI, fontSize: 11, color: T.faint, marginBottom: 4 }}>其間有無地點之事，故弧作虛線。</div>
                 )}
-                <div style={{ fontFamily: serif, fontSize: 12.5, color: T.ink, lineHeight: 1.75 }}>
+                <div style={{ fontFamily: gUI, fontSize: 12.5, color: T.ink, lineHeight: 1.75 }}>
                   <span style={{ color: T.muted, fontSize: 11.5 }}>（{eraOf(hoverSeg.s.ev.year)}{hoverSeg.s.ev.month != null ? ` ${CN_MONTH[hoverSeg.s.ev.month]}` : ""}）</span>
                   {ttl.length > 100 ? ttl.slice(0, 100) + "……" : ttl}
                 </div>
-                <div style={{ fontFamily: serif, fontSize: 10.5, color: T.faint, marginTop: 5 }}>繫此段者為到達之首見，未必為位移之因；全文點駐地開側欄。</div>
+                <div style={{ fontFamily: gUI, fontSize: 10.5, color: T.faint, marginTop: 5 }}>繫此段者為到達之首見，未必為位移之因；全文點駐地開側欄。</div>
               </div>
             );
           })()}
@@ -2082,14 +2140,14 @@ function GeoMap({ onOpenChar }) {
         {sel && (
           <div style={{ flex: narrow ? "1 1 auto" : "0 0 360px", width: narrow ? "100%" : 360, maxHeight: narrow ? "none" : 640, overflowY: "auto", border: `1px solid ${T.line}`, background: T.panel, padding: "14px 16px 6px 20px" }}>
             <div className="flex items-baseline" style={{ gap: 10, marginBottom: 4 }}>
-              <span style={{ fontFamily: serif, fontSize: 17, color: T.ink, fontWeight: 700 }}>
+              <span style={{ fontFamily: gUI, fontSize: 17, color: T.ink, fontWeight: 700 }}>
                 {sel === NOLOC_KEY ? "無地點之事" : sel}
               </span>
-              <span style={{ fontFamily: serif, fontSize: 12, color: T.muted }}>{selEvents.length} 事</span>
+              <span style={{ fontFamily: gUI, fontSize: 12, color: T.muted }}>{selEvents.length} 事</span>
               <button onClick={() => setSel(null)} style={{ marginLeft: "auto", background: "none", border: "none", color: T.faint, fontSize: 16, cursor: "pointer" }}>×</button>
             </div>
             {selCoord && selCoord.note && (
-              <div style={{ fontFamily: serif, fontSize: 11.5, color: T.faint, marginBottom: 8 }}>按：{selCoord.note}。</div>
+              <div style={{ fontFamily: gUI, fontSize: 11.5, color: T.faint, marginBottom: 8 }}>按：{selCoord.note}。</div>
             )}
             <div style={{ borderTop: `1px solid ${T.line}`, paddingTop: 14, marginLeft: 40 }}>
               {selEvents.map((e, i) => {
@@ -2097,7 +2155,7 @@ function GeoMap({ onOpenChar }) {
                 return <EvRow key={i} e={e} showYear={showYear} onOpenChar={onOpenChar} />;
               })}
               {selEvents.length === 0 && (
-                <div style={{ fontFamily: serif, fontSize: 12.5, color: T.faint, padding: "10px 0 20px" }}>當前篩選下此地無事。</div>
+                <div style={{ fontFamily: gUI, fontSize: 12.5, color: T.faint, padding: "10px 0 20px" }}>當前篩選下此地無事。</div>
               )}
             </div>
           </div>

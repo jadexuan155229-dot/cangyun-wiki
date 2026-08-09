@@ -1162,6 +1162,27 @@ function ZoomBtns({ view, zoomBy, reset }) {
   );
 }
 
+/* 橢圓上取 n 個等弧長之角。
+   按：橢圓等角非等弧——長軸兩端弧速最慢，等角鋪陳必於彼處堆疊。
+   故先分段積分弧長成表，再按目標弧長反查角度。S 取 2048 段，誤差遠細於一像素。 */
+function ellipseAngles(rx, ry, n) {
+  const S = 2048, cum = [0];
+  const speed = (t) => Math.hypot(rx * Math.sin(t), ry * Math.cos(t));
+  for (let i = 1; i <= S; i++) {
+    const t0 = ((i - 1) / S) * Math.PI * 2, t1 = (i / S) * Math.PI * 2;
+    cum.push(cum[i - 1] + ((speed(t0) + speed(t1)) / 2) * ((Math.PI * 2) / S));
+  }
+  const total = cum[S], out = [];
+  let j = 0; /* 目標弧長遞增，游標單向前行即可，不必每次重掃 */
+  for (let i = 0; i < n; i++) {
+    const target = (i / n) * total;
+    while (j < S && cum[j + 1] < target) j++;
+    const seg = cum[j + 1] - cum[j] || 1;
+    out.push(((j + (target - cum[j]) / seg) / S) * Math.PI * 2);
+  }
+  return out;
+}
+
 /* ---------------- 行星式關係圖：雙星系統 ---------------- */
 /* 兩核：閔方城（蒼雲線）與程凱（天策線）。
    軌道悉由《事件与年份》與各核之共見計數自動生成；
@@ -1174,10 +1195,12 @@ function Planetary({ onOpenChar }) {
   const CX = [350, 850], CY = 410;
   const layout = useMemo(() => {
     const counts = CENTERS_META.map((m) => coCountsFor(m.id));
+    /* 外軌收至 226：兩核相距 500，舊值 248 令兩系外軌之間僅餘四像素，
+       而唯一之橋星恰坐此夾縫。今中縫得四十八像素，橋星圓周不再壓兩圈虛線。 */
     const RINGS = [
-      { label: "內軌 ≥6", r: 108, test: (n) => n >= 6 },
-      { label: "中軌 3–5", r: 178, test: (n) => n >= 3 && n <= 5 },
-      { label: "外軌 1–2", r: 248, test: (n) => n >= 1 && n <= 2 },
+      { label: "內軌", note: "共見 ≥6 事", r: 105, test: (n) => n >= 6 },
+      { label: "中軌", note: "共見 3–5 事", r: 168, test: (n) => n >= 3 && n <= 5 },
+      { label: "外軌", note: "共見 1–2 事", r: 226, test: (n) => n >= 1 && n <= 2 },
     ];
     const centerIds = CENTERS_META.map((m) => m.id);
     const shared = [], far = [], sys = [[], []];
@@ -1212,14 +1235,18 @@ function Planetary({ onOpenChar }) {
     const bridge = shared.map((m, i) => ({
       ...m, x: 600, y: CY + (i - (shared.length - 1) / 2) * 72,
     }));
-    /* 遠軌：環抱全系之橢圓 */
-    const FAR = { rx: 552, ry: 356 };
-    const farNodes = far
-      .sort((x, y) => (x.belong[0] || "").localeCompare(y.belong[0] || ""))
-      .map((c, i) => {
-        const ang = -Math.PI / 2 + (i / far.length) * Math.PI * 2;
-        return { c, x: 600 + FAR.rx * Math.cos(ang), y: CY + FAR.ry * Math.sin(ang) };
-      });
+    /* 遠軌：環抱全系之橢圓。人多而環促——與兩核俱無共見者常逾七十，
+       舊法按等角平鋪，長軸兩端最近鄰僅二十九像素而圓徑四十，過半相疊。
+       今改等弧長取位，復令奇偶兩列內外錯開（LANE），同列間距倍之。
+       數為奇時末一枚落回中列，免首尾同列於接縫處相撞。 */
+    const FAR = { rx: 552, ry: 356 }, LANE = 16;
+    const sortedFar = far.sort((x, y) => (x.belong[0] || "").localeCompare(y.belong[0] || ""));
+    const angs = ellipseAngles(FAR.rx, FAR.ry, sortedFar.length);
+    const farNodes = sortedFar.map((c, i) => {
+      const ang = -Math.PI / 2 + angs[i];
+      const d = sortedFar.length % 2 === 1 && i === sortedFar.length - 1 ? 0 : i % 2 ? LANE : -LANE;
+      return { c, x: 600 + (FAR.rx + d) * Math.cos(ang), y: CY + (FAR.ry + d) * Math.sin(ang) };
+    });
     return { rings, bridge, farNodes, FAR, RINGS };
   }, []);
 
@@ -1251,8 +1278,16 @@ function Planetary({ onOpenChar }) {
     );
   };
 
-  const Node = ({ n, countLabel }) => {
+  /* dim：遠軌之星。與兩核俱無共見者逾全譜六成，若與有事者同其大小明度，
+     則畫面最艷之一環恰是信息最薄之一環，主客倒置。故縮其徑、褪其色、
+     底填幅色如鑿孔——懸停即復原大小與墨色，點選之途不減。 */
+  const Node = ({ n, countLabel, dim }) => {
     const hi = hover === n.c.id;
+    const soft = dim && !hi;
+    const r0 = dim ? (hi ? 19 : 15) : hi ? 24 : 20;
+    const fs = dim
+      ? n.c.name.length > 3 ? 8 : n.c.name.length > 2 ? 9 : 11
+      : n.c.name.length > 3 ? 9 : n.c.name.length > 2 ? 10.5 : 12.5;
     return (
       <g style={{ cursor: "pointer" }}
         onMouseEnter={() => { if (!coarse) setHover(n.c.id); }}
@@ -1260,12 +1295,14 @@ function Planetary({ onOpenChar }) {
         /* 觸屏無懸停：首觸牽出其關係弧，再觸方開檔案 */
         onClick={() => { if (movedRef.current > 5) return; if (coarse && hover !== n.c.id) { setHover(n.c.id); return; } onOpenChar(n.c); }}>
         {coarse && <circle cx={n.x} cy={n.y} r={30} fill="transparent" />}
-        <circle cx={n.x} cy={n.y} r={hi ? 24 : 20} fill={T.panel} stroke={fc(n.c.belong[0])} strokeWidth={1.6} />
+        <circle cx={n.x} cy={n.y} r={r0} fill={soft ? T.bg : T.panel} stroke={fc(n.c.belong[0])}
+          strokeWidth={soft ? 1.2 : 1.6} strokeOpacity={soft ? 0.55 : 1} />
         {n.c.belong.length > 1 && (
-          <circle cx={n.x} cy={n.y} r={hi ? 28 : 24} fill="none" stroke={fc(n.c.belong[1])} strokeWidth={0.8} opacity={0.7} />
+          <circle cx={n.x} cy={n.y} r={r0 + 4} fill="none" stroke={fc(n.c.belong[1])}
+            strokeWidth={0.8} opacity={soft ? 0.35 : 0.7} />
         )}
         <text x={n.x} y={n.y + 4} textAnchor="middle"
-          style={{ fontFamily: serif, fontSize: n.c.name.length > 3 ? 9 : n.c.name.length > 2 ? 10.5 : 12.5, fill: T.ink }}>
+          style={{ fontFamily: serif, fontSize: fs, fill: soft ? T.muted : T.ink }}>
           {n.c.name}
         </text>
         {countLabel && (
@@ -1288,19 +1325,27 @@ function Planetary({ onOpenChar }) {
         {/* 襯底：觸屏點空處即卸下所選人物，關係弦線隨之收起 */}
         <rect x={-4000} y={-4000} width={9000} height={9000} fill="transparent"
           onClick={() => { if (movedRef.current > 5) return; setHover(null); }} />
-        {/* 遠軌橢圓 */}
+        {/* 遠軌橢圓：兩列星體分居其內外，此線居中為準 */}
         <ellipse cx={600} cy={CY} rx={layout.FAR.rx} ry={layout.FAR.ry} fill="none" stroke={T.line} strokeDasharray="2 5" />
-        <text x={600} y={CY - layout.FAR.ry - 9} textAnchor="middle" style={{ fontFamily: serif, fontSize: 11, fill: T.faint }}>遠軌 0（與兩核俱無共見）</text>
         {/* 各系軌道 */}
         {layout.RINGS.map((ring, ri) => (
           <g key={ri}>
             {[0, 1].map((k) => (
               <circle key={k} cx={CX[k]} cy={CY} r={ring.r} fill="none" stroke={T.line} strokeDasharray="2 5" />
             ))}
-            <text x={CX[0]} y={CY - ring.r - 7} textAnchor="middle" style={{ fontFamily: serif, fontSize: 11, fill: T.faint }}>{ring.label}</text>
-            <text x={CX[1]} y={CY - ring.r - 7} textAnchor="middle" style={{ fontFamily: serif, fontSize: 11, fill: T.faint }}>{ring.label}</text>
           </g>
         ))}
+        {/* 圖例：軌道之義。舊法每環之名於兩核頭頂各書一遍，六字之中三為重出，
+            又正壓十二點鐘方向之星體；今並歸幅左之空處，環上不再有壓字。
+            此隅在遠軌橢圓之外，四環由內而外以縮進示之。 */}
+        <g transform="translate(28, 40)">
+          <text x={0} y={0} style={{ fontFamily: serif, fontSize: 11, fill: T.muted }}>虛線諸環：與本系之核共見事數</text>
+          {[...layout.RINGS.map((r) => [r.label, r.note]), ["遠軌", "與兩核俱無共見（作淡圓點）"]].map(([nm, note], i) => (
+            <text key={nm} x={i * 8} y={20 + i * 15} style={{ fontFamily: serif, fontSize: 10.5, fill: T.faint }}>
+              {nm}　{note}
+            </text>
+          ))}
+        </g>
         {/* 系內星體連線 */}
         {layout.rings.flatMap((sysRings, k) =>
           sysRings.flatMap((ring) =>
@@ -1343,7 +1388,7 @@ function Planetary({ onOpenChar }) {
           )
         )}
         {layout.bridge.map((n) => <Node key={n.c.id} n={n} countLabel={`閔 ${n.a} · 程 ${n.b}`} />)}
-        {layout.farNodes.map((n) => <Node key={n.c.id} n={n} countLabel={null} />)}
+        {layout.farNodes.map((n) => <Node key={n.c.id} n={n} countLabel={null} dim />)}
         </g>
       </svg>
       <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: serif }}>

@@ -1183,6 +1183,14 @@ function ellipseAngles(rx, ry, n) {
   return out;
 }
 
+/* 軌道星之徑：環已判三檔（≥6／3–5／1–2），徑則於檔內再別多寡，尺寸一通道舊本閒置。
+   開方而非按數——n 自一至二十，線性則巨細懸絕，一事者小不可辨。今得 17–23.9px。
+   橋星雙繫兩核、不入任一檔，故存中庸之徑；遠軌俱零共見，一律最小。 */
+const orbitR = (n) => 15 + Math.sqrt(n) * 2;
+/* 線寬同理開方：舊作 0.5+0.28n，一事得 0.78px 幾不可見、二十事得 6.1px 粗如短棒，
+   八倍之差兩端俱失。今收於 1.7–5.5px，細者可辨、粗者不橫。 */
+const linkW = (n) => 0.6 + Math.sqrt(n) * 1.1;
+
 /* ---------------- 行星式關係圖：雙星系統 ---------------- */
 /* 兩核：閔方城（蒼雲線）與程凱（天策線）。
    軌道悉由《事件与年份》與各核之共見計數自動生成；
@@ -1195,12 +1203,15 @@ function Planetary({ onOpenChar }) {
   const CX = [350, 850], CY = 410;
   const layout = useMemo(() => {
     const counts = CENTERS_META.map((m) => coCountsFor(m.id));
-    /* 外軌收至 226：兩核相距 500，舊值 248 令兩系外軌之間僅餘四像素，
-       而唯一之橋星恰坐此夾縫。今中縫得四十八像素，橋星圓周不再壓兩圈虛線。 */
+    /* 外軌收至 218：兩核相距 500，舊值 248 令兩系外軌之間僅餘四像素，
+       而唯一之橋星恰坐此夾縫。今中縫得六十四像素，橋星圓周不再壓兩圈虛線。
+       maxSpan 為扇面上限（圈之幾分）：讓道於雙星之間的橋區，而讓多讓寡因環而異——
+       橋線所經在外，故外環讓足 0.27 圈，內環去核近、不涉其事，讓 0.21 即可。
+       此一鬆，蒼雲系內軌九人之封頂星距由 53.5px 昇至 58px，全幅最緊處遂不復在此。 */
     const RINGS = [
-      { label: "內軌", note: "共見 ≥6 事", r: 105, test: (n) => n >= 6 },
-      { label: "中軌", note: "共見 3–5 事", r: 168, test: (n) => n >= 3 && n <= 5 },
-      { label: "外軌", note: "共見 1–2 事", r: 226, test: (n) => n >= 1 && n <= 2 },
+      { label: "內軌", note: "共見 ≥6 事", r: 105, maxSpan: 0.79, test: (n) => n >= 6 },
+      { label: "中軌", note: "共見 3–5 事", r: 168, maxSpan: 0.76, test: (n) => n >= 3 && n <= 5 },
+      { label: "外軌", note: "共見 1–2 事", r: 218, maxSpan: 0.73, test: (n) => n >= 1 && n <= 2 },
     ];
     const centerIds = CENTERS_META.map((m) => m.id);
     const shared = [], far = [], sys = [[], []];
@@ -1213,41 +1224,60 @@ function Planetary({ onOpenChar }) {
       else sys[1].push({ c, n: b });
     }
     shared.sort((x, y) => y.a + y.b - (x.a + x.b));
-    /* 各系星體：面向外側展開，避讓雙星之間的橋區 */
+    /* 各系星體：面向外側展開，避讓雙星之間的橋區。
+       扇面不再一概鋪滿——舊法無論幾人皆攤足 0.73 圈，故蒼雲系中軌二人相隔
+       四百餘像素、天策系內軌一人獨佔一環，環環看去皆空。今按人數定扇面：
+       星距恒取 GAP，扇面即 n·GAP/r，逾本環之 maxSpan 則封頂（僅蒼雲系內軌
+       九人觸頂，星距 58px）。餘者一律 72px，環之弧長遂自成人數之量度。 */
+    const GAP = 72;
     const rings = sys.map((members, k) => {
       const outward = k === 0 ? Math.PI : 0;
       return RINGS.map((ring, ri) => {
         const ms = members
           .filter((m) => ring.test(m.n))
           .sort((x, y) => (x.c.belong[0] || "").localeCompare(y.c.belong[0] || "") || y.n - x.n);
-        const span = Math.PI * 2 * 0.73;
+        const span = Math.min(Math.PI * 2 * ring.maxSpan, (ms.length * GAP) / ring.r);
         const start = outward - span / 2 + ri * 0.22;
         return {
           ...ring,
           nodes: ms.map((m, i) => {
             const ang = start + ((i + 0.5) / ms.length) * span;
-            return { ...m, x: CX[k] + ring.r * Math.cos(ang), y: CY + ring.r * Math.sin(ang), k };
+            return { ...m, r: orbitR(m.n), x: CX[k] + ring.r * Math.cos(ang), y: CY + ring.r * Math.sin(ang), k };
           }),
         };
       });
     });
     /* 橋星：居雙星連線中央，縱向錯落 */
     const bridge = shared.map((m, i) => ({
-      ...m, x: 600, y: CY + (i - (shared.length - 1) / 2) * 72,
+      ...m, r: 20, x: 600, y: CY + (i - (shared.length - 1) / 2) * 72,
     }));
     /* 遠軌：環抱全系之橢圓。人多而環促——與兩核俱無共見者常逾七十，
        舊法按等角平鋪，長軸兩端最近鄰僅二十九像素而圓徑四十，過半相疊。
        今改等弧長取位，復令奇偶兩列內外錯開（LANE），同列間距倍之。
        數為奇時末一枚落回中列，免首尾同列於接縫處相撞。 */
-    const FAR = { rx: 552, ry: 356 }, LANE = 16;
+    /* 徑略收（552→540 / 356→348），為軌外之門派署名讓出邊白。 */
+    const FAR = { rx: 540, ry: 348 }, LANE = 16;
     const sortedFar = far.sort((x, y) => (x.belong[0] || "").localeCompare(y.belong[0] || ""));
-    const angs = ellipseAngles(FAR.rx, FAR.ry, sortedFar.length);
+    const nf = sortedFar.length;
+    /* 取兩倍之角：偶位為星體所居，奇位為兩星之間的半步，門派弧段即以半步為界 */
+    const angs2 = ellipseAngles(FAR.rx, FAR.ry, nf * 2);
+    const farAng = (i) => -Math.PI / 2 + angs2[((i % (nf * 2)) + nf * 2) % (nf * 2)];
     const farNodes = sortedFar.map((c, i) => {
-      const ang = -Math.PI / 2 + angs[i];
-      const d = sortedFar.length % 2 === 1 && i === sortedFar.length - 1 ? 0 : i % 2 ? LANE : -LANE;
-      return { c, x: 600 + (FAR.rx + d) * Math.cos(ang), y: CY + (FAR.ry + d) * Math.sin(ang) };
+      const ang = farAng(2 * i);
+      const d = nf % 2 === 1 && i === nf - 1 ? 0 : i % 2 ? LANE : -LANE;
+      return { c, r: 15, x: 600 + (FAR.rx + d) * Math.cos(ang), y: CY + (FAR.ry + d) * Math.sin(ang) };
     });
-    return { rings, bridge, farNodes, FAR, RINGS };
+    /* 遠軌本已按門派排序、色塊天然成段，舊時軌線卻是通體一色的虛線，
+       七十七枚散點遂只讀作噪。今於軌線上按段著門派之色，逾三人者更署其名，
+       一環即分作二十四段——同色相鄰者為同門，不必逐一辨圈色。 */
+    const farRuns = [];
+    sortedFar.forEach((c, i) => {
+      const f = c.belong[0] || "";
+      const last = farRuns[farRuns.length - 1];
+      if (last && last.f === f) last.i1 = i;
+      else farRuns.push({ f, i0: i, i1: i });
+    });
+    return { rings, bridge, farNodes, farRuns, farAng, FAR, LANE, RINGS };
   }, []);
 
   const pos = {};
@@ -1284,7 +1314,7 @@ function Planetary({ onOpenChar }) {
   const Node = ({ n, countLabel, dim }) => {
     const hi = hover === n.c.id;
     const soft = dim && !hi;
-    const r0 = dim ? (hi ? 19 : 15) : hi ? 24 : 20;
+    const r0 = n.r + (hi ? (dim ? 4 : 3) : 0);
     const fs = dim
       ? n.c.name.length > 3 ? 8 : n.c.name.length > 2 ? 9 : 11
       : n.c.name.length > 3 ? 9 : n.c.name.length > 2 ? 10.5 : 12.5;
@@ -1305,9 +1335,11 @@ function Planetary({ onOpenChar }) {
           style={{ fontFamily: serif, fontSize: fs, fill: soft ? T.muted : T.ink }}>
           {n.c.name}
         </text>
-        {countLabel && (
-          <text x={n.x} y={n.y + (hi ? 40 : 36)} textAnchor="middle"
-            style={{ fontFamily: serif, fontSize: 10, fill: hi ? T.accent : T.faint }}>
+        {/* 共見數改懸停始現：四十條同級灰字常駐，鋪成一層霧而已；
+            其量今由徑與線寬並載，欲知確數者懸停（觸屏首觸）即得。 */}
+        {countLabel && hi && (
+          <text x={n.x} y={n.y + r0 + 15} textAnchor="middle"
+            style={{ fontFamily: serif, fontSize: 10.5, fill: T.accent }}>
             {countLabel}
           </text>
         )}
@@ -1325,8 +1357,37 @@ function Planetary({ onOpenChar }) {
         {/* 襯底：觸屏點空處即卸下所選人物，關係弦線隨之收起 */}
         <rect x={-4000} y={-4000} width={9000} height={9000} fill="transparent"
           onClick={() => { if (movedRef.current > 5) return; setHover(null); }} />
-        {/* 遠軌橢圓：兩列星體分居其內外，此線居中為準 */}
-        <ellipse cx={600} cy={CY} rx={layout.FAR.rx} ry={layout.FAR.ry} fill="none" stroke={T.line} strokeDasharray="2 5" />
+        {/* 遠軌：兩列星體分居軌線內外，線居中為準。線按門派分段著色，逾三人者署名。
+            署名沿軌切向書寫，故無論名之長短，徑向只佔字高十許像素，不慮出幅。 */}
+        {(() => {
+          const { rx, ry } = layout.FAR, PAD = 0.012;
+          const pt = (a, dr) => [600 + (rx + dr) * Math.cos(a), CY + (ry + dr) * Math.sin(a)];
+          const LAB = layout.LANE + 15 + 17; /* 外列圓心 + 圓徑 + 留白 */
+          return layout.farRuns.map((run) => {
+            const a0 = layout.farAng(2 * run.i0 - 1) + PAD, a1 = layout.farAng(2 * run.i1 + 1) - PAD;
+            const sweep = ((a1 - a0) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+            const [x0, y0] = pt(a0, 0), [x1, y1] = pt(a1, 0);
+            const col = fc(run.f);
+            const am = layout.farAng(run.i0 + run.i1);
+            const [lx, ly] = pt(am, LAB);
+            /* 切向：橢圓非圓，須用真切線 (-rx·sin, ry·cos)；正規至 ±90° 免字倒懸 */
+            let rot = (Math.atan2((ry + LAB) * Math.cos(am), -(rx + LAB) * Math.sin(am)) * 180) / Math.PI;
+            if (rot > 90) rot -= 180; else if (rot < -90) rot += 180;
+            return (
+              <g key={"fr" + run.i0}>
+                <path d={`M ${x0} ${y0} A ${rx} ${ry} 0 ${sweep > Math.PI ? 1 : 0} 1 ${x1} ${y1}`}
+                  fill="none" stroke={col} strokeWidth={1.2} strokeDasharray="2 5" opacity={0.5} />
+                {run.i1 - run.i0 >= 2 && (
+                  <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central"
+                    transform={`rotate(${rot.toFixed(2)} ${lx.toFixed(1)} ${ly.toFixed(1)})`}
+                    style={{ fontFamily: serif, fontSize: 9.5, fill: col, opacity: 0.75, letterSpacing: "0.08em" }}>
+                    {run.f || "無門派"}
+                  </text>
+                )}
+              </g>
+            );
+          });
+        })()}
         {/* 各系軌道 */}
         {layout.RINGS.map((ring, ri) => (
           <g key={ri}>
@@ -1352,7 +1413,7 @@ function Planetary({ onOpenChar }) {
             ring.nodes.map((n) => (
               <line key={n.c.id + "l"} x1={CX[k]} y1={CY} x2={n.x} y2={n.y}
                 stroke={hover === n.c.id ? T.accent : T.line}
-                strokeWidth={0.5 + n.n * 0.28}
+                strokeWidth={linkW(n.n)}
                 opacity={hover && hover !== n.c.id ? 0.25 : 0.85} />
             ))
           )
@@ -1361,9 +1422,9 @@ function Planetary({ onOpenChar }) {
         {layout.bridge.map((n) => (
           <g key={n.c.id + "bl"}>
             <line x1={CX[0]} y1={CY} x2={n.x} y2={n.y} stroke={hover === n.c.id ? T.accent : T.line}
-              strokeWidth={0.5 + n.a * 0.28} opacity={hover && hover !== n.c.id ? 0.25 : 0.85} />
+              strokeWidth={linkW(n.a)} opacity={hover && hover !== n.c.id ? 0.25 : 0.85} />
             <line x1={CX[1]} y1={CY} x2={n.x} y2={n.y} stroke={hover === n.c.id ? T.accent : T.line}
-              strokeWidth={0.5 + n.b * 0.28} opacity={hover && hover !== n.c.id ? 0.25 : 0.85} />
+              strokeWidth={linkW(n.b)} opacity={hover && hover !== n.c.id ? 0.25 : 0.85} />
           </g>
         ))}
         {/* 懸停弦線：星體間之關係 */}
@@ -1392,8 +1453,9 @@ function Planetary({ onOpenChar }) {
         </g>
       </svg>
       <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: serif }}>
-        雙星系統：閔方城（蒼雲線）與程凱（天策線）同格為核。軌道由《事件与年份》中與各核共見事件之計數自動生成，線之粗細亦然；
-        與兩核共見皆不少於二事者為橋星，居雙星之間，雙繫於兩核。
+        雙星系統：閔方城（蒼雲線）與程凱（天策線）同格為核。軌道由《事件与年份》中與各核共見事件之計數自動生成，圈徑與線粗亦然（皆按開方），
+        環之弧長即其人數；懸停一人即見確數。與兩核共見皆不少於二事者為橋星，居雙星之間，雙繫於兩核，不入軌檔故存中庸之徑。
+        遠軌之線按門派分段著色，逾三人者署名於軌外。
         {coarse ? "輕觸一人牽出其關係弦線，再觸方開檔案；放大後可雙指捏合、單指平移。" : "點選任一人開啟檔案。"}
       </div>
     </div>

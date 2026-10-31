@@ -898,3 +898,160 @@ body {
     transition: opacity 0.45s ease 0.1s;
   }
 }
+
+/* Phase-one English: scope typography to navigation and the translated profile.
+   Seals retain their original Chinese type and all faction layers remain intact. */
+.language-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+}
+.language-switch button {
+  background: none;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 8px;
+  font: 13px Georgia, "Songti SC", serif;
+  cursor: pointer;
+}
+.nav-en button {
+  font-family: Georgia, "Songti SC", serif !important;
+  letter-spacing: normal !important;
+  text-indent: 0 !important;
+  overflow-wrap: anywhere;
+}
+.translation-scope {
+  max-width: 1080px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+  font: 13px/1.6 Georgia, "Songti SC", serif;
+}
+/* Only the translated character receives profile-en; Chinese cards are untouched. */
+.profile-en {
+  --profile-latin-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Songti SC", serif;
+}
+.profile-en div,
+.profile-en button,
+.profile-en em,
+.profile-en cite,
+.profile-en span:not(.seal-svg-shell):not(.seal-stamp):not(.seal-stamp-ch) {
+  font-family: var(--profile-latin-serif) !important;
+  letter-spacing: normal !important;
+  overflow-wrap: anywhere;
+}
+.profile-en .profile-prose {
+  font-size: 14px !important;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.65 !important;
+}
+/* The previous Iowan/Palatino stack was already weight 400. Use a finer
+   system serif for detail prose rather than requesting a nonexistent light face. */
+.profile-en .char-modal-scroll .profile-prose {
+  --profile-latin-serif: Baskerville, "Times New Roman", Times, "Songti SC", serif;
+  font-weight: 400;
+}
+.profile-en.texture-test-sm .profile-lifespan-years,
+.profile-en.texture-test-sm .profile-lifespan-era {
+  display: block;
+}
+.profile-en.texture-test-sm .profile-lifespan-era {
+  font-size: 11.5px;
+}
+.profile-en .profile-gloss {
+  font-size: 13.5px !important;
+}
+.profile-en .profile-gloss p {
+  margin: 0 0 8px;
+}
+.profile-en .profile-gloss p:last-child {
+  margin-bottom: 0;
+}
+.profile-en .profile-gloss-explanation {
+  padding-top: 8px;
+  border-top: 1px solid rgba(139, 148, 160, 0.18);
+}
+.profile-en .profile-label {
+  flex: 0 0 104px;
+  min-width: 0 !important;
+  font-size: 11.5px !important;
+  line-height: 1.45;
+}
+.profile-en .profile-label + div {
+  min-width: 0;
+}
+.profile-en .profile-heading {
+  column-gap: 12px !important;
+  row-gap: 5px !important;
+}
+.profile-en .profile-name {
+  font-size: 28px !important;
+  line-height: 1.25;
+}
+.profile-en .profile-hanzi {
+  font-size: 0.72em;
+  white-space: nowrap;
+}
+.profile-en .profile-courtesy {
+  margin-left: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.4;
+}
+.profile-en .profile-epithet {
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 15px !important;
+  line-height: 1.4;
+}
+.profile-en .profile-epithet em {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 400;
+}
+.profile-en.texture-test-sm .profile-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.profile-en.texture-test-sm .profile-name {
+  grid-column: 1;
+  font-size: 21px !important;
+}
+.profile-en.texture-test-sm .profile-courtesy {
+  grid-column: 1;
+  grid-row: 2;
+  margin-right: 0 !important;
+  font-size: 12px !important;
+}
+.profile-en.texture-test-sm .profile-heading > .seal-svg-shell,
+.profile-en.texture-test-sm .profile-heading > .seal-stamp {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+.profile-en.texture-test-sm .profile-label {
+  flex-basis: 65px;
+}
+.profile-en.texture-test-sm .profile-epithet {
+  font-size: 12px !important;
+}
+.profile-en.texture-test-sm .profile-epithet em {
+  font-size: 12px;
+}
+@media (max-width: 480px) {
+  .profile-en .profile-label {
+    flex-basis: 80px;
+  }
+  .profile-en .char-modal-scroll {
+    padding: 28px 18px 24px !important;
+  }
+  .profile-en .profile-name {
+    font-size: 25px !important;
+  }
+}
+/* The SVG seal uses an invisible Chinese glyph to size its frame. */
+.profile-en .seal-svg-shell,
+.profile-en .seal-svg-shell span {
+  font-family: "HuiwenZhengKai" !important;
+}

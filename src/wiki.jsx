@@ -1123,7 +1123,7 @@ function usePanZoom(w, h) {
     if (pts.size === 1) {
       const [r] = [...pts.values()];
       const v = viewRef.current;
-      dragRef.current = { x: r.x, y: r.y, tx: v.tx, ty: v.ty };
+      dragRef.current = { x: r.x, y: r.y, tx: v.tx, ty: v.ty, cap: true };
     } else if (pts.size === 0) {
       dragRef.current = null;
     }
@@ -1138,8 +1138,11 @@ function usePanZoom(w, h) {
       if (v.k === 1) return;
       const pts = ptsRef.current;
       pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* 捕獲不成則退為普通事件流 */ }
       if (pts.size >= 2) {
+        /* 雙指捏合：即刻捕獲兩指，免一指滑出幅面而斷 */
+        for (const id of pts.keys()) {
+          try { e.currentTarget.setPointerCapture?.(id); } catch { /* 捕獲不成則退為普通事件流 */ }
+        }
         const [a, b] = [...pts.values()];
         pinchRef.current = {
           d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2,
@@ -1147,7 +1150,10 @@ function usePanZoom(w, h) {
         };
         dragRef.current = null;
       } else {
-        dragRef.current = { x: e.clientX, y: e.clientY, tx: v.tx, ty: v.ty };
+        /* 單指／滑鼠：暫不捕獲。指針一經捕獲，pointerup 即改投幅面本身，
+           click 隨之落在幅面而非所點之地，點位、人物節點盡失靈；
+           故待真拖過閾（onPointerMove）方捕獲 */
+        dragRef.current = { x: e.clientX, y: e.clientY, tx: v.tx, ty: v.ty, cap: false };
       }
     },
     onPointerMove: (e) => {
@@ -1176,6 +1182,12 @@ function usePanZoom(w, h) {
          pointerup 可能已將 dragRef 置空，於彼時解引用即擲錯而白屏 */
       const g = dragRef.current;
       if (!g) return;
+      if (!g.cap) {
+        /* 屏幕位移逾 4px 方認作拖曳並捕獲指針；未逾者仍是點選 */
+        if (Math.abs(e.clientX - g.x) + Math.abs(e.clientY - g.y) <= 4) return;
+        g.cap = true;
+        try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* 捕獲不成則退為普通事件流 */ }
+      }
       const dx = (e.clientX - g.x) * s, dy = (e.clientY - g.y) * s;
       movedRef.current = Math.max(movedRef.current, Math.abs(dx) + Math.abs(dy));
       setView((v) => ({ ...v, tx: g.tx + dx, ty: g.ty + dy }));
@@ -1383,10 +1395,11 @@ function Planetary({ onOpenChar }) {
     ? RELATIONS.filter((r) => (r.a === hover || r.b === hover) && pos[r.a] && pos[r.b] && !centerIds.includes(r.a) && !centerIds.includes(r.b))
     : [];
 
-  const Star = ({ k }) => {
+  /* 星核與節點皆以渲染函數呼之（理同輿圖 renderSpot：內嵌元件逢懸停重繪即卸載重掛，吞去 click） */
+  const renderStar = (k) => {
     const c = byId[CENTERS_META[k].id];
     return (
-      <g style={{ cursor: "pointer" }} onClick={() => { if (movedRef.current > 5) return; onOpenChar(c); }}>
+      <g key={"star" + k} style={{ cursor: "pointer" }} onClick={() => { if (movedRef.current > 5) return; onOpenChar(c); }}>
         <text x={CX[k]} y={CY - 66} textAnchor="middle"
           style={{ fontFamily: gUI, fontSize: 11.5, fill: fc(c.belong[0]), letterSpacing: "0.45em" }}>
           {CENTERS_META[k].tag}
@@ -1403,13 +1416,13 @@ function Planetary({ onOpenChar }) {
   /* dim：遠軌之星。與兩核俱無共見者逾全譜六成，若與有事者同其大小明度，
      則畫面最艷之一環恰是信息最薄之一環，主客倒置。故縮其徑、褪其色、
      底填幅色如鑿孔——懸停即復原大小與墨色，點選之途不減。 */
-  const Node = ({ n, countLabel, dim }) => {
+  const renderNode = (n, countLabel, dim) => {
     const hi = hover === n.c.id;
     const soft = dim && !hi;
     const r0 = n.r + (hi ? (dim ? 4 : 3) : 0);
     const fs = nodeFontSize(n.c.name.length, n.r, dim);
     return (
-      <g style={{ cursor: "pointer" }}
+      <g key={n.c.id} style={{ cursor: "pointer" }}
         onMouseEnter={() => { if (!coarse) setHover(n.c.id); }}
         onMouseLeave={() => { if (!coarse) setHover(null); }}
         /* 觸屏無懸停：首觸牽出其關係弧，再觸方開檔案 */
@@ -1531,15 +1544,15 @@ function Planetary({ onOpenChar }) {
             </g>
           );
         })}
-        <Star k={0} />
-        <Star k={1} />
+        {renderStar(0)}
+        {renderStar(1)}
         {layout.rings.flatMap((sysRings) =>
           sysRings.flatMap((ring) =>
-            ring.nodes.map((n) => <Node key={n.c.id} n={n} countLabel={`共 ${n.n} 事`} />)
+            ring.nodes.map((n) => renderNode(n, `共 ${n.n} 事`))
           )
         )}
-        {layout.bridge.map((n) => <Node key={n.c.id} n={n} countLabel={`閔 ${n.a} · 程 ${n.b}`} />)}
-        {layout.farNodes.map((n) => <Node key={n.c.id} n={n} countLabel={null} dim />)}
+        {layout.bridge.map((n) => renderNode(n, `閔 ${n.a} · 程 ${n.b}`))}
+        {layout.farNodes.map((n) => renderNode(n, null, true))}
         </g>
       </svg>
       <div style={{ fontSize: 12, color: T.faint, textAlign: "center", marginTop: 4, fontFamily: gUI }}>
@@ -1861,8 +1874,10 @@ function GeoMap({ onOpenChar }) {
   const offNames = { "西": [], "東": [] };
   Object.entries(LOC_COORDS).forEach(([name, c]) => { if (c.kind === "off") offNames[c.dir].push(name); });
 
-  /* 單地點位：暈染面／弧環／中心符號（圓＝城邑，菱＝門派） */
-  const Spot = ({ name }) => {
+  /* 單地點位：暈染面／弧環／中心符號（圓＝城邑，菱＝門派）。
+     以渲染函數而非內嵌元件呼之：內嵌元件每次重繪皆為新型別，懸停一變即整批卸載重掛，
+     按下與鬆開落在前後兩個節點上，click 便發不出來 */
+  const renderSpot = (name) => {
     const c = LOC_COORDS[name];
     const d = spots.m[name];
     if (!c || c.kind === "off") return null;
@@ -1875,12 +1890,10 @@ function GeoMap({ onOpenChar }) {
     const dim = n === 0 ? 0.18 : (hover || sel) && !isSel && !isHov ? 0.45 : 1;
     let acc = 0;
     return (
-      <g style={{ cursor: n > 0 ? "pointer" : "default", opacity: dim, transition: "opacity .15s" }}
+      <g key={name} style={{ cursor: n > 0 ? "pointer" : "default", opacity: dim, transition: "opacity .15s" }}
         onMouseEnter={() => { if (!coarse) setHover(name); }}
         onMouseLeave={() => { if (!coarse) setHover(null); }}
         onClick={() => { if (movedRef.current > 5) return; if (n > 0) setSel(isSel ? null : name); }}>
-        {/* 觸屏加大點選域：小邑環徑不足指腹之半 */}
-        {coarse && n > 0 && <circle cx={c.x} cy={c.y} r={Math.max(r, 14 / z)} fill="transparent" />}
         {c.kind === "region" && (
           <ellipse cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} fill={segs[0] ? fc(segs[0][0]) : T.faint} opacity={0.10}
             transform={c.rot ? `rotate(${c.rot} ${c.x} ${c.y})` : undefined} stroke={T.line} strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
@@ -1920,8 +1933,26 @@ function GeoMap({ onOpenChar }) {
     );
   };
 
+  /* 點位感應層：每地一枚透明圓盤，覆滿環內（環本空心，點環中空處原無反應），
+     徑至少 9px（觸屏 14px）；繪於動線之上，免動線感應帶搶去點選；
+     大環先繪、小環後繪，相鄰小邑不為大環所掩 */
+  const hitOrder = Object.keys(LOC_COORDS)
+    .filter((nm) => (LOC_COORDS[nm].kind === "city" || LOC_COORDS[nm].kind === "sect") && (spots.m[nm]?.n || 0) > 0)
+    .sort((a, b) => spots.m[b].n - spots.m[a].n);
+  const renderSpotHit = (name) => {
+    const c = LOC_COORDS[name];
+    const z = view.k;
+    const r = Math.max(rOf(spots.m[name].n) / z, (coarse ? 14 : 9) / z);
+    return (
+      <circle key={name} cx={c.x} cy={c.y} r={r} fill="transparent" style={{ cursor: "pointer" }}
+        onMouseEnter={() => { if (!coarse) setHover(name); }}
+        onMouseLeave={() => { if (!coarse) setHover(null); }}
+        onClick={() => { if (movedRef.current > 5) return; setSel(sel === name ? null : name); }} />
+    );
+  };
+
   /* 離圖框：羅盤方位小匣，域外遠地之歸處 */
-  const OffBox = ({ dir }) => {
+  const renderOffBox = (dir) => {
     const names = offNames[dir].filter((nm) => (spots.m[nm]?.n || 0) > 0 || allLabels);
     if (names.length === 0) return null;
     const b = offBoxes[dir];
@@ -2074,8 +2105,8 @@ function GeoMap({ onOpenChar }) {
                 style={{ fontFamily: gUI, fontSize: 13, fill: T.faint, letterSpacing: "0.5em", opacity: 0.65 }}>{l.t}</text>
             ))}
             {/* 泛稱面先繪（襯底），點位後繪 */}
-            {Object.keys(LOC_COORDS).filter((nm) => LOC_COORDS[nm].kind === "region").map((nm) => <Spot key={nm} name={nm} />)}
-            {Object.keys(LOC_COORDS).filter((nm) => LOC_COORDS[nm].kind === "city" || LOC_COORDS[nm].kind === "sect").map((nm) => <Spot key={nm} name={nm} />)}
+            {Object.keys(LOC_COORDS).filter((nm) => LOC_COORDS[nm].kind === "region").map((nm) => renderSpot(nm))}
+            {Object.keys(LOC_COORDS).filter((nm) => LOC_COORDS[nm].kind === "city" || LOC_COORDS[nm].kind === "sect").map((nm) => renderSpot(nm))}
             {/* 第二期：人物動線 —— 弧線僅表先後曾在，非循此路行；虛線段居間有無地點之事 */}
             {tracks.map((t) => {
               const sh = (t.ti - (tracks.length - 1) / 2) * 6 / view.k; /* 多線並比微錯位，免駐點疊死 */
@@ -2135,9 +2166,11 @@ function GeoMap({ onOpenChar }) {
                 </g>
               );
             })}
+            {/* 點位感應層（見 renderSpotHit） */}
+            {hitOrder.map((nm) => renderSpotHit(nm))}
             </g>
-            <OffBox dir="西" />
-            <OffBox dir="東" />
+            {renderOffBox("西")}
+            {renderOffBox("東")}
             {/* 圖例 */}
             <g transform="translate(34, 620)">
               <circle cx={6} cy={0} r={3.2} fill={T.ink} /><text x={16} y={4} style={{ fontFamily: gUI, fontSize: 10.5, fill: T.muted }}>實名城邑</text>

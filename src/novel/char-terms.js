@@ -9,7 +9,7 @@
    識別邏輯（scanCharTerms）純函數，可於 Node 直接測試。
    維護流程見 docs/wenku-margin-note.md。
    ============================================================ */
-import { CHARACTERS } from "../cangyun-data.js";
+import { CHARACTERS } from "../wiki-data.js";
 
 const TERM_EXCLUDE = new Set([]); /* 以人物 id 摘除，不參與正文識別 */
 export const CHAR_TERMS = CHARACTERS

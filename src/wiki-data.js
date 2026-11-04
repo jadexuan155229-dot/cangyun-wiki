@@ -1,8 +1,8 @@
 /* ============================================================
-   蒼雲 · 人山人海 檔案 —— 數據層 (cangyun-data.js)
+   八千里路 · 人山人海 檔案 —— 數據層 (wiki-data.js)
    本文件为纯数据 + 建构辅助（F / fc / FACTION_COLORS）。
    来源：Notion 两库。修改数据只动此文件，不进渲染引擎上下文。
-   引擎 cangyun-wiki.jsx 从此处 import：
+   引擎 wiki.jsx 从此处 import：
      fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE
    ============================================================ */
 

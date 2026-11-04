@@ -13,7 +13,7 @@
    雲、月、燭暈、題字、朱印、提示（暗上之物，開屏即見）。
    ============================================================ */
 import { useEffect, useRef, useState } from "react";
-import { GEO_BASE, LOC_COORDS } from "./cangyun-data.js";
+import { GEO_BASE, LOC_COORDS } from "./wiki-data.js";
 import { serif, useCoarsePointer } from "./theme.js";
 
 /* ---------------- 輿圖紋理 ---------------- */

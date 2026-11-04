@@ -1,5 +1,14 @@
 # 更新记录
 
+## 2026-11-04
+
+### 项目统一命名为“八千里路”
+
+英文名 Eight Thousand Miles Away；技术名与目标仓库名 `eight-thousand-miles-away-wiki`。更新 npm 包名、网站元数据及 Pages base；全站模块 `cangyun-wiki.jsx` → `wiki.jsx`、`cangyun-data.js` → `wiki-data.js`，同步引用。数据内容、首页设计、路由和阅读进度存储键保持原样。迁移步骤见 [项目重命名说明](project-renaming.md)。
+
+以下历史记录保留当时的文件名、品牌及部署网址；它们不是当前部署配置。
+
+
 ## 2026-11-02
 
 ### 苍云／长歌／霸刀线与 Notion 事件库同步；作者裁定两条落定

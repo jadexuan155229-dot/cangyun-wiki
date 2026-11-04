@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-/* 全站視覺常量：宋體字族與底色板，自 cangyun-wiki 抽出以供諸視圖共用 */
+/* 全站視覺常量：宋體字族與底色板，自 wiki.jsx 抽出以供諸視圖共用 */
 export const serif = '"Songti SC","Noto Serif SC","Noto Serif CJK SC","SimSun",serif';
 export const T = {
   bg: "#15181D", panel: "#1D2229", panelHi: "#232A33", line: "#2E3640",

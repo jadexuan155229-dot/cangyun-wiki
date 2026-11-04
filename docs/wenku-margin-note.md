@@ -12,7 +12,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `src/cangyun-data.js` | 人物数据，含批注专用字段 `readerNote` |
+| `src/wiki-data.js` | 人物数据，含批注专用字段 `readerNote` |
 | `src/novel/char-terms.js` | 词条表（`CHAR_TERMS`）与识别逻辑（`scanCharTerms`，纯函数、可 Node 测试） |
 | `src/novel-reader.jsx` | 命中段渲染（`splitCharTerms`）、批注卡（`MarginNote`）、引导线 |
 

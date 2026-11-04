@@ -1,13 +1,13 @@
 /* ============================================================
    數據一致性校驗 (scripts/check-data.js)
-   校驗 cangyun-data.js 五庫之間的引用完整性——渲染層大量直取
+   校驗 wiki-data.js 五庫之間的引用完整性——渲染層大量直取
    byId[id].xxx / LOC_COORDS[l]，一個錯 id 即白屏或靜默丟點，
    此處先於瀏覽器把錯攔下。隨 npm run lint 執行；亦可單跑：
      node scripts/check-data.js
    錯誤（exit 1）：會導致崩潰或數據靜默丟失的引用錯。
    警告（exit 0）：可疑但站點尚能運行的問題。
    ============================================================ */
-import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS } from "../src/cangyun-data.js";
+import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS } from "../src/wiki-data.js";
 import { CHAR_TERMS } from "../src/novel/char-terms.js";
 import { SEAL_SVG_FILE } from "../src/seals.js";
 import { readdirSync, existsSync } from "node:fs";

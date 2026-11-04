@@ -48,7 +48,7 @@ body {
   cursor: pointer;
 }
 
-/* 門派底紋：對應門派人物的檔案詳情卡渲染（cangyun-wiki.jsx DetailPanel）。
+/* 門派底紋：對應門派人物的檔案詳情卡渲染（wiki.jsx DetailPanel）。
    須置於詳情卡不滾動的外層（overflow: hidden 裁切邊緣溢出），
    正文滾動層 z-index: 1 在其上，故不遮字、不擋關閉鈕與印章。 */
 .faction-watermark {
@@ -271,7 +271,7 @@ body {
   right: -40px;
   top: 16%;
   background: url("/images/faction-marks/yaozong-mark.webp") center / contain no-repeat;
-  /* 自定義灰度（濾鏡定義見 cangyun-wiki.jsx 水印層內的 #yaozong-tone）：
+  /* 自定義灰度（濾鏡定義見 wiki.jsx 水印層內的 #yaozong-tone）：
      藍通道負權重使中心黃芽（≈1.0）亮於白線（≈0.8），黃形輪廓可辨；
      外圍翠綠（≈0.46）、淺綠（≈0.69）維持原有深淺關係 */
   filter: url(#yaozong-tone);
@@ -325,7 +325,7 @@ body {
   opacity: 0.075;
 }
 
-/* 人物檔案卡網格（cangyun-wiki.jsx 檔案頁）：桌面首屏恰容三整行。
+/* 人物檔案卡網格（wiki.jsx 檔案頁）：桌面首屏恰容三整行。
    行距須由此處聲明（內聯 gap 會壓過媒體查詢），列距 14 仍在組件內聯。
    網格頂緣距頁頂約 287px（表頭 ~124 + 主欄上內距 28 + 兩行門派籤 ~78 + 檢索行 ~52，
    實測值，隨字體度量有 ±4px 浮動）。首屏多餘縱向空間由行距與卡高各擔一半：
@@ -459,7 +459,7 @@ body {
 }
 
 /* ══ 宣紙肌理 ══════════════════════════════════════════════════════════
-   範圍由 cangyun-wiki.jsx 的 isTextureTest() 單點把關，現恆真——全站一百二十人，
+   範圍由 wiki.jsx 的 isTextureTest() 單點把關，現恆真——全站一百二十人，
    無一例外（初時只及馬翊一卡，繼而天策、蒼雲，終遍及全站）。兩處掛鉤：
      .texture-test    → DetailPanel 詳情卡：紙紋 + 斑駁 + 名號行下漸變金線（僅無稱號者掛）
                         + 檔案行線左端泛金。左側綾邊曾試於此，後撤去、整套移交小卡（見下方
@@ -593,7 +593,7 @@ body {
    走 border-image 而非實色 border——內聯未涉此屬性，無須 !important。
    小卡：承接原豎排左欄退場後留下的分區職責，行內為「姓名 + 字 X + 印」，
          線下方為生卒、出身、事件三行標目與門派籤。小卡不渲染稱號，故此線恆在。
-   詳情卡：僅無稱號者掛 .tt-rule（見 cangyun-wiki.jsx）——有稱號者，
+   詳情卡：僅無稱號者掛 .tt-rule（見 wiki.jsx）——有稱號者，
          稱號塊自帶的下劃線即其主分隔線，已由下方「檔案行線」規則一併染成金漸變，
          此處不宜再出一道。
    小卡側沿用 .items-baseline 這個全站工具類，已由 .texture-test-sm 圈定；

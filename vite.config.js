@@ -13,7 +13,7 @@ function novelMentions() {
   const V = 'virtual:novel-mentions'
   const RESOLVED = '\0' + V
   const NOVEL_DIR = fileURLToPath(new URL('./src/novel/', import.meta.url))
-  const DATA = fileURLToPath(new URL('./src/cangyun-data.js', import.meta.url))
+  const DATA = fileURLToPath(new URL('./src/wiki-data.js', import.meta.url))
   const listTxt = (dir, base = '') => {
     const out = []
     for (const name of readdirSync(dir)) {
@@ -28,7 +28,7 @@ function novelMentions() {
     resolveId(id) { if (id === V) return RESOLVED },
     async load(id) {
       if (id !== RESOLVED) return
-      const { CHARACTERS } = await import('./src/cangyun-data.js')
+      const { CHARACTERS } = await import('./src/wiki-data.js')
       this.addWatchFile(DATA)
       const mentions = {}
       for (const file of listTxt(NOVEL_DIR)) {
@@ -50,9 +50,9 @@ function novelMentions() {
 }
 
 // https://vite.dev/config/
-// base：部署到 GitHub Pages 项目站（<user>.github.io/cangyun-wiki/）时，
+// base：部署到 GitHub Pages 项目站（<user>.github.io/eight-thousand-miles-away-wiki/）时，
 // 站点在子路径下，资产须带此前缀，否则从根请求全部 404。
 export default defineConfig({
-  base: '/cangyun-wiki/',
+  base: '/eight-thousand-miles-away-wiki/',
   plugins: [react(), novelMentions()],
 })

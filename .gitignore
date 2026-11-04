@@ -13,7 +13,9 @@ dist-ssr
 *.local
 
 # 手工 zip 备份（git 接管版本历史后不再入库）
+# 保留旧名备份的忽略规则
 cangyun-wiki-*.zip
+eight-thousand-miles-away-wiki-*.zip
 
 # Editor directories and files
 .vscode/*

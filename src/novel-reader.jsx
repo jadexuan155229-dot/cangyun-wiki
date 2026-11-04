@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } fr
 import { serif, T, useNarrow } from "./theme";
 import { NOVELS, FLAT, loadTexts } from "./novel";
 import { CHAR_TERMS, scanCharTerms } from "./novel/char-terms";
-import { fc, CHARACTERS } from "./cangyun-data";
+import { fc, CHARACTERS } from "./wiki-data";
 
 /* ============================================================
    文庫 · 正文閱讀器

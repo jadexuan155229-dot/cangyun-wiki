@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "自动启动苍云 Wiki",
+      "label": "自动启动八千里路",
       "type": "npm",
       "script": "dev",
       "runOptions": {

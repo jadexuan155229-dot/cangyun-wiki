@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE } from "./cangyun-data";
+import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS, GEO_BASE } from "./wiki-data";
 import { serif, T, useNarrow, useCoarsePointer } from "./theme";
 import { parseRoute, routeHash } from "./router";
 import { FLAT } from "./novel";
@@ -11,7 +11,7 @@ import { translateUI, eventCountText, libraryCountText } from "./i18n/ui";
 import { characterTranslation } from "./i18n/characters.en";
 
 /* ============================================================
-   蒼雲 · 人山人海 檔案 — 可視化站點原型 v4
+   八千里路 · 人山人海 檔案 — 可視化站點原型 v4
    題頭體例：名·字 — 別號 — 四字概覽 — 一字品評 — 訓詁
    檔案八目：官职身份 / 体貌特征 / 性格 / 偶像 / 武学 /
              随身物件 / 喜好 / 专擅 —— 有明文者依原文，
@@ -2201,7 +2201,7 @@ function GeoMap({ onOpenChar }) {
 }
 
 /* ---------------- 主應用 ---------------- */
-export default function CangyunWiki({ onOpenLanding }) {
+export default function Wiki({ onOpenLanding }) {
   const [locale, setLocale] = useLanguage();
   const t = (key) => translateUI(locale, key);
   /* 路由：哈希為唯一事實源（見 router.js 體例）。寫入即改哈希，

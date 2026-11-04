@@ -1,5 +1,5 @@
 # 部署到 GitHub Pages：push 到 main 即自动 build 并发布 dist。
-# 站点在项目子路径下（<user>.github.io/cangyun-wiki/），base 已在 vite.config.js 配好。
+# 站点在项目子路径下（<user>.github.io/eight-thousand-miles-away-wiki/），base 已在 vite.config.js 配好。
 name: Deploy to GitHub Pages
 
 on:

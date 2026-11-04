@@ -1,4 +1,4 @@
-// Translation overlay only: never merge into or mutate cangyun-data.js.
+// Translation overlay only: never merge into or mutate wiki-data.js.
 // Unresolved readings and editorial decisions: docs/lvdingyi-translation-review.md.
 // Review notes are deliberately not imported into the public profile.
 export const charactersEn = {

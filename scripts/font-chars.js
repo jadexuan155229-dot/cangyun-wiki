@@ -1,7 +1,7 @@
 /* ============================================================
    站內用字掃描 (scripts/font-chars.js)
-   汇文正楷、汇文明朝兩枚字體只帶 scripts/font-subset-chars.txt
-   所列之字（子集），表外之字在正楷、明朝處回落系統字體。
+   汇文明朝、汇文正楷、京华老宋三枚字體只帶 scripts/font-subset-chars.txt
+   所列之字（子集），表外之字在三體處回落系統字體。
    本檔掃 src/ 與 index.html 的全部文字，與字符表比對：
      - 直接執行：把站內用到而表中沒有的字補進字符表（只增不刪）
        node scripts/font-chars.js

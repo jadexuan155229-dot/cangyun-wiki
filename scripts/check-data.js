@@ -127,12 +127,12 @@ for (const [name, c] of Object.entries(LOC_COORDS)) {
 }
 
 /* ---------- 字體子集 ----------
-   正楷、明朝只帶字符表所列之字，表外之字靜默回落系統字體——
+   明朝、正楷、老宋只帶字符表所列之字，表外之字靜默回落系統字體——
    站內用字有表外者即報；npm run fonts 補表並重裁子集後自消。 */
 const missingGlyphs = missingFontChars();
 if (missingGlyphs.length) {
   const shown = missingGlyphs.slice(0, 40).join("") + (missingGlyphs.length > 40 ? "……" : "");
-  warn("字體子集", `站內用字 ${missingGlyphs.length} 個不在 scripts/font-subset-chars.txt，正楷、明朝處將回落系統字體：${shown}——跑 npm run fonts`);
+  warn("字體子集", `站內用字 ${missingGlyphs.length} 個不在 scripts/font-subset-chars.txt，明朝、正楷、老宋處將回落系統字體：${shown}——跑 npm run fonts`);
 }
 
 /* ---------- 結果 ---------- */

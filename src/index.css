@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: "JingHuaLaoSong";
-  src: url("./assets/fonts/JingHuaLaoSong.woff2") format("woff2");
+  src: url("./assets/fonts/JingHuaLaoSong.subset.woff2") format("woff2");
   font-display: swap;
 }
 

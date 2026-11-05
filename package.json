@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "oxlint && node scripts/check-data.js",
     "check-data": "node scripts/check-data.js",
+    "fonts": "node scripts/font-chars.js && python3 scripts/subset-fonts.py",
     "preview": "vite preview"
   },
   "dependencies": {

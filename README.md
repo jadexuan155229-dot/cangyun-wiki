@@ -18,6 +18,17 @@ npm run lint
 npm run build
 ```
 
+## 字体子集
+
+汇文正楷、汇文明朝只带站内用到的字（`scripts/font-subset-chars.txt`），表外之字会回落系统字体。写进新字后若 `check-data` 报「字體子集」警告，跑一次：
+
+```bash
+pip install fonttools brotli   # 首次
+npm run fonts
+```
+
+它先把站内用字补进字符表，再从 git 历史取出完整字体、重裁两枚子集，然后提交 `src/assets/fonts/` 下变动的两个文件即可。京华老宋是全量字体，不受影响。
+
 ## 链接体例（哈希路由）
 
 页签、打开的人物档案、文库章节都写入网址，可直接分享、刷新不丢、浏览器前进后退可用：

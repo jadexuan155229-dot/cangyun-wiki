@@ -10,6 +10,7 @@
 import { fc, CHARACTERS, EVENTS, RELATIONS, LOC_COORDS, TRACK_SUPPLEMENTS } from "../src/wiki-data.js";
 import { CHAR_TERMS } from "../src/novel/char-terms.js";
 import { SEAL_SVG_FILE } from "../src/seals.js";
+import { missingFontChars } from "./font-chars.js";
 import { readdirSync, existsSync } from "node:fs";
 
 const errors = [];
@@ -123,6 +124,15 @@ for (const [name, c] of Object.entries(LOC_COORDS)) {
   if (!KINDS.has(c.kind)) err(tag, `kind 非法：${c.kind}`);
   if (typeof c.x !== "number" || typeof c.y !== "number") err(tag, "缺 x/y 座標");
   if (c.kind === "off" && c.dir !== "西" && c.dir !== "東") err(tag, `off 條目 dir 須為「西」或「東」：${c.dir}`);
+}
+
+/* ---------- 字體子集 ----------
+   正楷、明朝只帶字符表所列之字，表外之字靜默回落系統字體——
+   站內用字有表外者即報；npm run fonts 補表並重裁子集後自消。 */
+const missingGlyphs = missingFontChars();
+if (missingGlyphs.length) {
+  const shown = missingGlyphs.slice(0, 40).join("") + (missingGlyphs.length > 40 ? "……" : "");
+  warn("字體子集", `站內用字 ${missingGlyphs.length} 個不在 scripts/font-subset-chars.txt，正楷、明朝處將回落系統字體：${shown}——跑 npm run fonts`);
 }
 
 /* ---------- 結果 ---------- */

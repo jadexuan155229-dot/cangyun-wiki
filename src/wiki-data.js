@@ -2173,6 +2173,29 @@ export const EVENTS = [
   { year: 765, month: 10, seq: null, fac: ["唐军"], loc: ["蜀中"], title: "郭英乂杀王崇俊、逼崔旰回成都，崔旰乘大雪败其军，郭英乂出奔被杀；柏茂琳、杨子琳、李昌夔起兵讨旰，蜀中大乱。程铎站朝廷委任的节度使，郭死后随柏茂琳诸将讨旰（待定；月份待核）", chars: ["chengduo"] },
   { year: 766, month: null, seq: null, fac: ["唐军"], loc: ["蜀中"], title: "杜鸿渐入蜀，姑息崔旰，分置东川；次年崔旰为西川节度使。讨旰诸将各得安置，程铎被闲置——守了一辈子的规矩，最后是规矩不要他（待定）", chars: ["chengduo"] },
   { year: 768, month: null, seq: null, fac: ["唐军", "唐门"], loc: ["蜀中"], title: "崔旰入朝，赐名崔宁，留弟崔宽守成都；杨子琳乘虚袭入，崔宁妾任氏出家财募兵，崔宽借此击退。杨子琳是程铎当年并肩讨旰的人，崔宁是他不肯认的人，而朝廷认的已是崔宁——他按规矩替崔宁守城，与唐遐同在一面城墙上。规矩没变，变的是规矩指着的人（待定）", chars: ["chengduo", "tangxia"] },
+  /* —— 2026-11-06 五毒线：736—746（与 Notion 同步）。成都一夜 745.6、大决战 745.7、收尾 746 依作者定稿；村寨与蝴蝶泉为新增地点，成都诸事系「蜀中」 —— */
+  { year: 736, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉出逃，途中加入五毒；来到这座西南山区村寨落脚，露出本事（据共创文本一：采蛛丝至溪山渡，遇村寨易主与毒蛛之祸，助卓沃平祸）", chars: ["manran", "zhuowo"] },
+  { year: 737, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉被沃家家长芒沃（女执政官）收为义女——名分而已：曼冉保留本姓 Rangs，不入沃家，不进继承顺位", chars: ["manran", "mangwo"] },
+  { year: 738, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉成为祭司", chars: ["manran"] },
+  { year: 739, month: 2, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "有寨民求医，曼冉以天一教秘法救治男童（天一教正太），男童痊愈后回到父母身边", chars: ["manran"] },
+  { year: 739, month: 10, seq: "D", fac: ["五毒"], loc: ["西南山区村落"], title: "稻谷入仓祭，曼冉带男童主祭，受寨民尊崇，称男童为「圣童」", chars: ["manran"] },
+  { year: 740, month: 6, seq: null, fac: ["五毒"], loc: ["西南山区村落", "蝴蝶泉"], title: "曼冉于蝴蝶泉边收留娜留、佩留并教导；姐妹父母是染织匠人，因「染料中有虫」被逐，迁居山中坠山而亡；姐妹把家传染法带进寨——寨中独有之布由此而来", chars: ["manran", "naliu", "peiliu"] },
+  { year: 740, month: 10, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉主祭，圣童第二年在旁，当场异状，天一教人暗中施术使其恢复，众人未觉；卓沃察觉，暗中收集曼冉勾连天一教、滥用禁术的证据，欲拉她下马", chars: ["manran", "zhuowo"] },
+  { year: 741, month: 2, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "男童病情反复，父母求医，曼冉借口将男童留下；天一教人趁虚而入，提供药方或术法（具体待定）", chars: ["manran"] },
+  { year: 741, month: 10, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉第三年主祭", chars: ["manran"] },
+  { year: 742, month: 2, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "芦笙节，卓沃发难，揭露曼冉滥用禁术，治男童之事公开，村民各执一词；诺朗当众讲述母亲以禁术救命之事，大祭司由此得到支持", chars: ["manran", "zhuowo", "nuolangqi", "niya"] },
+  { year: 742, month: 3, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉与卓沃冲突，借力尼亚得胜，将卓沃控制起来，政教又合一", chars: ["manran", "zhuowo", "niya"] },
+  { year: 742, month: 7, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "男童死亡、化为毒尸，适逢父母探望，曼冉灭口", chars: ["manran"] },
+  { year: 742, month: 8, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "天一教掌握曼冉灭口一事，要挟她相助，始渗透村寨；曼冉意图摆脱压制，转而改造、控制男童以自强", chars: ["manran", "naliu", "peiliu"] },
+  { year: 743, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "天一教叛乱，控制村寨", chars: ["manran", "naliu", "peiliu"] },
+  { year: 744, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "曼冉试图完全控制男童；娜留或已唤醒男童意识（待定）", chars: ["manran", "naliu"] },
+  { year: 745, month: null, seq: null, fac: ["史实"], loc: ["南诏"], title: "章仇兼琼开步头路（云南通交州），筑安宁城；东爨诸部起兵杀筑城者，朝廷令蒙归义（皮逻阁）弹压，南诏借爨氏内斗吞并其地。底色：蒙萍换蛊即为此局；安宁盐路由此断绝，卓沃的盐成了筹码", chars: [] },
+  { year: 745, month: 6, seq: null, fac: ["五毒", "唐门"], loc: ["蜀中"], title: "成都一夜：佩留交割特殊药材后灭口南诏商人蒙萍；央馨为截换天一教药材冒充商人入仓库，死于唐哲小组伏击，尸身随仓库焚毁，唐哲私藏其驱蚊小球；杨钊扣下布料与药材，照单全收。监视唐哲者为谁，暂未定", chars: ["peiliu", "yangxin", "tangzhe", "tangxuan"] },
+  { year: 745, month: 7, seq: null, fac: ["五毒"], loc: ["西南山区村落"], title: "大决战：成都一夜后天一教缺药、毒尸狂暴；曼冉放出卓沃共抗天一教，圣童出手终结毒尸；大祭司一方损失惨重，娜留或死于此役；卓沃趁虚而入", chars: ["manran", "zhuowo", "naliu"] },
+  { year: 745, month: null, seq: null, fac: ["史实"], loc: ["蜀中", "长安"], title: "秋，杨钊携春彩入京，另携郫地蜀货「可直万缗」，分赠诸姊并称「此章仇公所赠也」；得出入禁中，改金吾兵曹参军。杨钊时为章仇兼琼推官，由采访支使鲜于仲通引荐。底色：春彩即成都一夜被扣之布", chars: [] },
+  { year: 746, month: null, seq: null, fac: ["五毒"], loc: ["西南山区村落", "蝴蝶泉"], title: "五毒线收尾：佩留任大祭司并统领村寨，政教又合一；曼冉与尼亚远走；诺朗带佩留回蝴蝶泉；卓沃再次远走，带商队另开盐路（盐路已断、男子只能代掌，佩留握圣童与染法）", chars: ["peiliu", "manran", "niya", "nuolangqi", "zhuowo", "naliu", "luwanyue"] },
+  { year: 746, month: 4, seq: null, fac: ["五毒", "唐门"], loc: [], title: "陆晚月去西南", chars: ["luwanyue"] },
+  { year: 746, month: null, seq: null, fac: ["唐门"], loc: ["蜀中"], title: "陆晚月在成都遇见唐哲", chars: ["luwanyue", "tangzhe"] },
 ];
 
 /* ---------- 關係（悉依《人山人海·人物关系》庫；d:1單向 甲→乙，ph殁后延续，da虚线） ---------- */
@@ -2493,6 +2516,8 @@ export const LOC_COORDS = {
   "蜀中":        { x: 524, y: 435, kind: "region", rx: 44, ry: 30, la: "w" },
   "药宗故地":    { x: 924, y: 120, kind: "sect", la: "w", note: "北天药宗，渤海国境，龙泉府东北、北临天池" },
   "南诏":        { x: 465, y: 549, kind: "city", la: "s" },
+  "蝴蝶泉":      { x: 447, y: 527, kind: "sect", la: "w", note: "五毒线落点示意：取大理苍山云弄峰下蝴蝶泉" },
+  "西南山区村落": { x: 519, y: 507, kind: "city", la: "e", note: "五毒线村寨（共创文本称溪山渡），虚构；落点示意取乌蒙山一带，北通戎州、成都，南接爨地盐路" },
   /* —— 域外遠地：離圖框 —— */
   "波斯":        { kind: "off", dir: "西", x: 36, y: 296, note: "萨珊故地" },
   "疾陵城":      { kind: "off", dir: "西", x: 36, y: 320, note: "波斯都督府治" },

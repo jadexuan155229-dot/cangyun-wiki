@@ -1090,13 +1090,13 @@ export const CHARACTERS = [
     id: "peiliu", name: "佩留", zi: "Pet Liuf", belong: ["五毒"], birth: 728, death: null,
     birthplace: "蝴蝶谷（？）", pin: "", epithet: "", hao: "",
     gloss: "Pet，雪花；Liuf，苗姓，意为蝴蝶。",
-    profile: F("五毒姐妹中的妹妹。", "", "", "", "", "", "", ""),
+    profile: F("五毒姐妹中的妹妹。745 年夏成都一夜，奉大祭司之命交割特殊药材后灭口南诏商人蒙萍；746 年继任大祭司，统领村寨。", "", "", "", "", "", "", ""),
   },
   {
-    id: "yangxin", name: "央馨", zi: "Vangb Xenb", belong: ["五毒"], birth: 726, death: null,
+    id: "yangxin", name: "央馨", zi: "Vangb Xenb", belong: ["五毒"], birth: 726, death: 745,
     birthplace: "", pin: "", epithet: "", hao: "",
     gloss: "Vangb，簸箕；Xenb，女名后缀，无实义。",
-    profile: F("五毒中人。", "", "", "", "", "", "", ""),
+    profile: F("五毒中人，反天一教，唐玄伴侣。745 年夏成都一夜，为截换天一教药材赴客栈，撞见南诏商人蒙萍尸身，冒充商人随伙计入仓库，死于唐门伏击，尸身随仓库焚毁；唐玄只知她失踪。", "", "", "", "", "", "", ""),
   },
   {
     id: "manran", name: "曼冉", zi: "Mait Rangs", belong: ["五毒"], birth: 716, death: null,
@@ -1120,7 +1120,7 @@ export const CHARACTERS = [
     id: "mangwo", name: "芒沃", zi: "Mangx Vos", belong: ["苗疆"], birth: null, death: null,
     birthplace: "", pin: "", epithet: "", hao: "",
     gloss: "Mangx，枫木——苗族以枫木为生命之源，枫木生蝴蝶之母妹榜妹留（Mais Bangx Mais Lief）；Vos，苗姓，见卓沃条。",
-    profile: F("女执政官。沃家（执政家族）家长，纽沃、卓沃之母。737年收曼冉为义女。", "", "", "", "", "", "", ""),
+    profile: F("女执政官。沃家（执政家族）家长，纽沃、卓沃之母。737年收曼冉为义女——名分而已，曼冉保留本姓、不入沃家、不进继承顺位。", "", "", "", "", "", "", ""),
   },
   {
     id: "niuwo", name: "纽沃", zi: "Hniub Vos", belong: ["苗疆"], birth: null, death: 736,
@@ -2261,7 +2261,7 @@ export const RELATIONS = [
   { a: "mayi", b: "caiyao", t: "有情", y1: 757 },
   /* —— 以下增補：唐门／五毒／七秀／丐帮四派，依作者训诂文本所载关系 —— */
   { a: "tangzhe", b: "tangxuan", t: "亲缘·收养", y0: 730 },
-  { a: "tangxuan", b: "yangxin", t: "伴侣" },
+  { a: "tangxuan", b: "yangxin", t: "伴侣", y1: 745, ph: 1 },
   { a: "tangchi", b: "wangji", t: "伴侣" },
   { a: "tangxia", b: "chengduo", t: "伴侣" },
   { a: "tangqingyang", b: "chengduo", t: "嫌隙·旧部" },
